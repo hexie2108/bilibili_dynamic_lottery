@@ -70,8 +70,6 @@ function getRepostUser(event) {
 
     event.preventDefault();
 
-    //隐藏游戏页面
-    $('#main').fadeOut();
 
     let $linkInput = $('#dynamic_link');
     let $inputErrorText = $('#dynamic_link_error_text');
@@ -110,6 +108,7 @@ function getRepostUser(event) {
             dynamicLink = dynamicLink.slice(0, index);
         }
 
+        //如果地址错误
         if (isNaN(dynamicLink)) {
             $linkInput.addClass('is-invalid ');
             $inputErrorText.html("动态地址填写错误");
@@ -202,8 +201,6 @@ function sendRequest(dynamicId) {
     function onComplete() {
         //隐藏进度条
         $loading.fadeOut('slow');
-        //激活按钮
-        $('#get-button').removeAttr('disabled');
     }
 
 
