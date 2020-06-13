@@ -25,11 +25,12 @@
 
 </head>
 <body>
-<div class="container-fluid w-75 mx-auto my-3">
+<div class="container-fluid w-75 mx-auto mt-3 mb-5">
 
     <header class="text-center">
         <h2 class="my-3">B站动态转发抽奖系统</h2>
-        <p>本页面使用 HTML+CSS+JS+Jquery完成, 可以从B站动态中提取出转发过的用户列表, 之后随即选出一位中奖者</p>
+        <p>本页面使用 HTML+CSS+JS+Jquery完成, 可以从B站动态中提取出转发过的用户列表, 之后通过自动游戏的方式选出一位中奖者</p>
+		  <p>@河蟹 | 初音社 www.mikuclub.org | Github仓库名 bilibili_dynamic_lottery , 由于时间紧, 本着能用就行的原则, 我代码是写的各种魔幻, 后续也没时间优化, 如果如果有人感兴趣 欢迎来改进下. </p>
         <div class="">
 
             <div class="input-group my-3 w-50 mx-auto">
@@ -158,10 +159,14 @@
                 <h3 class="message text-center"></h3>
             </div>
 
-            <audio src="sound/swoard.wav"></audio>
-            <audio src="sound/spear.wav" ></audio>
-            <audio src="sound/arrow.wav" ></audio>
-
+            <audio class="attack" src="sound/sword.wav"></audio>
+            <audio class="attack" src="sound/spear.wav" ></audio>
+            <audio class="attack" src="sound/arrow.wav" ></audio>
+			<audio class="death" src="sound/death.wav" ></audio>
+            <audio class="death" src="sound/death2.wav" ></audio>
+			<audio class="hurt" src="sound/hurt.wav" ></audio>
+            <audio class="hurt" src="sound/hurt2.wav" ></audio>
+            <audio class="hurt" src="sound/hurt3.wav" ></audio>
         </div>
         <div class="sidebar col-3">
 

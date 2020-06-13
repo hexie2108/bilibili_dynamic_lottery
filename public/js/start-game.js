@@ -85,7 +85,7 @@ function startGame() {
     //定时1秒后开始攻击
     setTimeout(function () {
         attack();
-    }, actionInterval*5);
+    }, actionInterval * 5);
 }
 
 
@@ -144,35 +144,34 @@ function attack() {
     //如果是默认未暂停状态
     if (!stopAttack) {
 
-        let attacker, defender, $attackElement, $defenderElement, marginEffectStart, marginEffectEnd;
+        let attacker, defender, $attackElement, $defenderElement, moveAnimationStart, moveAnimationEnd;
+
 
         if (leftFirstAttack) {
             attacker = leftPlayer;
             defender = rightPlayer;
             $attackElement = $('.main .left-player');
             $defenderElement = $('.main .right-player');
-            marginEffectStart = {marginLeft : '200px'};
-            marginEffectEnd = {marginLeft : '0px'};
-
+            moveAnimationStart = {marginLeft: '200px'};
+            moveAnimationEnd = {marginLeft: '0px'};
         }
         else {
             attacker = rightPlayer;
             defender = leftPlayer;
             $attackElement = $('.main .right-player');
             $defenderElement = $('.main .left-player');
-            marginEffectStart = {marginRight : '100px'};
-            marginEffectEnd = {marginRight : '0px'};
+            moveAnimationStart = {marginRight: '100px'};
+            moveAnimationEnd = {marginRight: '0px'};
         }
 
 
         printMessage(`"<b class="text-info">${attacker.name}</b>" 发动了攻击`);
 
         //攻击动画
-        $attackElement.find('img').animate(marginEffectEnd, actionInterval, function () {
+        $attackElement.find('img').animate(moveAnimationEnd, actionInterval, function () {
             //插入攻击音效
-            $('audio').eq(attacker.career).trigger('play');
-        }).animate(marginEffectStart, actionInterval/2).animate(marginEffectEnd, actionInterval/2);
-
+            $('audio.attack').eq(attacker.career).trigger('play');
+        }).animate(moveAnimationStart, actionInterval / 2).animate(moveAnimationEnd, actionInterval / 2);
 
 
         //手动延时
@@ -193,17 +192,17 @@ function attack() {
                 }
 
                 //必杀伤害 加倍
-                if(getRandomInt(0, 100) < 10){
+                if (getRandomInt(0, 100) < 10) {
                     damage *= 2;
                     printMessage(`<p class="text-danger">"${attacker.name}" 使出了必杀一击, 对 "${defender.name}" 造成了 <b>${damage}</b> 点 必杀伤害</p>`);
                 }
-                else{
+                else {
                     printMessage(`"<b class="text-info">${defender.name}</b>" 受到了 <b class="text-danger">${damage}</b> 点 伤害`);
                 }
 
 
                 //受伤害特效
-                $defenderElement.find('img').fadeOut(actionInterval/5).fadeIn(actionInterval/5).fadeOut(actionInterval/5).fadeIn(actionInterval/5);
+                $defenderElement.find('img').fadeOut(actionInterval / 5).fadeIn(actionInterval / 5).fadeOut(actionInterval / 5).fadeIn(actionInterval / 5);
 
                 //血量更新
                 changeHp(defender, $defenderElement, -damage);
@@ -213,10 +212,12 @@ function attack() {
 
                     //头像变黑白
                     $defenderElement.find('img').addClass('death').css('filter', 'grayscale(1)');
+                    //插入死亡音效
+                    $('audio.death').eq(getRandomInt(0, 1)).trigger('play');
                     //1秒后退出通知
                     setTimeout(function () {
                         printMessage(`"<b class="text-info">${defender.name}</b>" 已退出战场`);
-                    }, actionInterval*2);
+                    }, actionInterval * 2);
 
 
                     //2秒后重选开始新游戏
@@ -228,23 +229,29 @@ function attack() {
                         else {
                             win(attacker);
                         }
-                    }, actionInterval*5);
+                    }, actionInterval * 5);
 
                 }
                 else {
+                    //插入受伤音效
+                    $('audio.hurt').eq(getRandomInt(0, 2)).trigger('play');
                     //等待下一轮攻击
-                    setTimeout(attack, actionInterval*2);
+                    setTimeout(attack, actionInterval * 2);
                 }
             }
             else {
+
+                //闪避动画
+                $defenderElement.find('img').animate(moveAnimationStart, actionInterval / 2).animate(moveAnimationEnd, actionInterval / 2);
+
                 printMessage(`攻击未命中`);
                 //等待下一轮攻击
-                setTimeout(attack, actionInterval*2);
+                setTimeout(attack, actionInterval * 2);
             }
 
             //下轮让对方攻击
             leftFirstAttack = !leftFirstAttack;
-        }, actionInterval*2)
+        }, actionInterval * 2)
     }
 
 }
@@ -256,6 +263,8 @@ function attack() {
 function win(winner) {
     let $text = `胜利者出现了~ 恭喜 "<b class="text-danger">${winner.name}</b>" 获得了最终的胜利, 稍后将会私信联系您</b>`;
     printMessage($text);
+    //暂停时间计时
+    clearInterval(timeInterval);
 }
 
 /**

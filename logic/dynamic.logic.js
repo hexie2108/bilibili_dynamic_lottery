@@ -2,7 +2,7 @@
 const http = require('./conn.util');
 const Users = require('../class/Users');
 
-const URL = process.env.BILIBILI_DYNAMIC_REPOST_API;
+const URL = process.env.BILIBILI_DYNAMIC_REPOST_API || 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
 
 async function getDynamicRepostList(dynamic_id) {
 
