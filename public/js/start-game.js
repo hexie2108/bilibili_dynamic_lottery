@@ -192,7 +192,7 @@ function attack() {
                 }
 
                 //必杀伤害 加倍
-                if (getRandomInt(0, 100) < 10) {
+                if (getRandomInt(0, 100) < attacker.mortality) {
                     damage *= 2;
                     printMessage(`<p class="text-danger">"${attacker.name}" 使出了必杀一击, 对 "${defender.name}" 造成了 <b>${damage}</b> 点 必杀伤害</p>`);
                 }

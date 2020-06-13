@@ -19,10 +19,12 @@ const CAREERS = [
         range: {
             attackMin: 30,
             attackMax: 40,
-            defendMin: 0,
-            defendMax: 5,
+            defendMin: 5,
+            defendMax: 10,
             dodgeMin: 0,
-            dodgeMax: 10
+            dodgeMax: 10,
+            mortalityMin: 0,
+            mortalityMax: 5,
         }
     },
     {
@@ -30,21 +32,25 @@ const CAREERS = [
         range: {
             attackMin: 25,
             attackMax: 35,
-            defendMin: 5,
-            defendMax: 10,
+            defendMin: 10,
+            defendMax: 15,
             dodgeMin: 10,
-            dodgeMax: 20
+            dodgeMax: 20,
+            mortalityMin: 5,
+            mortalityMax: 10,
         }
     },
     {
         name: '弓手',
         range: {
             attackMin: 20,
-            attackMax: 30,
+            attackMax: 25,
             defendMin: 0,
             defendMax: 5,
-            dodgeMin: 30,
-            dodgeMax: 50
+            dodgeMin: 20,
+            dodgeMax: 40,
+            mortalityMin: 10,
+            mortalityMax: 20,
         }
     }
 ];
@@ -64,6 +70,8 @@ function getRepostUser(event) {
 
     event.preventDefault();
 
+    //隐藏游戏页面
+    $('#main').fadeOut();
 
     let $linkInput = $('#dynamic_link');
     let $inputErrorText = $('#dynamic_link_error_text');
@@ -82,8 +90,7 @@ function getRepostUser(event) {
         $inputErrorText.fadeIn('slow');
     }
     else {
-        //注销按钮
-        $(event.target).attr('disabled', true);
+
 
         //移除错误提示
         $linkInput.removeClass('is-invalid ');
@@ -103,7 +110,15 @@ function getRepostUser(event) {
             dynamicLink = dynamicLink.slice(0, index);
         }
 
-        sendRequest(dynamicLink)
+        if (isNaN(dynamicLink)) {
+            $linkInput.addClass('is-invalid ');
+            $inputErrorText.html("动态地址填写错误");
+            $inputErrorText.fadeIn('slow');
+        }
+        else {
+
+            sendRequest(dynamicLink);
+        }
 
     }
 
@@ -116,10 +131,15 @@ function getRepostUser(event) {
  */
 function sendRequest(dynamicId) {
 
+    //注销按钮
+    $('#get-button').attr('disabled', true);
+
     console.log("获取动态ID " + dynamicId)
 
     //列表
     let $userListElement = $('.user-list');
+    //清空列表
+    $userListElement.empty();
 
     let $loading = $('#loading');
     //现实进度条
@@ -182,6 +202,8 @@ function sendRequest(dynamicId) {
     function onComplete() {
         //隐藏进度条
         $loading.fadeOut('slow');
+        //激活按钮
+        $('#get-button').removeAttr('disabled');
     }
 
 
@@ -199,9 +221,10 @@ function generateCareer(user) {
     let careerIndex = getRandomInt(0, CAREERS.length - 1);
     gameData.career = careerIndex;
     gameData.hp = 100;
-    gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin + user.level * 2, CAREERS[careerIndex].range.attackMax + user.level * 2);
-    gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin + user.level * 2, CAREERS[careerIndex].range.defendMax + user.level * 2);
-    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 2, CAREERS[careerIndex].range.dodgeMax + user.level * 2);
+    gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin + user.level * 3, CAREERS[careerIndex].range.attackMax + user.level * 3);
+    gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin + user.level * 3, CAREERS[careerIndex].range.defendMax + user.level * 3);
+    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 3, CAREERS[careerIndex].range.dodgeMax + user.level * 3);
+    gameData.mortality = getRandomInt(CAREERS[careerIndex].range.mortalityMin + user.level * 2, CAREERS[careerIndex].range.mortalityMax + user.level * 2);
 
     return gameData;
 
