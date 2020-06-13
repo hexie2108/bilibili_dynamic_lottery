@@ -1,8 +1,6 @@
-const BACKEND_URL = 'http://localhost:3000/dynamic/';
+const BACKEND_URL = document.location.href + 'dynamic/';
 
 const BILIBILI_URL = 'bilibili.com';
-
-
 
 
 //背景颜色类名列表
@@ -198,12 +196,12 @@ function generateCareer(user) {
     let gameData = {};
 
     //随机职业ID
-    let careerIndex = getRandomInt(0, CAREERS.length-1);
+    let careerIndex = getRandomInt(0, CAREERS.length - 1);
     gameData.career = careerIndex;
     gameData.hp = 100;
-    gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin+user.level*2, CAREERS[careerIndex].range.attackMax+user.level*2);
-    gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin+user.level*2, CAREERS[careerIndex].range.defendMax+user.level*2);
-    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin+user.level*2, CAREERS[careerIndex].range.dodgeMax+user.level*2);
+    gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin + user.level * 2, CAREERS[careerIndex].range.attackMax + user.level * 2);
+    gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin + user.level * 2, CAREERS[careerIndex].range.defendMax + user.level * 2);
+    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 2, CAREERS[careerIndex].range.dodgeMax + user.level * 2);
 
     return gameData;
 
