@@ -12,7 +12,7 @@ var dynamic= require('./routes/dynamic');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/', index);BILIBILI_DYNAMIC_REPOST_API
+app.use('/', index);
 app.use('/dynamic', dynamic);
 
 app.listen(PORT, function(){
