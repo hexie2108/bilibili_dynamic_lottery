@@ -40,7 +40,9 @@ class Users extends Array {
             for (let i = 0; i < items.length; i++) {
                 let user = new User(items[i]);
 
-                if (!user.isNull()) {
+
+                //如果用户数据不完整, 或者 已经存在过 (避免重复转发)
+                if (!user.isNull() && !this.find(element => element.uid === user.uid) ) {
                     this.push(user);
                 }
             }
