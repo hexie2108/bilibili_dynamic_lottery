@@ -129,6 +129,8 @@ function selectNewPlayer($playerElement, isLeft) {
     $playerElement.find('.attack').html(user.attack);
     $playerElement.find('.defend').html(user.defend);
     $playerElement.find('.dodge').html(user.dodge);
+    $playerElement.find('.mortality').html(user.mortality);
+
     $playerElement.find('.badge-level').empty().append(badgeLevel);
     $playerElement.find('.badge-career').empty().append(badgeCareer);
 
