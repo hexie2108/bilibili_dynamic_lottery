@@ -17,10 +17,10 @@ const CAREERS = [
     {
         name: '骑士',
         range: {
-            attackMin: 30,
-            attackMax: 40,
-            defendMin: 5,
-            defendMax: 10,
+            attackMin: 25,
+            attackMax: 35,
+            defendMin: 10,
+            defendMax: 15,
             dodgeMin: 0,
             dodgeMax: 10,
             mortalityMin: 0,
@@ -30,12 +30,12 @@ const CAREERS = [
     {
         name: '枪兵',
         range: {
-            attackMin: 25,
-            attackMax: 35,
-            defendMin: 10,
-            defendMax: 15,
-            dodgeMin: 10,
-            dodgeMax: 20,
+            attackMin: 30,
+            attackMax: 40,
+            defendMin: 5,
+            defendMax: 10,
+            dodgeMin: 5,
+            dodgeMax: 15,
             mortalityMin: 5,
             mortalityMax: 10,
         }
@@ -43,12 +43,12 @@ const CAREERS = [
     {
         name: '弓手',
         range: {
-            attackMin: 20,
-            attackMax: 25,
+            attackMin: 25,
+            attackMax: 30,
             defendMin: 0,
             defendMax: 5,
-            dodgeMin: 20,
-            dodgeMax: 40,
+            dodgeMin: 10,
+            dodgeMax: 30,
             mortalityMin: 10,
             mortalityMax: 20,
         }
@@ -220,7 +220,7 @@ function generateCareer(user) {
     gameData.hp = 100;
     gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin + user.level * 3, CAREERS[careerIndex].range.attackMax + user.level * 3);
     gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin + user.level * 3, CAREERS[careerIndex].range.defendMax + user.level * 3);
-    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 3, CAREERS[careerIndex].range.dodgeMax + user.level * 3);
+    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 1, CAREERS[careerIndex].range.dodgeMax + user.level * 1);
     gameData.mortality = getRandomInt(CAREERS[careerIndex].range.mortalityMin + user.level * 2, CAREERS[careerIndex].range.mortalityMax + user.level * 2);
 
     return gameData;

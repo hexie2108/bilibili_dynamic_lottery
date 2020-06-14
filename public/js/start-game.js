@@ -96,8 +96,11 @@ function startGame() {
  */
 function selectNewPlayer($playerElement, isLeft) {
 
-    let randomIndex = getRandomInt(0, USER_LIST.length - 1);
-
+	//随机选择
+    //let randomIndex = getRandomInt(0, USER_LIST.length - 1);
+	//选择第一个
+	let randomIndex = 0;
+ 
     //提取被选中用户
     let user = USER_LIST[randomIndex];
 

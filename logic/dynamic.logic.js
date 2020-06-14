@@ -45,6 +45,10 @@ async function getDynamicRepostList(dynamic_id) {
         };
     }
     else {
+		
+		//重新排序
+		 users.sort(() => Math.random() - 0.5);
+		
         result = {
             body: users,
             status: 200
