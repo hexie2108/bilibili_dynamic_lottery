@@ -50,7 +50,7 @@ const CAREERS = [
             dodgeMin: 10,
             dodgeMax: 30,
             mortalityMin: 10,
-            mortalityMax: 20,
+            mortalityMax: 25,
         }
     }
 ];
@@ -220,7 +220,7 @@ function generateCareer(user) {
     gameData.hp = 100;
     gameData.attack = getRandomInt(CAREERS[careerIndex].range.attackMin + user.level * 3, CAREERS[careerIndex].range.attackMax + user.level * 3);
     gameData.defend = getRandomInt(CAREERS[careerIndex].range.defendMin + user.level * 3, CAREERS[careerIndex].range.defendMax + user.level * 3);
-    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 1, CAREERS[careerIndex].range.dodgeMax + user.level * 1);
+    gameData.dodge = getRandomInt(CAREERS[careerIndex].range.dodgeMin + user.level * 1, CAREERS[careerIndex].range.dodgeMax + user.level * 2);
     gameData.mortality = getRandomInt(CAREERS[careerIndex].range.mortalityMin + user.level * 2, CAREERS[careerIndex].range.mortalityMax + user.level * 2);
 
     return gameData;
