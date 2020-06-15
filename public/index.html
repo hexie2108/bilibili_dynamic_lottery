@@ -39,7 +39,7 @@
 
             <form class="form-inline col-12">
 
-                <div class="input-group input-group-lg my-3 mx-auto col-8">
+                <div class="input-group input-group-lg my-3 mx-auto col-6">
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="dynamic_link">动态地址</label>
                     </div>
@@ -47,12 +47,20 @@
                            placeholder="https://t.bilibili.com/xxx"/>
                 </div>
 
-                <div class="input-group  input-group-lg  my-3 mx-auto col-4">
+                <div class="input-group  input-group-lg  my-3 mx-auto col-3">
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="winner-number">抽选人数</label>
                     </div>
                     <input class="form-control " type="number" id="winner-number" name="winner-number"
                            value="1" min="1"/>
+                </div>
+
+                <div class="input-group  input-group-lg  my-3 mx-auto col-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="level-filter">等级墙</label>
+                    </div>
+                    <input class="form-control " type="number" id="level-filter" name="level-filter" value="0" min="0"
+                        max="6"/>
                 </div>
 
             </form>

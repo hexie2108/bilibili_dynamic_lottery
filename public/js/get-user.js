@@ -6,10 +6,20 @@ const BILIBILI_URL = 'bilibili.com';
 $(function () {
 
     $('.get-button').on('click', getRepostUser);
+    //监听等级墙变化
+    $('#level-filter').on('change', resetLevelFilter);
 
 
 
 });
+
+/**
+ * 等级墙变更后禁用开始抽选按钮
+ */
+function resetLevelFilter() {
+    //禁用开始抽选按钮
+    $('.start-button').attr('disabled', true);
+}
 
 /**
  * 获取用户列表
@@ -81,6 +91,8 @@ function getRepostUser(event) {
  */
 function sendRequest(dynamicId) {
 
+    //将被中断标记置为真
+    IS_INTERRUPED = true
     let $toast = $('.toast1');
     //列表
     let $userListElement = $('.user-list');
@@ -90,8 +102,12 @@ function sendRequest(dynamicId) {
     //清空数据列表
     USER_LIST.length = 0;
 
+    //获取等级墙
+    let levelFilter = $('#level-filter').val();
+    //关闭抽选进行中的Toast
+    $('.toast2').toast('hide');
     //注销按钮
-    $('#get-button').attr('disabled', true);
+    $('.get-button').attr('disabled', true);
     //显示模态加载窗口
     $('.modal').modal('show');
 
@@ -111,21 +127,27 @@ function sendRequest(dynamicId) {
             //遍历每个元素
             data.forEach(function (user) {
 
-                //保存到全局列表
-                USER_LIST.push(user);
+                // 等级过滤
+                if (user.level >= levelFilter) {
 
-                //创建插入元素到页面
-                let newElement = `
+                    //保存到全局列表
+                    USER_LIST.push(user);
+
+                    //创建插入元素到页面
+                    let newElement = `
 <div class="border col-3 m-2 rounded">
+    <a href="https://space.bilibili.com/${user.uid}" id="user-link" target="_blank">
     <img class="img-fluid rounded-circle m-1" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
     <span class="m-1 name small">
         ${user.name}
     </span>
+    </a>
     <span class="badge ${getBgColorClass(user.level - 1)} m-1">
         Lv ${user.level}
     </span>
 </div>`;
-                $userListElement.append(newElement);
+                    $userListElement.append(newElement);
+                }
             });
 
             // 激活按钮
@@ -194,5 +216,3 @@ function getBgColorClass(index) {
     return BG_CLASSES[index];
 
 }
-
-

@@ -29,7 +29,8 @@ $(function () {
  */
 function startGame() {
 
-
+    // 开始新的抽选, 中断结束
+    IS_INTERRUPED = false
     //如果剩余人数大于要抽选的人数, 继续抽选
     if (USER_LIST.length > winnerNumber) {
 
@@ -44,13 +45,14 @@ function startGame() {
             USER_LIST.splice(randomIndex, 1);
             //更新剩余数量显示
             $('.toast2 .toast-body').html("剩余: " + USER_LIST.length);
-            //定时下个循环
-            setTimeout(startGame, removeSpeed());
+            //定时下个循环, 发生中断后中止循环
+            if (!IS_INTERRUPED) {
+                setTimeout(startGame, removeSpeed());
+            }
         });
 
-
-    } else {
-
+    //没有发生中断才能正常结束
+    } else if (!IS_INTERRUPED) {
         endGame();
     }
 
@@ -91,4 +93,3 @@ function removeSpeed() {
 
 
 }
-

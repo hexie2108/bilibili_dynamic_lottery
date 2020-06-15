@@ -16,3 +16,18 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+#user-link {
+    color: #6d757a;
+    text-decoration: none;
+}
+
+#user-link:hover {
+    color: #6d757a;
+    text-decoration: none;
+}
+
+#user-link:visited {
+    color: #6d757a;
+    text-decoration: none;
+}
