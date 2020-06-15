@@ -9,7 +9,7 @@
 }
 
 .user-list .name {
-    width: 50%;
+    width: 40%;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -17,17 +17,3 @@
     vertical-align: middle;
 }
 
-#user-link {
-    color: #6d757a;
-    text-decoration: none;
-}
-
-#user-link:hover {
-    color: #6d757a;
-    text-decoration: none;
-}
-
-#user-link:visited {
-    color: #6d757a;
-    text-decoration: none;
-}

@@ -10,7 +10,6 @@ $(function () {
     $('#level-filter').on('change', resetLevelFilter);
 
 
-
 });
 
 /**
@@ -92,7 +91,7 @@ function getRepostUser(event) {
 function sendRequest(dynamicId) {
 
     //将被中断标记置为真
-    IS_INTERRUPED = true
+    isInterrupted = true
     let $toast = $('.toast1');
     //列表
     let $userListElement = $('.user-list');
@@ -136,11 +135,9 @@ function sendRequest(dynamicId) {
                     //创建插入元素到页面
                     let newElement = `
 <div class="border col-3 m-2 rounded">
-    <a href="https://space.bilibili.com/${user.uid}" id="user-link" target="_blank">
-    <img class="img-fluid rounded-circle m-1" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
-    <span class="m-1 name small">
-        ${user.name}
-    </span>
+    <a href="https://space.bilibili.com/${user.uid}" id="user-link" target="_blank" class="text-dark text-decoration-none">
+        <img class="img-fluid rounded-circle m-1" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
+        <span class="m-1 name small">${user.name}</span>
     </a>
     <span class="badge ${getBgColorClass(user.level - 1)} m-1">
         Lv ${user.level}
@@ -179,7 +176,6 @@ function sendRequest(dynamicId) {
 
 
 }
-
 
 
 /**
