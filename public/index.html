@@ -22,175 +22,110 @@
     <script src="js/start-game.js"></script>
 
 
+
+
     <title>B站动态转发抽奖系统</title>
 
 
 </head>
 <body>
-<div class="container-fluid w-75 mx-auto mt-3 mb-5">
+<div class="container-fluid w-75 mx-auto mt-3 mb-5" style="min-height: 950px">
 
     <header class="text-center">
-        <h2 class="my-3">B站动态转发抽奖系统</h2>
+        <h2 class="my-3">B站动态转发抽奖系统V2</h2>
         <p>本页面使用 HTML+CSS+JS+Jquery完成, 可以从B站动态中提取出转发过的用户列表, 之后通过自动游戏的方式选出一位中奖者</p>
-		  <p>@河蟹 | 初音社 www.mikuclub.org | Github仓库名 bilibili_dynamic_lottery , 由于时间紧, 本着能用就行的原则, 我代码是写的各种魔幻, 后续也没时间优化, 如果如果有人感兴趣 欢迎来改进下. </p>
-        <div class="">
 
-            <div class="input-group my-3 w-50 mx-auto">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="dynamic_link">动态地址</label>
+        <div class="row">
+
+            <form class="form-inline col-12">
+
+                <div class="input-group input-group-lg my-3 mx-auto col-8">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="dynamic_link">动态地址</label>
+                    </div>
+                    <input class="form-control " type="text" id="dynamic_link" name="dynamic_link"
+                           placeholder="https://t.bilibili.com/xxx"/>
                 </div>
-                <input class="form-control " type="text" id="dynamic_link" name="dynamic_link"
-                       placeholder="https://t.bilibili.com/xxx"/>
-            </div>
-            <div id="dynamic_link_error_text" class="text-center text-danger my-3" style="display: none">
-                错误信息
-            </div>
-            <div>
-                <button id="get-button" class="btn btn-primary mx-2">获取转发列表</button>
-                <button id="start-button" class="btn btn-info mx-2" disabled>开始游戏</button>
-                <button id="speed-up-button" class="btn btn-secondary mx-2" disabled>加速游戏</button>
-                <button id="stop-button" class="btn btn-warning mx-2" disabled>暂停游戏</button>
+
+                <div class="input-group  input-group-lg  my-3 mx-auto col-4">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="winner-number">抽选人数</label>
+                    </div>
+                    <input class="form-control " type="number" id="winner-number" name="winner-number"
+                           value="1" min="1"/>
+                </div>
+
+            </form>
+
+
+            <div class="col-12 row my-3">
+                <div class="col-6">
+                    <button id="" class="get-button btn btn-primary  w-75 btn-lg">获取转发用户</button>
+                </div>
+                <div class="col-6">
+                    <button id="" class="start-button btn btn-info w-75  btn-lg" disabled>开始抽选</button>
+                </div>
+
             </div>
 
 
-        </div>
-
-        <div id="loading" class="spinner-border text-primary my-3" role="status" style="display: none">
-            <span class="sr-only">Loading...</span>
         </div>
 
 
     </header>
 
-    <div class="row my-4">
+    <hr/>
 
-        <div class="col-9">
+    <div class="user-list row justify-content-center">
 
-
-            <div class="row my-2">
-                <h4 class="col-12 my-2">规则说明:</h4>
-                <p class="col-12 my-2">兵种介绍: 骑士最猛, 但是闪避低, 枪兵 中庸, 弓手 是高闪避流. | 基础属性: 攻击,防御,必杀, 闪避 (是不是眼熟, 没错老火焰纹章玩家了) | 先手攻击: 随机</p>
-                <p class="col-12 my-2">兵种相克: (2倍伤害): 骑士克弓兵, 弓兵克枪兵, 枪兵克骑兵 | 等级: B站高等级用户在属性上有加成 | 必杀(额外双倍伤害): 每次攻击有一定几率发动 </p>
-
-            </div>
-
-            <div class="row main my-3" style="display: none">
-                <div class="col-6 ">
-                    <h3 class="time text-center"></h3>
-                </div>
-                <div class="col-6 ">
-                    <h3 class="user-number text-center"></h3>
-                </div>
-            </div>
-
-
-
-            <div class="row main my-3" style="display: none">
-
-                <div class="col-5 left-player">
-                    <div class="avatar  my-4 text-center">
-
-                    </div>
-                    <div class="info my-2">
-                        <div class=" my-4">
-                            <h4 class="name text-center"></h4>
-                        </div>
-                        <div class="row  my-2 text-center">
-                            <div class="col-6 text-center badge-level"></div>
-                            <div class="col-6 text-center badge-career"></div>
-                        </div>
-                        <div class="progress my-2">
-                            <div class="hp progress-bar bg-success  progress-bar-striped progress-bar-animated"
-                                 style="width: 0%">0
-                            </div>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-hammer"></i> 攻击</h4>
-                            <h4 class="col attack  text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-shield-alt"></i> 防御</h4>
-                            <h4 class="col defend  text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-jedi"></i> 必杀率</h4>
-                            <h4 class="col mortality text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-running"></i> 闪避率</h4>
-                            <h4 class="col dodge  text-center">0</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-2 d-flex justify-content-center align-items-center">
-                    <h1 class="display-3">
-                        VS
-                    </h1>
-                </div>
-                <div class="col-5 right-player">
-                    <div class="avatar my-4 text-center">
-
-                    </div>
-                    <div class="info my-2">
-                        <div class=" my-4">
-                            <h4 class="name text-center"></h4>
-                        </div>
-                        <div class="row  my-2 text-center">
-                            <div class="col-6 text-center badge-level"></div>
-                            <div class="col-6 text-center badge-career"></div>
-                        </div>
-                        <div class="progress  my-2">
-                            <div class="hp progress-bar bg-success  progress-bar-striped progress-bar-animated"
-                                 style="width: 0%">0
-                            </div>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-hammer"></i> 攻击</h4>
-                            <h4 class="col attack text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-shield-alt"></i> 防御</h4>
-                            <h4 class="col defend text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-jedi"></i> 必杀率</h4>
-                            <h4 class="col mortality text-center">0</h4>
-                        </div>
-                        <div class="row  my-2">
-                            <h4 class="col text-center"><i class="fas fa-running"></i> 闪避率</h4>
-                            <h4 class="col dodge text-center">0</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="main my-3" style="display: none">
-                <h3 class="mb-3"><i class="fas fa-newspaper"></i> 战况</h3>
-                <h3 class="message text-center"></h3>
-            </div>
-
-            <audio class="attack" src="sound/sword.wav"></audio>
-            <audio class="attack" src="sound/spear.wav" ></audio>
-            <audio class="attack" src="sound/arrow.wav" ></audio>
-			<audio class="death" src="sound/death.wav" ></audio>
-            <audio class="death" src="sound/death2.wav" ></audio>
-			<audio class="hurt" src="sound/hurt.wav" ></audio>
-            <audio class="hurt" src="sound/hurt2.wav" ></audio>
-            <audio class="hurt" src="sound/hurt3.wav" ></audio>
-        </div>
-        <div class="sidebar col-3">
-
-            <ul class="list-group user-list">
-            </ul>
-
-        </div>
 
     </div>
 
 
-
-
 </div>
+
+<!--底部-->
+<div class="my-5 text-center">
+    <h4>@河蟹 | <a href="https://www.mikuclub.org">初音社</a> | Github仓库地址 <a
+            href="https://github.com/hexie2108/bilibili_dynamic_lottery">bilibili_dynamic_lottery</a></h4>
+</div>
+
+<!--模态窗口-->
+<div class="modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard=false>
+    <div class="modal-dialog mt-5">
+        <div class="modal-content">
+
+            <div class="modal-body text-center p-5">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--轻量弹窗-->
+<div class="toast toast1 position-fixed mt-3 mr-3" style="right: 0; top: 0; min-width: 300px" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+    <div class="toast-header">
+        <h4 class="toast-title mr-auto my-auto text-danger">错误</h4>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <h5 class="toast-body my-auto ">
+    </h5>
+</div>
+<div class="toast toast2 position-fixed mt-3 mr-3" style="right: 0; top: 0; min-width: 300px" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+    <div class="toast-header">
+        <h4 class="toast-title mr-auto my-auto text-success"></h4>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <h5 class="toast-body my-auto ">
+    </h5>
+</div>
+
 
 </body>
 </html>
