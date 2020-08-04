@@ -57,9 +57,9 @@
 
                 <div class="input-group  input-group-lg  my-3 mx-auto col-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="level-filter">等级墙</label>
+                        <label class="input-group-text" for="level-filter">最低等级</label>
                     </div>
-                    <input class="form-control " type="number" id="level-filter" name="level-filter" value="0" min="0"
+                    <input class="form-control " type="number" id="level-filter" name="level-filter" value="1" min="1"
                         max="6"/>
                 </div>
 
@@ -79,10 +79,27 @@
 
         </div>
 
+        <div  class="text-danger text-center">
+            注意: 因为B站的API接口限制, 只支持转发次数550次以下的动态, 超过550次以上的转发记录无法全部获取
+        </div>
+
 
     </header>
 
     <hr/>
+
+    <div class="user-count row" style="display: none">
+        <div class="col text-center">
+            全部用户数 <span class="badge badge-info"></span>
+        </div>
+        <div class="col text-center">
+            过滤重复后 <span class="badge badge-info"></span>
+        </div>
+        <div class="col text-center">
+            过滤最低等级后 <span class="badge badge-info"></span>
+        </div>
+
+    </div>
 
     <div class="user-list row justify-content-center">
 

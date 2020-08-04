@@ -118,13 +118,13 @@ function sendRequest(dynamicId) {
     function onSuccess(data) {
 
         //如果是空列表
-        if (data.length === 0) {
+        if (data.users.length === 0) {
             onEmptyError();
         }
         else {
 
             //遍历每个元素
-            data.forEach(function (user) {
+            data.users.forEach(function (user) {
 
                 // 等级过滤
                 if (user.level >= levelFilter) {
@@ -149,6 +149,15 @@ function sendRequest(dynamicId) {
 
             // 激活按钮
             $('.start-button').removeAttr('disabled');
+
+            //显示统计信息
+            $('.user-count').show();
+            //全部用户数
+            $('.user-count .badge').eq(0).html(data.totalUserCount);
+            //过滤重复后
+            $('.user-count .badge').eq(1).html(data.users.length);
+            //过滤等级后
+            $('.user-count .badge').eq(2).html(USER_LIST.length);
 
 
         }
@@ -177,17 +186,6 @@ function sendRequest(dynamicId) {
 
 }
 
-
-/**
- * 获取职业名
- * @param {number} careerIndex 职业id
- * @return {string} 职业名
- */
-function getCareerName(careerIndex) {
-    //避免index超过范围
-    careerIndex = careerIndex % CAREERS.length;
-    return CAREERS[careerIndex].name;
-}
 
 /**
  * 根据索引大小获取不同颜色的css类名
