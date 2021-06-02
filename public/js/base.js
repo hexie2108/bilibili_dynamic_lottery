@@ -15,3 +15,20 @@ let isInterrupted  = false;
 function getRandomInt(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+
+
+
+$(function(){
+
+    $('input[name="user_type"]').on('click', function () {
+        if($(this).val() === 'forward'){
+            $('.warning-message').show();
+        }
+        else{
+            $('.warning-message').hide();
+        }
+    });
+
+
+});

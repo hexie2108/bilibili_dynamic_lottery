@@ -32,6 +32,9 @@ function getRepostUser(event) {
     let $linkInput = $('#dynamic_link');
     let $inputErrorText = $('#dynamic_link_error_text');
 
+    //获取用户类型
+    let user_type = $('input[name="user_type"]:checked').val();
+
     let $toast = $('.toast1');
 
 
@@ -76,7 +79,7 @@ function getRepostUser(event) {
         }
         else {
 
-            sendRequest(dynamicId);
+            sendRequest(dynamicId, user_type);
         }
 
     }
@@ -87,8 +90,9 @@ function getRepostUser(event) {
 /**
  * 发送get请求
  * @param {string} dynamicId 动态id
+ * @param {string} user_type 用户类型
  */
-function sendRequest(dynamicId) {
+function sendRequest(dynamicId, user_type) {
 
     //将被中断标记置为真
     isInterrupted = true
@@ -110,10 +114,15 @@ function sendRequest(dynamicId) {
     //显示模态加载窗口
     $('.modal').modal('show');
 
-    console.log("获取动态ID " + dynamicId)
+    console.log("获取动态ID " + dynamicId);
 
 
-    $.getJSON(BACKEND_URL + dynamicId, onSuccess).fail(onError).always(onComplete);
+    let data = {
+        user_type,
+    };
+
+
+    $.getJSON(BACKEND_URL + dynamicId, data, onSuccess).fail(onError).always(onComplete);
 
     function onSuccess(data) {
 
@@ -166,7 +175,7 @@ function sendRequest(dynamicId) {
 
     function onEmptyError() {
 
-        $('.toast .toast-body').html("转发用户列表为空");
+        $('.toast .toast-body').html("用户列表为空");
         $toast.toast('show');
     }
 
@@ -196,12 +205,12 @@ function getBgColorClass(index) {
 
     //背景颜色类名列表
     const BG_CLASSES = [
-        'badge-secondary',
-        'badge-primary',
-        'badge-success',
-        'badge-info',
-        'badge-warning',
-        'badge-danger',
+        'bg-secondary',
+        'bg-primary',
+        'bg-success',
+        'bg-info',
+        'bg-warning',
+        'bg-danger',
     ];
 
     //避免index超过范围

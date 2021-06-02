@@ -1,3 +1,8 @@
+# 在线演示地址
+[https://bilibili-dynamic-lottery.herokuapp.com/](https://bilibili-dynamic-lottery.herokuapp.com/ "https://bilibili-dynamic-lottery.herokuapp.com/ ")
+
+
+
 # B站动态转发抽奖小程序
 本应用是 使用node.js+html+Jquery+bootstrap完成, 需要node环境支持, 通过抓取B站特定动态的都转换列表, 来实现抽奖功能, 抽奖过程 因为个人爱好变得游戏化了, 感觉很有趣
 
