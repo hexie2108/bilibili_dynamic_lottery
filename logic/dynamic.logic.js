@@ -14,7 +14,7 @@ async function getDynamicRepostList(dynamic_id) {
     let errorTime = 0;
     let users = new user_type.Users();
 
-    let query = {dynamic_id};
+    let query = { dynamic_id };
 
     //总用户数
     let totalUserCount = 0;
@@ -23,6 +23,8 @@ async function getDynamicRepostList(dynamic_id) {
         //单次提取20条转发记录
         //console.log(URL_REPOST_LIST+'?dynamic_id='+query.dynamic_id+'&offset='+query.offset);
         let response = await http.get(URL_REPOST_LIST, query);
+
+
         //如果有错误代码
         if (response.data.code > 0) {
             //增加错误次数, 然后重新请求
@@ -46,13 +48,13 @@ async function getDynamicRepostList(dynamic_id) {
             }
         }
     }
-        //还有更多, 并且错误次数低于10
+    //还有更多, 并且错误次数低于10
     while (hasMore && errorTime < 10)
 
     //如果错误次数等于10,  说明有错误
     if (errorTime === 10) {
         result = {
-            body: {error: "获取错误, 请重试"},
+            body: { error: "获取错误, 请重试" },
             status: 400
         };
     } else {
@@ -80,6 +82,7 @@ async function getDynamicCommentList(dynamic_id) {
     let hasMore = true;
     let errorTime = 0;
     let users = new user_type.CommentUsers();
+  
 
     //初始化id和类型
     let oid = 0;
@@ -96,14 +99,14 @@ async function getDynamicCommentList(dynamic_id) {
 
 
         //如果是原创动态
-        if(dynamic_response.data.data.card.desc.orig_type === 0){
+        if (dynamic_response.data.data.card.desc.orig_type === 0) {
             //更改评论列表类型
             type = 11;
             //设置专属OID
             oid = dynamic_response.data.data.card.desc.rid;
         }
         //如果是转发别人动态的动态
-        else{
+        else {
             //更改评论列表类型
             type = 17;
             //更改oid为 动态ID
@@ -116,7 +119,7 @@ async function getDynamicCommentList(dynamic_id) {
         console.error(exception);
 
         return {
-            body: {error: "无法获取该动态的OID数据, 请重试"},
+            body: { error: "无法获取该动态的OID数据, 请重试" },
             status: 500
         };
     }
@@ -125,7 +128,8 @@ async function getDynamicCommentList(dynamic_id) {
         oid,
         jsonp: 'jsonp',
         type,
-        mode: 3,
+        mode: 2, //最新排序
+        //mode: 3, //热门排序
 
         //offset
         next: 0,
@@ -154,9 +158,9 @@ async function getDynamicCommentList(dynamic_id) {
 
             if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('cursor')) {
                 //统计总用户数 (只统计一次)
-                if (totalUserCount === 0) {
+                /*if (totalUserCount === 0) {
                     totalUserCount = response.data.data.cursor.all_count;
-                }
+                }*/
                 //如果还有后续
                 if (response.data.data.cursor.is_end === false) {
                     query.next++;
@@ -166,21 +170,29 @@ async function getDynamicCommentList(dynamic_id) {
 
             }
 
+            //统计一级评论的数量
+            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('replies') && Array.isArray(response.data.data.replies) ) {
+
+                totalUserCount += response.data.data.replies.length ;
+            }
+
         }
     }
-        //还有更多, 并且错误次数低于10
+    //还有更多, 并且错误次数低于10
     while (hasMore && errorTime < 10)
 
     //如果错误次数等于10,  说明有错误
     if (errorTime === 10) {
         result = {
-            body: {error: "获取错误, 请重试"},
+            body: { error: "获取错误, 请重试" },
             status: 400
         };
     } else {
 
         //随机排序
         //users.sort(() => Math.random() - 0.5);
+
+        
 
         result = {
             body: {
