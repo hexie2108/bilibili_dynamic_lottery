@@ -163,7 +163,10 @@ async function getDynamicCommentList(dynamic_id) {
                 }*/
                 //如果还有后续
                 if (response.data.data.cursor.is_end === false) {
-                    query.next++;
+
+                    //query.next++; //mode 3情况的下一个分页为递增
+                    query.next = response.data.data.cursor.next; //mode 2情况的下一个分页需要在请求里获取
+
                 } else {
                     hasMore = false;
                 }
