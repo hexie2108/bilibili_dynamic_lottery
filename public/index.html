@@ -103,9 +103,9 @@
 
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="user_type" id="user_type_2"
-                                        value="comment" disabled>
+                                        value="comment">
                                     <label class="form-check-label" for="user_type_2">
-                                        评论用户 (接口需要身份验证, 已停用)
+                                        评论用户
                                     </label>
                                 </div>
 
@@ -120,6 +120,9 @@
                                 </div>
                                 <div class="text-warning">
                                     注意2: 转发用户 无法使用等级过滤器, 并且容易被风控导致无法获取, 建议使用点赞用户列表
+                                </div>
+                                <div class="text-secondary">
+                                    注意3: 评论用户 只会获取直接回复动态的用户, 楼中楼的子评论不在获取范围
                                 </div>
                             </div>
 

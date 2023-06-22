@@ -110,6 +110,7 @@ async function getDynamicCommentList(dynamic_id) {
     let result;
     let hasMore = true;
     let errorTime = 0;
+    let blocked = false;
     let users = new user_type.CommentUsers();
 
 
@@ -125,6 +126,13 @@ async function getDynamicCommentList(dynamic_id) {
 
 
     try {
+
+        if(dynamic_response.data.data.hasOwnProperty('card') === false){
+            return {
+                body: { error: "登陆凭证已过期, 请联系管理员更新" },
+                status: 500
+            };
+        }
 
 
         //如果是原创动态
@@ -148,7 +156,7 @@ async function getDynamicCommentList(dynamic_id) {
         console.error(exception);
 
         return {
-            body: { error: "无法获取该动态的OID数据, 请重试" },
+            body: { error: "无法获取该动态的详情数据, " },
             status: 500
         };
     }
@@ -180,6 +188,11 @@ async function getDynamicCommentList(dynamic_id) {
             errorTime++;
             //输出错误信息
             console.error(response.data);
+
+            if (response_data.code === -412) {
+                errorTime = 10;
+                blocked = true;
+            }
         } else {
 
             //保存新获取到的用户数据到 数组里
@@ -219,6 +232,13 @@ async function getDynamicCommentList(dynamic_id) {
             body: { error: "获取错误, 请重试" },
             status: 400
         };
+
+         if (blocked) {
+            result = {
+                body: { error: "当前的请求过于频繁, 已触发B站风控, 请过段时间再尝试," },
+                status: 400
+            };
+        }
     } else {
 
         //随机排序

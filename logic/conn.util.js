@@ -3,9 +3,14 @@
  *
  */
 
+//get environmental variables from env file
+require('dotenv').config();
+
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
 const Headers = require('fetch-headers');
+
+const COOKIE = process.env.COOKIE;
 
 
 //10 seconds for timeout
@@ -80,7 +85,7 @@ async function get(url, queryData = null) {
     jsonHeaders.append('Accept', 'application/json');
     jsonHeaders.append('Content-Type', 'application/json;charset=UTF-8');
     jsonHeaders.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
- 
+    jsonHeaders.append('Cookie', COOKIE);
 
     let options = {
         "method": 'GET',

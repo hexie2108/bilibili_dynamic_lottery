@@ -90,18 +90,16 @@ class CommentUser {
         this.name = member["uname"];
         this.avatar = member["avatar"];
 
-        if (member['level_info'] && member['level_info'].hasOwnProperty('current_level')) {
+        if (member.hasOwnProperty('level_info')) {
+
             this.level = member['level_info']['current_level'];
         }
 
         //如果是大会员
         if (member.hasOwnProperty('vip') && member.vip.hasOwnProperty('label')) {
 
-            this.vip = user.vip.label.text || '';
-
+            this.vip = member.vip.label.text || '';
         }
-
-
 
     }
 
