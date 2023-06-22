@@ -1,6 +1,6 @@
 const BACKEND_URL = document.location.href + 'dynamic/';
 
-const BILIBILI_URL = 'bilibili.com';
+const BILIBILI_URL = 'bilibili.com/opus';
 
 
 $(function () {
@@ -38,7 +38,7 @@ function getRepostUser(event) {
     let $toast = $('.toast1');
 
 
-    let dynamicLink = $.trim($linkInput.val());
+    let dynamicLink = $.trim($linkInput.val()).replace(/\/$/, "");
     //如果是空值
     if (!dynamicLink) {
         $linkInput.addClass('is-invalid ');
@@ -48,7 +48,7 @@ function getRepostUser(event) {
     //如果不是哔哩哔哩
     else if (!dynamicLink.includes(BILIBILI_URL)) {
         $linkInput.addClass('is-invalid ');
-        $toast.children('.toast-body').html("链接不属于哔哩哔哩");
+        $toast.children('.toast-body').html("当前只支持包含opus路径的新版动态地址 (例子: https://www.bilibili.com/opus/794288535874043936)");
         $toast.toast('show');
     }
     else {
@@ -122,7 +122,15 @@ function sendRequest(dynamicId, user_type) {
     };
 
 
-    $.getJSON(BACKEND_URL + dynamicId, data, onSuccess).fail(onError).always(onComplete);
+    //$.getJSON(BACKEND_URL + dynamicId, data, onSuccess).fail(onError).always(onComplete);
+
+    $.ajax({
+        url: BACKEND_URL + dynamicId,
+        dataType: 'json',
+        data,
+        timeout: 1000 * 60 * 30 //30 minutes
+    }).done(onSuccess).fail(onError).always(onComplete);
+
 
     function onSuccess(data) {
 
@@ -135,22 +143,49 @@ function sendRequest(dynamicId, user_type) {
             //遍历每个元素
             data.users.forEach(function (user) {
 
-                // 等级过滤
-                if (user.level >= levelFilter) {
+                // 如果等级信息不存在 或者 大于等级过滤器
+                if (user.level === undefined || user.level >= levelFilter) {
 
                     //保存到全局列表
                     USER_LIST.push(user);
 
                     //创建插入元素到页面
                     let newElement = `
-<div class="border col-3 m-2 rounded">
-    <a href="https://space.bilibili.com/${user.uid}" id="user-link" target="_blank" class="text-dark text-decoration-none">
-        <img class="img-fluid rounded-circle m-1" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
-        <span class="m-1 name small">${user.name}</span>
-    </a>
-    <span class="badge ${getBgColorClass(user.level - 1)} m-1">
-        Lv ${user.level}
-    </span>
+<div class="border col-3 m-2 p-2 rounded">
+
+   <div class="row">
+        <div class="col-auto">
+           
+                <div>
+                    <a href="https://space.bilibili.com/${user.uid}"  target="_blank" class="text-dark text-decoration-none">
+                        <img class="img-fluid rounded-circle" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
+                    </a>
+                </div>
+                <div class="mt-2" style="height:20px">
+
+                    <span class="d-inline-block badge me-1 ${getBgColorClassByLevel(user.level)}">
+                        Lv ${user.level}
+                    </span>
+                    <span class="d-inline-block badge ${getBgColorClassByVip(user.vip)}">
+                        ${user.vip}
+                    </span>
+
+                </div>
+
+
+              
+            
+        </div>
+        <div class="col">
+            <a href="https://space.bilibili.com/${user.uid}"  target="_blank" class="text-dark text-decoration-none">
+                <span class="name small">${user.name}</span>
+            </a>
+        </div>
+
+   </div>
+
+   
+   
 </div>`;
                     $userListElement.append(newElement);
                 }
@@ -179,9 +214,12 @@ function sendRequest(dynamicId, user_type) {
         $toast.toast('show');
     }
 
-    function onError() {
+    function onError(jqXHR) {
 
-        $('.toast .toast-body').html("获取错误, 请检查后台服务!");
+        let responseJSON = jqXHR.responseJSON;
+        let error = responseJSON.error || "获取错误, 请检查后台服务!";
+
+        $('.toast .toast-body').html(error);
         $toast.toast('show');
     }
 
@@ -195,27 +233,75 @@ function sendRequest(dynamicId, user_type) {
 
 }
 
-
 /**
  * 根据索引大小获取不同颜色的css类名
  * @param index  索引
  * @return string css类名
  */
-function getBgColorClass(index) {
+function getBgColorClassByLevel(level) {
 
-    //背景颜色类名列表
-    const BG_CLASSES = [
-        'bg-secondary',
-        'bg-primary',
-        'bg-success',
-        'bg-info',
-        'bg-warning',
-        'bg-danger',
-    ];
+    let result = 'd-none';
+
+    if (level) {
+
+        //背景颜色类名列表
+        const BG_CLASSES = [
+            'bg-secondary',
+            'bg-primary',
+            'bg-success',
+            'bg-info',
+            'bg-warning',
+            'bg-danger',
+        ];
+
+        index = level - 1;
+        if (index < 0) {
+            index = 0;
+        }
+
+        result = BG_CLASSES[index];
+
+    }
 
     //避免index超过范围
-    index = index % BG_CLASSES.length;
+    //index = index % BG_CLASSES.length;
 
-    return BG_CLASSES[index];
+    return result;
 
 }
+
+/**
+ * 根据大会员名称获取不同颜色的css类名
+ * @param vip 
+ * @return string css类名
+ */
+function getBgColorClassByVip(vip) {
+
+    let result = 'd-none';
+
+
+    if (vip) {
+
+        result = 'bg-secondary';
+
+        switch (vip) {
+            case '大会员':
+                result = 'bg-primary';
+                break;
+
+            case '年度大会员':
+                result = 'bg-warning';
+                break;
+            case '十年大会员':
+                result = 'bg-danger';
+                break;
+        }
+
+    }
+
+    return result;
+
+
+}
+
+

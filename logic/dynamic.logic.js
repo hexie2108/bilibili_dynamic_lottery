@@ -1,9 +1,14 @@
 const http = require('./conn.util');
 const user_type = require('../class/Users');
 
-const URL_REPOST_LIST = 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
+//const URL_REPOST_LIST = 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
+const URL_REPOST_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/forward';
 const URL_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/main';
+const URL_LIKE_LIST = 'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/spec_item_likes';
+
 const URL_DYNAMIC_DETAIL = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail';
+
+
 
 
 //获取转发用户列表
@@ -12,9 +17,10 @@ async function getDynamicRepostList(dynamic_id) {
     let result;
     let hasMore = true;
     let errorTime = 0;
+    let blocked = false;
     let users = new user_type.Users();
 
-    let query = { dynamic_id };
+    let query = { id: dynamic_id };
 
     //总用户数
     let totalUserCount = 0;
@@ -23,30 +29,45 @@ async function getDynamicRepostList(dynamic_id) {
         //单次提取20条转发记录
         //console.log(URL_REPOST_LIST+'?dynamic_id='+query.dynamic_id+'&offset='+query.offset);
         let response = await http.get(URL_REPOST_LIST, query);
+        const response_data = response.data;
 
+        //console.log(response);
 
         //如果有错误代码
-        if (response.data.code > 0) {
+        if (response_data.code !== 0) {
             //增加错误次数, 然后重新请求
             errorTime++;
+
+            //输出错误信息
+            console.error(response_data);
+
+            if (response_data.code === -412) {
+                errorTime = 10;
+                blocked = true;
+            }
+
+
         } else {
 
             //保存新获取到的用户数据到 数组里
-            users.add(response.data);
+            users.add(response_data);
 
             //统计总用户数
-            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('items') && Array.isArray(response.data.data.items) && response.data.data.items.length > 0) {
-                totalUserCount += response.data.data.items.length;
+            if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('items') && Array.isArray(response_data.data.items) && response_data.data.items.length > 0) {
+                totalUserCount += response_data.data.items.length;
             }
 
             //如果还有更多
-            if (response.data.hasOwnProperty('data') && response.data.data['has_more'] === 1) {
+            if (response_data.hasOwnProperty('data') && response_data.data['has_more'] === true) {
                 //设置下一页的变量
-                query.offset = response.data.data['offset'];
+                query.offset = response_data.data['offset'];
             } else {
                 hasMore = false;
             }
         }
+
+        //暂停2秒钟
+        await sleep_loop(1000 * 2);
     }
     //还有更多, 并且错误次数低于10
     while (hasMore && errorTime < 10)
@@ -57,6 +78,14 @@ async function getDynamicRepostList(dynamic_id) {
             body: { error: "获取错误, 请重试" },
             status: 400
         };
+
+        if (blocked) {
+            result = {
+                body: { error: "当前的请求过于频繁, 已触发B站风控, 请改用其他用户类型, 或者请过段时间再尝试," },
+                status: 400
+            };
+        }
+
     } else {
 
         //随机排序
@@ -82,7 +111,7 @@ async function getDynamicCommentList(dynamic_id) {
     let hasMore = true;
     let errorTime = 0;
     let users = new user_type.CommentUsers();
-  
+
 
     //初始化id和类型
     let oid = 0;
@@ -174,9 +203,9 @@ async function getDynamicCommentList(dynamic_id) {
             }
 
             //统计一级评论的数量
-            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('replies') && Array.isArray(response.data.data.replies) ) {
+            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('replies') && Array.isArray(response.data.data.replies)) {
 
-                totalUserCount += response.data.data.replies.length ;
+                totalUserCount += response.data.data.replies.length;
             }
 
         }
@@ -195,7 +224,7 @@ async function getDynamicCommentList(dynamic_id) {
         //随机排序
         //users.sort(() => Math.random() - 0.5);
 
-        
+
 
         result = {
             body: {
@@ -211,5 +240,113 @@ async function getDynamicCommentList(dynamic_id) {
 }
 
 
+//获取点赞用户列表
+async function getDynamicLikeList(dynamic_id) {
+
+    let result;
+    let hasMore = true;
+    let errorTime = 0;
+    let blocked = false;
+    let users = new user_type.LikeUsers();
+
+
+    let query = {
+        dynamic_id,
+        //offset
+        pn: 1,
+
+    };
+
+    //总用户数
+    let totalUserCount = 0;
+
+
+    do {
+
+        let response = await http.get(URL_LIKE_LIST, query);
+        const response_data = response.data;
+
+
+        //如果有错误代码
+        if (response_data.code !== 0) {
+            //增加错误次数, 然后重新请求
+            errorTime++;
+            //输出错误信息
+            console.error(response_data);
+
+            if (response.data.code === -412) {
+                errorTime = 10;
+                blocked = true;
+            }
+
+        } else {
+
+            //保存新获取到的用户数据到 数组里
+            users.add(response_data);
+
+            //统计总用户数
+            if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('item_likes') && Array.isArray(response_data.data.item_likes) && response_data.data.item_likes.length > 0) {
+                totalUserCount += response_data.data.item_likes.length;
+            }
+
+            //如果还有更多
+            if (response_data.hasOwnProperty('data') && response_data.data['has_more'] === 1) {
+                //设置下一页的变量
+                query.pn++;
+            } else {
+                hasMore = false;
+            }
+
+        }
+    }
+    //还有更多, 并且错误次数低于10
+    while (hasMore && errorTime < 10)
+
+    //如果错误次数等于10,  说明有错误
+    if (errorTime === 10) {
+        result = {
+            body: { error: "获取错误, 请重试" },
+            status: 400
+        };
+
+        if (blocked) {
+            result = {
+                body: { error: "当前的请求过于频繁, 已触发B站风控, 请过段时间再尝试," },
+                status: 400
+            };
+        }
+
+    } else {
+
+        //随机排序
+        //users.sort(() => Math.random() - 0.5);
+
+
+
+        result = {
+            body: {
+                users,
+                totalUserCount,
+
+            },
+            status: 200
+        }
+    }
+
+    return result;
+}
+
+/**
+ * 暂停运行, 避免触发风控
+ */
+async function sleep_loop(time) {
+    await delay_by_promise(time);
+}
+
+function delay_by_promise(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
 module.exports.getDynamicRepostList = getDynamicRepostList;
 module.exports.getDynamicCommentList = getDynamicCommentList;
+module.exports.getDynamicLikeList = getDynamicLikeList;

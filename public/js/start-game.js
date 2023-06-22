@@ -1,5 +1,5 @@
 let winnerNumber;
-const SPEED = 400;
+const SPEED = 300;
 
 
 $(function () {
@@ -41,18 +41,43 @@ function startGame() {
             //随机生成index
             let randomIndex = getRandomInt(0, USER_LIST.length - 1);
 
-            //从页面列表隐藏元素, 然后运行回调函数
-            $('.user-list div').eq(randomIndex).fadeOut(removeSpeed(), function () {
+            let $element = $('.user-list > div').eq(randomIndex);
+
+            //从全局INDEX数组中移除
+            USER_LIST.splice(randomIndex, 1);
+
+
+            //如果数量大于500 并且 不是500的整除, 或者 大于50 , 并且不是50的整除, 直接进入下一个循环
+            if ((USER_LIST.length >= 500 && USER_LIST.length % 500 !== 0 ) || (USER_LIST.length < 500 && USER_LIST.length >= 50 && USER_LIST.length % 50 !== 0)) {
+
                 //从页面移除元素
-                $(this).remove();
-                //从全局INDEX数组中移除
-                USER_LIST.splice(randomIndex, 1);
+                $element.remove();
+
+                //直接删除
+                startGame();
+            }
+            else {
+
                 //更新剩余数量显示
                 $('.toast2 .toast-body').html("剩余: " + USER_LIST.length);
-                //定时下个循环
-                setTimeout(startGame, removeSpeed());
 
-            });
+                //运行淡出动画 之后再继续删除
+                $element.fadeOut(SPEED, function () {
+
+                    //从页面移除元素
+                    $element.remove();
+
+                    //下个循环
+                    startGame();
+
+                    //定时下个循环
+                    //setTimeout(startGame, SPEED);
+
+                });
+
+            }
+
+
 
 
         }
@@ -83,20 +108,3 @@ function endGame() {
     $('.toast2 .toast-body').html("恭喜中奖者: " + winnerName);
 }
 
-/**
- * 根据列表长度动态设置速度
- * @returns {number}
- */
-function removeSpeed() {
-
-    let speedRation = USER_LIST.length / 10;
-
-    if (speedRation > 1) {
-        return SPEED / speedRation;
-    }
-    else {
-        return SPEED;
-    }
-
-
-}

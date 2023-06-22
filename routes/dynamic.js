@@ -14,6 +14,9 @@ router.get('/:dynamic_id', async function (req, res) {
     } else if (user_type === 'comment') {
         result = await logic.getDynamicCommentList(dynamic_id);
     }
+    else if (user_type === 'like') {
+        result = await logic.getDynamicLikeList(dynamic_id);
+    }
 
 
     res.status(result.status);

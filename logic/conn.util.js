@@ -79,6 +79,8 @@ async function get(url, queryData = null) {
     let jsonHeaders = new Headers();
     jsonHeaders.append('Accept', 'application/json');
     jsonHeaders.append('Content-Type', 'application/json;charset=UTF-8');
+    jsonHeaders.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
+ 
 
     let options = {
         "method": 'GET',

@@ -21,6 +21,8 @@ function getRandomInt(min, max){
 
 $(function(){
 
+    
+    /*
     $('input[name="user_type"]').on('click', function () {
         if($(this).val() === 'forward'){
             $('.warning-message').show();
@@ -28,7 +30,7 @@ $(function(){
         else{
             $('.warning-message').hide();
         }
-    });
+    });*/
 
 
 });

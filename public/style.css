@@ -4,10 +4,11 @@
 
 
 .user-list div img{
-    width: 100px;
-    height: 100px;
+    width: 125px;
+    height: 125px;
 }
 
+/*
 .user-list .name {
     width: 40%;
     white-space: nowrap;
@@ -15,5 +16,5 @@
     overflow: hidden;
     display: inline-block;
     vertical-align: middle;
-}
+}*/
 

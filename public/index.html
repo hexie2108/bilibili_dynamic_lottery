@@ -1,4 +1,5 @@
 <html lang="zh">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +9,7 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     <link rel="stylesheet" type="text/css"
-          href="https://cdn.staticfile.org/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+        href="https://cdn.staticfile.org/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -22,174 +23,213 @@
 
     <script src="js/start-game.js"></script>
 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442793010183347"
+     crossorigin="anonymous"></script>
 
-    <title>B站动态在线抽奖系统V3 | 初音社</title>
+
+    <title>B站动态在线抽奖系统V4 | 初音社</title>
 
 
 </head>
+
 <body>
-<div class="container-fluid w-75 mx-auto mt-3 mb-5" style="min-height: 950px">
+    <div class="container-fluid w-75 mx-auto mt-3 mb-5" style="min-height: 950px">
 
-    <header class="text-center">
-        <div class="mt-5"></div>
-        <h2 class="my-3">B站动态在线抽奖系统V3 | @<a href="https://space.bilibili.com/277257" target="_blank" title="初音社">初音社</a></h2>
-        <p>本网页程序可以从B站动态中提取出转发/评论过的用户列表, 然后通过随机方式选出中奖者 </p>
+        <header class="text-center">
+            <div class="mt-5"></div>
+            <h2 class="my-3">B站动态在线抽奖系统V4 | @<a href="https://space.bilibili.com/277257" target="_blank"
+                    title="初音社">初音社</a></h2>
+            <p>本网页程序可以从B站动态中提取出转发/点赞过的用户列表, 然后通过随机方式选出中奖者 (2023年06月更新) </p>
 
-        <div class="row">
+            <div class="row">
 
-            <form class="col-12">
+                <form class="col-12">
 
-                <div class="row gy-4">
-                    <div class="col-12">
-                        <div class="input-group input-group-lg ">
-                            <label class="input-group-text" for="dynamic_link">动态地址</label>
-                            <input class="form-control " type="text" id="dynamic_link" name="dynamic_link"
-                                   placeholder="例子: https://t.bilibili.com/xxx"/>
-                        </div>
-                    </div>
-
-                    <div class="col-6">
-                        <div class="input-group  input-group-lg">
-
-                            <label class="input-group-text" for="winner-number">抽选人数</label>
-
-                            <input class="form-control " type="number" id="winner-number" name="winner-number"
-                                   value="1" min="1"/>
-                        </div>
-                    </div>
-
-                    <div class="col-6">
-                        <div class="input-group  input-group-lg">
-
-                            <label class="input-group-text" for="level-filter">最低等级</label>
-
-                            <input class="form-control " type="number" id="level-filter" name="level-filter" value="1"
-                                   min="1"
-                                   max="6"/>
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-6">
-                        <div class="text-start border rounded" style="font-size: 1.25em">
-
-                            <div class="pe-3 ps-3  p-2  me-2 border-end d-inline-block text-center" style="background-color: #e9ecef;">
-                                用户类型
+                    <div class="row gy-4">
+                        <div class="col-12">
+                            <div class="input-group input-group-lg ">
+                                <label class="input-group-text" for="dynamic_link">动态地址</label>
+                                <input class="form-control " type="text" id="dynamic_link" name="dynamic_link"
+                                    placeholder="例子: https://www.bilibili.com/opus/794288535874043936" />
                             </div>
+                        </div>
 
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="user_type" id="user_type_1" value="forward"   checked>
-                                <label class="form-check-label" for="user_type_1">
-                                    转发用户
-                                </label>
+                        <div class="col-6">
+                            <div class="input-group  input-group-lg">
+
+                                <label class="input-group-text" for="winner-number">抽选人数</label>
+
+                                <input class="form-control " type="number" id="winner-number" name="winner-number"
+                                    value="1" min="1" />
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="user_type" id="user_type_2" value="comment">
-                                <label class="form-check-label" for="user_type_2">
-                                    评论用户
-                                </label>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="input-group  input-group-lg">
+
+                                <label class="input-group-text" for="level-filter">最低等级</label>
+
+                                <input class="form-control " type="number" id="level-filter" name="level-filter"
+                                    value="1" min="1" max="6" />
                             </div>
 
                         </div>
 
-                    </div>
-                    <div class="col-6">
 
-                        <div class="text-danger warning-message text-start">
-                            注意: 因为B站API接口限制, 只能获取最后550个转发用户, 如果转发用户超过550个, 建议使用评论用户列表来抽奖
+                        <div class="col-12">
+                            <div class="text-start border rounded" style="font-size: 1.25em">
+
+                                <div class="pe-3 ps-3  p-2  me-2 border-end d-inline-block text-center"
+                                    style="background-color: #e9ecef;">
+                                    用户类型
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="user_type" id="user_type_1"
+                                        value="forward" checked>
+                                    <label class="form-check-label" for="user_type_1">
+                                        转发用户 (最大支持 550名用户)
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="user_type" id="user_type_3"
+                                        value="like">
+                                    <label class="form-check-label" for="user_type_1">
+                                        点赞用户 (最大支持 大约25.000名用户)
+                                    </label>
+                                </div>
+
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="user_type" id="user_type_2"
+                                        value="comment" disabled>
+                                    <label class="form-check-label" for="user_type_2">
+                                        评论用户 (接口需要身份验证, 已停用)
+                                    </label>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="col-12">
+
+                            <div class="text-start" style="font-size: 1.25em">
+                                <div class="text-info">
+                                    注意1: 因为从B站获取转发用户的API接口有频率限制, 获取速度会比较慢, 大约每1秒只能获取10~20条记录, 请耐心等待
+                                </div>
+                                <div class="text-warning">
+                                    注意2: 转发用户 无法使用等级过滤器, 并且容易被风控导致无法获取, 建议使用点赞用户列表
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
 
+                </form>
+
+                <div class="col-12 row my-4">
+
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442793010183347"
+                    crossorigin="anonymous"></script>
+                <!-- B站抽奖广告 -->
+                <ins class="adsbygoogle"
+                    style="display:block"
+                    data-ad-client="ca-pub-1442793010183347"
+                    data-ad-slot="5515977879"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"></ins>
+                <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+
                 </div>
 
-            </form>
+                <div class="col-12 row my-3">
+                    <div class="col-6">
+                        <button id="" class="get-button btn btn-secondary  w-75 btn-lg">1. 加载用户列表</button>
+                    </div>
+                    <div class="col-6">
+                        <button id="" class="start-button btn btn-primary w-75  btn-lg" disabled>2. 开始抽选</button>
+                    </div>
 
+                </div>
 
-            <div class="col-12 row my-3">
-                <div class="col-6">
-                    <button id="" class="get-button btn btn-secondary  w-75 btn-lg">1. 加载用户列表</button>
-                </div>
-                <div class="col-6">
-                    <button id="" class="start-button btn btn-primary w-75  btn-lg" disabled>2. 开始抽选</button>
-                </div>
 
             </div>
 
 
+        </header>
+
+        <hr />
+
+        <div class="user-count row" style="display: none">
+            <div class="col text-center">
+                全部用户数 <span class="badge bg-info"></span>
+            </div>
+            <div class="col text-center">
+                过滤重复后 <span class="badge bg-info"></span>
+            </div>
+            <div class="col text-center">
+                过滤最低等级后 <span class="badge bg-info"></span>
+            </div>
+
         </div>
 
+        <div class="user-list row justify-content-center">
 
-    </header>
 
-    <hr/>
+        </div>
 
-    <div class="user-count row" style="display: none">
-        <div class="col text-center">
-            全部用户数 <span class="badge bg-info"></span>
-        </div>
-        <div class="col text-center">
-            过滤重复后 <span class="badge bg-info"></span>
-        </div>
-        <div class="col text-center">
-            过滤最低等级后 <span class="badge bg-info"></span>
-        </div>
 
     </div>
 
-    <div class="user-list row justify-content-center">
-
-
+    <!--底部-->
+    <div class="my-5 text-center">
+        <h4> <a href="https://www.mikuclub.cc">初音社网站</a> | Github源码地址 <a
+                href="https://github.com/hexie2108/bilibili_dynamic_lottery">bilibili_dynamic_lottery</a></h4>
     </div>
 
+    <!--模态窗口-->
+    <div class="modal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard=false>
+        <div class="modal-dialog mt-5">
+            <div class="modal-content">
 
-</div>
-
-<!--底部-->
-<div class="my-5 text-center">
-    <h4> <a href="https://www.mikuclub.cc">初音社网站</a> | Github源码地址 <a
-            href="https://github.com/hexie2108/bilibili_dynamic_lottery">bilibili_dynamic_lottery</a></h4>
-</div>
-
-<!--模态窗口-->
-<div class="modal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard=false>
-    <div class="modal-dialog mt-5">
-        <div class="modal-content">
-
-            <div class="modal-body text-center p-5">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="sr-only">Loading...</span>
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!--轻量弹窗-->
-<div class="toast toast1 position-fixed mt-3 me-3" style="right: 0; top: 0; min-width: 300px" role="alert"
-     aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-    <div class="toast-header">
-        <h4 class="toast-title me-auto my-auto text-danger">错误</h4>
-        <button type="button" class="ms-2 mb-1 btn-close" data-bs-dismiss="toast" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <!--轻量弹窗-->
+    <div class="toast toast1 position-fixed mt-3 me-3" style="right: 0; top: 0; min-width: 300px" role="alert"
+        aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <h4 class="toast-title me-auto my-auto text-danger">错误</h4>
+            <button type="button" class="ms-2 mb-1 btn-close" data-bs-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <h5 class="toast-body my-auto ">
+        </h5>
     </div>
-    <h5 class="toast-body my-auto ">
-    </h5>
-</div>
-<div class="toast toast2 position-fixed mt-3 me-3" style="right: 0; top: 0; min-width: 300px" role="alert"
-     aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-    <div class="toast-header">
-        <h4 class="toast-title me-auto my-auto text-success"></h4>
-        <button type="button" class="ms-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="toast toast2 position-fixed mt-3 me-3" style="right: 0; top: 0; min-width: 300px" role="alert"
+        aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+            <h4 class="toast-title me-auto my-auto text-success"></h4>
+            <button type="button" class="ms-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <h5 class="toast-body my-auto ">
+        </h5>
     </div>
-    <h5 class="toast-body my-auto ">
-    </h5>
-</div>
 
 
 </body>
+
 </html>

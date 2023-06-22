@@ -3,7 +3,7 @@ class User {
 
     constructor(item) {
 
-
+        /*
         if (item.hasOwnProperty('desc') && item['desc'].hasOwnProperty('user_profile') && item['desc']['user_profile'].hasOwnProperty('info')) {
             let userInfo = item['desc']['user_profile']['info'];
             this.id = item['desc']['dynamic_id'];
@@ -16,6 +16,23 @@ class User {
 
 
         }
+        */
+
+        if (item.hasOwnProperty('user')) {
+
+            const user = item['user'];
+
+            this.uid = user["mid"];
+            this.name = user["name"];
+            this.avatar = user["face"];
+
+            //如果是大会员
+            if (user.hasOwnProperty('vip') && user.vip.hasOwnProperty('label')) {
+
+                this.vip = user.vip.label.text || '';
+
+            }
+        }
 
 
     }
@@ -24,7 +41,7 @@ class User {
      * 如果有空值, 说明用户信息获取不完整
      */
     isNull() {
-        return !(this.id && this.uid && this.name && this.avatar);
+        return !(this.uid && this.name && this.avatar);
     }
 
 }
@@ -36,21 +53,29 @@ class Users extends Array {
     //从转发列表获取用户
     add(result) {
 
-        if (result.hasOwnProperty('data') && result["data"].hasOwnProperty('items') && Array.isArray(result["data"]["items"]) && result["data"]["items"].length > 0) {
+        if(result.hasOwnProperty('data') && result.data &&  result.data.hasOwnProperty('items')){
 
-            //提取数据, 遍历添加到用户数组
-            let items = result["data"]["items"];
-            for (let i = 0; i < items.length; i++) {
-                let user = new User(items[i]);
+            let items = result.data.items;
 
+            if (Array.isArray(items) && items.length > 0) {
 
-                //如果用户数据不完整, 或者 已经存在过 (避免重复转发)
-                if (!user.isNull() && !this.find(element => element.uid === user.uid)) {
-                    this.push(user);
+                //提取数据, 遍历添加到用户数组
+                for(const item of items){
+                    
+                    let user = new User(item);
+
+                    //如果用户数据不完整, 或者 已经存在过 (避免重复转发)
+                    if (!user.isNull() && !this.find(element => element.uid === user.uid)) {
+                        this.push(user);
+                    }
+
                 }
+    
             }
 
         }
+
+      
     }
 
 
@@ -64,8 +89,16 @@ class CommentUser {
         this.uid = member["mid"];
         this.name = member["uname"];
         this.avatar = member["avatar"];
+
         if (member['level_info'] && member['level_info'].hasOwnProperty('current_level')) {
             this.level = member['level_info']['current_level'];
+        }
+
+        //如果是大会员
+        if (member.hasOwnProperty('vip') && member.vip.hasOwnProperty('label')) {
+
+            this.vip = user.vip.label.text || '';
+
         }
 
 
@@ -80,6 +113,47 @@ class CommentUser {
     }
 
 }
+
+//评论用户
+class LikeUser {
+
+    constructor(member) {
+
+        this.uid = member["uid"];
+        this.name = member["uname"];
+        this.avatar = member["face_url"];
+
+        if(member.hasOwnProperty('user_info')){
+
+            const user_info = member['user_info'];
+
+            if (user_info.hasOwnProperty('level_info')) {
+                this.level = user_info.level_info.current_level || '';
+            }
+    
+            //如果是大会员
+            if (user_info.hasOwnProperty('vip') && user_info.vip.hasOwnProperty('label')) {
+    
+                this.vip = user_info.vip.label.text || '';
+    
+            }
+
+        }
+      
+
+
+
+    }
+
+    /**
+     * 如果有空值, 说明用户信息获取不完整
+     */
+    isNull() {
+        return !(this.uid && this.name && this.avatar);
+    }
+
+}
+
 
 
 //评论用户数组
@@ -112,12 +186,12 @@ class CommentUsers extends Array {
                     if (!user.isNull() && !this.find(element => element.uid === user.uid)) {
                         this.push(user);
 
-                       
+
 
                     }
                     else {
 
-                       
+
 
                     }
 
@@ -138,7 +212,39 @@ class CommentUsers extends Array {
 }
 
 
+//点赞用户数组
+class LikeUsers extends Array {
+
+
+    //从评论列表获取用户
+    add(result) {
+
+        if (result.hasOwnProperty('data') && result["data"].hasOwnProperty('item_likes') && Array.isArray(result.data.item_likes) && result.data.item_likes.length > 0) {
+
+            //提取数据, 遍历添加到用户数组
+            for (const member of result.data.item_likes) {
+
+                let user = new LikeUser(member);
+
+                //如果用户数据完整 并且还未保存过 (避免重复转发)
+                if (!user.isNull() && !this.find(element => element.uid === user.uid)) {
+                    this.push(user);
+                }
+
+            }
+
+
+        }
+
+
+
+    }
+
+}
+
+
 module.exports = {
     Users,
     CommentUsers,
+    LikeUsers,
 };
