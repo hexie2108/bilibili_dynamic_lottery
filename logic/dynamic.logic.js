@@ -67,7 +67,7 @@ async function getDynamicRepostList(dynamic_id) {
         }
 
         //暂停2秒钟
-        await sleep_loop(1000 * 2);
+        await sleep_loop(1000 * 6);
     }
     //还有更多, 并且错误次数低于10
     while (hasMore && errorTime < 10)
