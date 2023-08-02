@@ -1,13 +1,30 @@
 const BACKEND_URL = document.location.href + 'dynamic/';
 
 const BILIBILI_URL = 'bilibili.com/opus';
-
+const BILIBILI_URL_OLD = 't.bilibili.com';
 
 $(function () {
 
     $('.get-button').on('click', getRepostUser);
     //监听等级墙变化
     $('#level-filter').on('change', resetLevelFilter);
+
+    $('#dynamic_link').on('change', function () {
+
+        // 获取输入框的值
+        const inputValue = $(this).val();
+        //修正旧版动态地址
+        if (inputValue.includes(BILIBILI_URL_OLD)) {
+            const videoId = url.match(/\/(\d+)\?/)?.[1];
+            if (videoId) {
+                const newURL = `https://www.${BILIBILI_URL}/${videoId}`;
+                // 更新输入框的值
+                $(this).val(newURL);
+            }
+        }
+
+    });
+
 
 
 });

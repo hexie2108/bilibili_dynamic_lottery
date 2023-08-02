@@ -127,7 +127,7 @@ async function getDynamicCommentList(dynamic_id) {
 
     try {
 
-        if(dynamic_response.data.data.hasOwnProperty('card') === false){
+        if (dynamic_response.data.data.hasOwnProperty('card') === false) {
             return {
                 body: { error: "登陆凭证已过期, 请联系管理员更新" },
                 status: 500
@@ -136,19 +136,13 @@ async function getDynamicCommentList(dynamic_id) {
 
 
         //如果是原创动态
-        if (dynamic_response.data.data.card.desc.orig_type === 0) {
-            //更改评论列表类型
-            type = 11;
-            //设置专属OID
-            oid = dynamic_response.data.data.card.desc.rid;
-        }
-        //如果是转发别人动态的动态
-        else {
-            //更改评论列表类型
-            type = 17;
-            //更改oid为 动态ID
-            oid = dynamic_id;
-        }
+        //if (dynamic_response.data.data.card.desc.orig_type === 0) {
+        //设置评论列表类型
+        type = 11;
+        //设置专属OID
+        oid = dynamic_response.data.data.card.desc.rid;
+        //}
+
 
 
     } catch (exception) {
@@ -189,10 +183,21 @@ async function getDynamicCommentList(dynamic_id) {
             //输出错误信息
             console.error(response.data);
 
-            if (response_data.code === -412) {
+            //如果是404错误, 尝试更换 请求参数
+            if (response_data.code === -404) {
+
+                //更改评论列表类型
+                query.type = 17;
+                //更改oid为 动态ID
+                query.oid = dynamic_id;
+
+            }
+
+            else if (response_data.code === -412) {
                 errorTime = 10;
                 blocked = true;
             }
+
         } else {
 
             //保存新获取到的用户数据到 数组里
@@ -233,7 +238,7 @@ async function getDynamicCommentList(dynamic_id) {
             status: 400
         };
 
-         if (blocked) {
+        if (blocked) {
             result = {
                 body: { error: "当前的请求过于频繁, 已触发B站风控, 请过段时间再尝试," },
                 status: 400
