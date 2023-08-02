@@ -174,14 +174,14 @@ async function getDynamicCommentList(dynamic_id) {
     do {
 
         let response = await http.get(URL_COMMENT_LIST, query);
-
+        const response_data = response.data;
 
         //如果有错误代码
-        if (response.data.code !== 0) {
+        if (response_data.code !== 0) {
             //增加错误次数, 然后重新请求
             errorTime++;
             //输出错误信息
-            console.error(response.data);
+            console.error(response_data);
 
             //如果是404错误, 尝试更换 请求参数
             if (response_data.code === -404) {
@@ -192,7 +192,6 @@ async function getDynamicCommentList(dynamic_id) {
                 query.oid = dynamic_id;
 
             }
-
             else if (response_data.code === -412) {
                 errorTime = 10;
                 blocked = true;
@@ -201,18 +200,18 @@ async function getDynamicCommentList(dynamic_id) {
         } else {
 
             //保存新获取到的用户数据到 数组里
-            users.add(response.data);
+            users.add(response_data);
 
-            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('cursor')) {
+            if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('cursor')) {
                 //统计总用户数 (只统计一次)
                 /*if (totalUserCount === 0) {
-                    totalUserCount = response.data.data.cursor.all_count;
+                    totalUserCount = response_data.data.cursor.all_count;
                 }*/
                 //如果还有后续
-                if (response.data.data.cursor.is_end === false) {
+                if (response_data.data.cursor.is_end === false) {
 
                     //query.next++; //mode 3情况的下一个分页为递增
-                    query.next = response.data.data.cursor.next; //mode 2情况的下一个分页需要在请求里获取
+                    query.next = response_data.data.cursor.next; //mode 2情况的下一个分页需要在请求里获取
 
                 } else {
                     hasMore = false;
@@ -221,9 +220,9 @@ async function getDynamicCommentList(dynamic_id) {
             }
 
             //统计一级评论的数量
-            if (response.data.hasOwnProperty('data') && response.data.data.hasOwnProperty('replies') && Array.isArray(response.data.data.replies)) {
+            if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('replies') && Array.isArray(response_data.data.replies)) {
 
-                totalUserCount += response.data.data.replies.length;
+                totalUserCount += response_data.data.replies.length;
             }
 
         }
@@ -299,7 +298,7 @@ async function getDynamicLikeList(dynamic_id) {
             //输出错误信息
             console.error(response_data);
 
-            if (response.data.code === -412) {
+            if (response_data.code === -412) {
                 errorTime = 10;
                 blocked = true;
             }
