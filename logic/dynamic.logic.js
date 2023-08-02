@@ -8,7 +8,9 @@ const URL_LIKE_LIST = 'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/
 
 const URL_DYNAMIC_DETAIL = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail';
 
-
+const COMMENT_TYPE_DYNAMIC = 11;
+const COMMENT_TYPE_DYNAMIC_OLD = 17;
+const COMMENT_TYPE_VIDEO = 1;
 
 
 //获取转发用户列表
@@ -64,10 +66,13 @@ async function getDynamicRepostList(dynamic_id) {
             } else {
                 hasMore = false;
             }
+
+            console.log('暂停: 当前列表长度' + totalUserCount);
+            //暂停2秒钟
+            await sleep_loop(1000 * 6);
         }
 
-        //暂停2秒钟
-        await sleep_loop(1000 * 6);
+
     }
     //还有更多, 并且错误次数低于10
     while (hasMore && errorTime < 10)
@@ -138,7 +143,7 @@ async function getDynamicCommentList(dynamic_id) {
         //如果是原创动态
         //if (dynamic_response.data.data.card.desc.orig_type === 0) {
         //设置评论列表类型
-        type = 11;
+        type = COMMENT_TYPE_DYNAMIC;
         //设置专属OID
         oid = dynamic_response.data.data.card.desc.rid;
         //}
@@ -157,13 +162,17 @@ async function getDynamicCommentList(dynamic_id) {
 
     let query = {
         oid,
-        jsonp: 'jsonp',
+        //jsonp: 'jsonp',
         type,
         mode: 2, //最新排序
         //mode: 3, //热门排序
 
         //offset
-        next: 0,
+        //next: 0,
+        ps: 30, //设置列表长度 (可选)
+        pagination_str: JSON.stringify({
+            offset: "",
+        }),
 
     };
 
@@ -186,10 +195,23 @@ async function getDynamicCommentList(dynamic_id) {
             //如果是404错误, 尝试更换 请求参数
             if (response_data.code === -404) {
 
-                //更改评论列表类型
-                query.type = 17;
-                //更改oid为 动态ID
-                query.oid = dynamic_id;
+                //如果当前参数是默认 
+                if (query.type === COMMENT_TYPE_DYNAMIC) {
+                    //更改评论列表类型
+                    query.type = COMMENT_TYPE_DYNAMIC_OLD;
+                    //更改oid为 动态ID
+                    query.oid = dynamic_id;
+                }
+                //如果参数 已经是旧类型 但还是错的
+                else if (query.type === COMMENT_TYPE_DYNAMIC_OLD) {
+
+                    //那就改成 视频类型
+                    query.type = COMMENT_TYPE_VIDEO;
+                    //重置默认oid
+                    query.oid = oid;
+                }
+
+
 
             }
             else if (response_data.code === -412) {
@@ -203,15 +225,29 @@ async function getDynamicCommentList(dynamic_id) {
             users.add(response_data);
 
             if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('cursor')) {
+
+                const cursor = response_data.data.cursor;
+
                 //统计总用户数 (只统计一次)
                 /*if (totalUserCount === 0) {
                     totalUserCount = response_data.data.cursor.all_count;
                 }*/
                 //如果还有后续
-                if (response_data.data.cursor.is_end === false) {
+                if (cursor.is_end === false) {
 
                     //query.next++; //mode 3情况的下一个分页为递增
-                    query.next = response_data.data.cursor.next; //mode 2情况的下一个分页需要在请求里获取
+                    //query.next = cursor.next; //mode 2情况的下一个分页需要在请求里获取
+
+                    //设置下个分页索引
+                    query.pagination_str = JSON.stringify({
+                        offset: JSON.stringify({
+                            type: 3,
+                            direction: 1,
+                            Data: {
+                                cursor: cursor.next,
+                            }
+                        })
+                    });
 
                 } else {
                     hasMore = false;
@@ -320,6 +356,10 @@ async function getDynamicLikeList(dynamic_id) {
             } else {
                 hasMore = false;
             }
+
+            console.log('暂停: 当前列表长度' + totalUserCount);
+            //暂停3秒钟
+            await sleep_loop(1000 * 3);
 
         }
     }
