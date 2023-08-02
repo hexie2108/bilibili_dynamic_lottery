@@ -15,7 +15,7 @@ $(function () {
         const inputValue = $(this).val();
         //修正旧版动态地址
         if (inputValue.includes(BILIBILI_URL_OLD)) {
-            const videoId = url.match(/\/(\d+)\?/)?.[1];
+            const videoId = inputValue.match(/\/(\d+)\?/)?.[1];
             if (videoId) {
                 const newURL = `https://www.${BILIBILI_URL}/${videoId}`;
                 // 更新输入框的值
