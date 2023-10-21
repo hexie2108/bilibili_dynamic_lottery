@@ -15,6 +15,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fetch-headers": "^2.0.0",
+    "md5": "^2.3.0",
     "node-fetch": "^2.6.0"
   }
 }

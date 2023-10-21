@@ -1,16 +1,19 @@
+const md5 = require('md5');
 const http = require('./conn.util');
 const user_type = require('../class/Users');
 
 //const URL_REPOST_LIST = 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
 const URL_REPOST_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/forward';
-const URL_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/main';
+const URL_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/wbi/main';
 const URL_LIKE_LIST = 'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/spec_item_likes';
+const URL_WBI_TOKEN = 'https://api.bilibili.com/x/web-interface/nav';
 
 const URL_DYNAMIC_DETAIL = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail';
 
 const COMMENT_TYPE_DYNAMIC = 11;
 const COMMENT_TYPE_DYNAMIC_OLD = 17;
 const COMMENT_TYPE_VIDEO = 1;
+
 
 
 //获取转发用户列表
@@ -182,8 +185,12 @@ async function getDynamicCommentList(dynamic_id) {
 
     do {
 
+
+        //加密参数
+        query = await encryptionQueryByWbiToken(query);
         let response = await http.get(URL_COMMENT_LIST, query);
         const response_data = response.data;
+
 
         //如果有错误代码
         if (response_data.code !== 0) {
@@ -192,8 +199,8 @@ async function getDynamicCommentList(dynamic_id) {
             //输出错误信息
             console.error(response_data);
 
-            //如果是404错误, 尝试更换 请求参数
-            if (response_data.code === -404) {
+            //如果是403错误, 尝试更换 请求参数
+            if (response_data.code === -403) {
 
                 //如果当前参数是默认 
                 if (query.type === COMMENT_TYPE_DYNAMIC) {
@@ -211,7 +218,7 @@ async function getDynamicCommentList(dynamic_id) {
                     query.oid = oid;
                 }
 
-
+                query = await encryptionQueryByWbiToken(query);
 
             }
             else if (response_data.code === -412) {
@@ -248,6 +255,8 @@ async function getDynamicCommentList(dynamic_id) {
                             }
                         })
                     });
+
+                    query = await encryptionQueryByWbiToken(query);
 
                 } else {
                     hasMore = false;
@@ -398,6 +407,126 @@ async function getDynamicLikeList(dynamic_id) {
     }
 
     return result;
+}
+
+
+
+
+/**
+ * 获取最新的 img_key 和 sub_key
+ * @returns {object}
+ * {
+ *    img_key,
+ *    sub_key,
+ * }
+ */
+async function getWbiToken() {
+
+    let result = {};
+
+    //如果有缓存
+    if (getWbiToken.img_key && getWbiToken.sub_key) {
+        result = {
+            img_key: getWbiToken.img_key,
+            sub_key: getWbiToken.sub_key
+        };
+    }
+    //否则重新获取
+    else {
+
+        let response = await http.get(URL_WBI_TOKEN);
+        const response_data = response.data;
+        if (response_data.hasOwnProperty('data')) {
+            let img_url = response_data.data.wbi_img.img_url || '';
+            let sub_url = response_data.data.wbi_img.sub_url || '';
+            if (img_url && sub_url) {
+
+                //保存到缓存
+                getWbiToken.img_key = img_url.slice(
+                    img_url.lastIndexOf('/') + 1,
+                    img_url.lastIndexOf('.')
+                );
+                getWbiToken.sub_key = sub_url.slice(
+                    sub_url.lastIndexOf('/') + 1,
+                    sub_url.lastIndexOf('.')
+                );
+
+                result = {
+                    img_key: getWbiToken.img_key,
+                    sub_key: getWbiToken.sub_key
+                };
+            }
+        }
+    }
+
+    return result;
+
+}
+
+/**
+ * 对 imgKey 和 subKey 进行字符顺序打乱编码
+ * @param {string} orig 
+ * @returns {string}
+ */
+function getMixinWbiToken(orig) {
+
+    //加密Wbi的表
+    const wbi_mixin_table = [
+        46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+        33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+        61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
+        36, 20, 34, 44, 52
+    ];
+
+    let temp = '';
+    wbi_mixin_table.forEach((n) => {
+        temp += orig[n]
+    });
+    return temp.slice(0, 32);
+}
+
+
+/**
+ * 使用wbi签名对参数进行加密
+ * @param {object} query 
+ * @returns  {object} 新的参数对象
+ */
+async function encryptionQueryByWbiToken(query) {
+
+    const wbi_token = await getWbiToken();
+    if (!wbi_token.img_key || !wbi_token.sub_key) {
+        throw new Error('wbi签名获取失败');
+    }
+
+    const mixin_key = getMixinWbiToken(wbi_token.img_key + wbi_token.sub_key);
+    const curr_time = Math.round(Date.now() / 1000);
+    const chr_filter = /[!'()*]/g;
+
+    //删除w_rid字段
+    delete query.w_rid;
+    // 添加 wts 字段
+    query.wts = curr_time;
+
+
+    const new_query = [];
+    // 按照 key 重排参数
+    Object.keys(query).sort().forEach((key) => {
+        new_query.push(
+            `${encodeURIComponent(key)}=${encodeURIComponent(
+                // 过滤 value 中的 "!'()*" 字符
+                query[key].toString().replace(chr_filter, '')
+            )}`
+        );
+    });
+
+    // console.log(new_query.join('&'));
+
+    // 计算 w_rid
+    const wbi_sign = md5(new_query.join('&') + mixin_key);
+
+    query.w_rid = wbi_sign;
+
+    return query;
 }
 
 /**
