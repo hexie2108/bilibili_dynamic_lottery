@@ -191,16 +191,19 @@ async function getDynamicCommentList(dynamic_id) {
         let response = await http.get(URL_COMMENT_LIST, query);
         const response_data = response.data;
 
+        // console.log(query);
+        // console.log(response_data);
 
-        //如果有错误代码
-        if (response_data.code !== 0) {
+
+        //如果有错误代码 或者没有回复记录
+        if (response_data.code !== 0 || !response_data.data.replies) {
             //增加错误次数, 然后重新请求
             errorTime++;
             //输出错误信息
             console.error(response_data);
 
             //如果是403错误, 尝试更换 请求参数
-            if (response_data.code === -403) {
+            if (response_data.code === -403 || response_data.code === -404 || !response_data.data.replies) {
 
                 //如果当前参数是默认 
                 if (query.type === COMMENT_TYPE_DYNAMIC) {
