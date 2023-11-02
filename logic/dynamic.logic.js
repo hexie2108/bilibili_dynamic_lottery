@@ -134,6 +134,7 @@ async function getDynamicCommentList(dynamic_id) {
 
 
     try {
+        // console.log(dynamic_response.data);
 
         if (dynamic_response.data.data.hasOwnProperty('card') === false) {
             return {
@@ -248,16 +249,23 @@ async function getDynamicCommentList(dynamic_id) {
                     //query.next++; //mode 3情况的下一个分页为递增
                     //query.next = cursor.next; //mode 2情况的下一个分页需要在请求里获取
 
+
                     //设置下个分页索引
+                    // query.pagination_str = JSON.stringify({
+                    //     offset: JSON.stringify({
+                    //         type: 3,
+                    //         direction: 1,
+                    //         Data: {
+                    //             cursor: cursor.next,
+                    //         }
+                    //     })
+                    // });
+
+                    //复制新版分页参数
                     query.pagination_str = JSON.stringify({
-                        offset: JSON.stringify({
-                            type: 3,
-                            direction: 1,
-                            Data: {
-                                cursor: cursor.next,
-                            }
-                        })
+                        offset: cursor.pagination_reply.next_offset
                     });
+
 
                     query = await encryptionQueryByWbiToken(query);
 
