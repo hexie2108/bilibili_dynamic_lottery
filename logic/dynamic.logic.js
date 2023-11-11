@@ -197,14 +197,14 @@ async function getDynamicCommentList(dynamic_id) {
 
 
         //如果有错误代码 或者没有回复记录
-        if (response_data.code !== 0 || !response_data.data.replies) {
+        if (response_data.code !== 0 || !response_data.data.replies || (totalUserCount === 0 && !response_data.data.replies.length)) {
             //增加错误次数, 然后重新请求
             errorTime++;
             //输出错误信息
-            console.error(response_data);
+            // console.error(response_data);
 
             //如果是403错误, 尝试更换 请求参数
-            if (response_data.code === -403 || response_data.code === -404 || !response_data.data.replies) {
+            if (response_data.code === -403 || response_data.code === -404 || !response_data.data.replies || (totalUserCount === 0 && !response_data.data.replies.length)) {
 
                 //如果当前参数是默认 
                 if (query.type === COMMENT_TYPE_DYNAMIC) {
