@@ -9,25 +9,28 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     <link rel="stylesheet" type="text/css"
-        href="https://cdn.staticfile.org/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
+        href="https://cdn.staticfile.org/bootstrap/5.3.1/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/font-awesome/5.15.3/css/all.min.css"> -->
+    <link rel="stylesheet" type="text/css" href="style.css?ver=7">
+    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"> -->
 
 
-    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.7.1/jquery.min.js"></script>
+    <!-- <script src="js/jquery.min.js"></script> -->
+    <script src="https://cdn.staticfile.org/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="js/bootstrap.bundle.min.js"></script> -->
 
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
 
-    <script src="js/base.js"></script>
-    <script src="js/get-user.js"></script>
+    <script src="js/base.js?ver=7"></script>
+    <script src="js/get-user.js?ver=7"></script>
 
-    <script src="js/start-game.js"></script>
+    <script src="js/start-game.js?ver=7"></script>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442793010183347"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 
 
-    <title>B站动态在线抽奖系统V5 | 初音社</title>
+    <title>B站动态在线抽奖系统V7 | 初音社</title>
 
 
 </head>
@@ -37,21 +40,22 @@
 
         <header class="text-center">
             <div class="mt-5"></div>
-            <h2 class="my-3">B站动态在线抽奖系统V6 | @<a href="https://space.bilibili.com/277257" target="_blank"
-                    title="初音社">初音社</a></h2>
-            <p>本网页程序可以从B站动态中提取出转发/点赞过的用户列表, 然后通过随机方式选出中奖者 (2023年10月更新) </p>
+            <h2 class="my-3">B站动态在线抽奖系统V7 | <a href="https://space.bilibili.com/277257" target="_blank"
+                    title="初音社">@初音社</a></h2>
+            <p>本网页程序可以从B站动态中提取出转发/点赞/评论过的用户列表, 然后通过随机方式选出中奖者 (2023年12月28日更新) </p>
 
             <div class="row">
 
                 <form class="col-12">
 
-                    <div class="row gy-4">
+                    <div class="row gy-3">
                         <div class="col-12">
-                            <div class="input-group input-group-lg ">
-                                <label class="input-group-text" for="dynamic_link">动态地址</label>
+                            <div class="input-group  input-group-lg ">
+                                <label class="input-group-text d-none d-sm-block" for="dynamic_link">动态地址</label>
                                 <input class="form-control " type="text" id="dynamic_link" name="dynamic_link"
                                     placeholder="例子: https://www.bilibili.com/opus/794288535874043936" />
                             </div>
+                            <div class="text-start small text-muted mt-1">请用网页电脑端复制动态地址, 不支持从手机APP里复制</div>
                         </div>
 
                         <div class="col-6">
@@ -88,7 +92,7 @@
                                     <input class="form-check-input" type="radio" name="user_type" id="user_type_1"
                                         value="forward" checked>
                                     <label class="form-check-label" for="user_type_1">
-                                        转发用户 (最大支持 550名)
+                                        转发用户
                                     </label>
                                 </div>
 
@@ -96,7 +100,7 @@
                                     <input class="form-check-input" type="radio" name="user_type" id="user_type_3"
                                         value="like">
                                     <label class="form-check-label" for="user_type_1">
-                                        点赞用户 (最大支持 动态视频:300名/图文动态: 25.000名)
+                                        点赞用户
                                     </label>
                                 </div>
 
@@ -116,15 +120,17 @@
 
                             <div class="text-start" style="font-size: 1.25em">
                                 <div class="text-info">
-                                    注意1: 因为的B站API接口有频率限制, 数据的获取速度会比较慢, 大约<strong>每1秒</strong>只能获取<strong>5~10条</strong>记录, 请耐心等待. 如果在获取过程中触发风控, 需要等待几个小时后才能恢复
+                                    注意1: 动态数据的获取速度会比较慢, 大约<strong>每1秒</strong>只能获取<strong>20-40条</strong>用户记录, 请耐心等待
                                 </div>
                                 <div class="text-warning">
-                                    注意2: 转发用户 无法使用等级过滤器, 并且容易被风控导致无法获取, 建议使用点赞/评论用户列表.
+                                    注意2: 转发/点赞用户 无法使用最低等级过滤器.
                                 </div>
                                 <div class="text-secondary">
-                                    注意3: 评论用户 只会获取直接回复的用户, 楼中楼的子评论不在获取范围, 如果提示登陆凭证过期, 请联系管理员更新凭证.
+                                    注意3: 评论用户 只会获取直接回复的用户, 楼中楼的子评论不在获取范围,.
                                 </div>
-                                
+                                <div class="text-danger">
+                                    注意4: 如果提示登陆凭证过期/失效, 请联系管理员更新凭证.
+                                </div>
                             </div>
 
                         </div>
@@ -133,29 +139,33 @@
 
                 </form>
 
-                <div class="col-12 row my-4">
+                <div class="col-12 my-3">
+                    <div class="row">
+                        <script async
+                            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442793010183347"
+                            crossorigin="anonymous"></script>
+                        <!-- B站抽奖广告 -->
+                        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1442793010183347"
+                            data-ad-slot="5515977879" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
 
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442793010183347"
-                    crossorigin="anonymous"></script>
-                <!-- B站抽奖广告 -->
-                <ins class="adsbygoogle"
-                    style="display:block"
-                    data-ad-client="ca-pub-1442793010183347"
-                    data-ad-slot="5515977879"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"></ins>
-                <script>
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+                    </div>
+
 
                 </div>
 
-                <div class="col-12 row my-3">
-                    <div class="col-6">
-                        <button id="" class="get-button btn btn-secondary  w-75 btn-lg">1. 加载用户列表</button>
-                    </div>
-                    <div class="col-6">
-                        <button id="" class="start-button btn btn-primary w-75  btn-lg" disabled>2. 开始抽选</button>
+                <div class="col-12 ">
+
+                    <div class="row gy-3 justify-content-center">
+
+                        <div class="col-12 col-sm-4">
+                            <button id="" class="get-button btn btn-secondary  w-100 btn-lg">1. 加载用户列表</button>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <button id="" class="start-button btn btn-primary w-100  btn-lg" disabled>2. 开始抽选</button>
+                        </div>
                     </div>
 
                 </div>
@@ -168,12 +178,12 @@
 
         <hr />
 
-        <div class="user-count row" style="display: none">
+        <div class="user-count row my-2" style="display: none">
             <div class="col text-center">
                 全部用户数 <span class="badge bg-info"></span>
             </div>
             <div class="col text-center">
-                过滤重复后 <span class="badge bg-info"></span>
+                过滤不符合条件后 <span class="badge bg-info"></span>
             </div>
             <div class="col text-center">
                 过滤最低等级后 <span class="badge bg-info"></span>
@@ -181,7 +191,7 @@
 
         </div>
 
-        <div class="user-list row justify-content-center">
+        <div class="user-list row row-cols-1 row-cols-md-3 row-cols-xxl-6  g-2">
 
 
         </div>
@@ -191,8 +201,8 @@
 
     <!--底部-->
     <div class="my-5 text-center">
-        <h4> <a href="https://www.mikuclub.cc">初音社网站</a> | Github源码地址 <a
-                href="https://github.com/hexie2108/bilibili_dynamic_lottery">bilibili_dynamic_lottery</a></h4>
+        <div> <a href="https://www.mikuclub.cc">初音社网站</a> | Github源码地址 <a
+                href="https://github.com/hexie2108/bilibili_dynamic_lottery">bilibili_dynamic_lottery</a></div>
     </div>
 
     <!--模态窗口-->
@@ -202,7 +212,7 @@
 
                 <div class="modal-body text-center p-5">
                     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="sr-only">Loading...</span>
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
             </div>

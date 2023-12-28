@@ -2,13 +2,22 @@ const md5 = require('md5');
 const http = require('./conn.util');
 const user_type = require('../class/Users');
 
-//const URL_REPOST_LIST = 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
-const URL_REPOST_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/forward';
-const URL_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/wbi/main';
-const URL_LIKE_LIST = 'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/spec_item_likes';
+//API签名验证接口
 const URL_WBI_TOKEN = 'https://api.bilibili.com/x/web-interface/nav';
-
+//评论详情接口
 const URL_DYNAMIC_DETAIL = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail';
+
+//const URL_REPOST_LIST = 'https://api.vc.bilibili.com/dynamic_repost/v1/dynamic_repost/repost_detail';
+//旧版 转发列表
+const URL_REPOST_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/forward';
+//旧版 点赞列表
+const URL_LIKE_LIST = 'https://api.vc.bilibili.com/dynamic_like/v1/dynamic_like/spec_item_likes';
+
+//评论列表
+const URL_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/wbi/main';
+
+//新版 点赞与转发列表
+const URL_REACTION_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/reaction';
 
 const COMMENT_TYPE_DYNAMIC = 11;
 const COMMENT_TYPE_DYNAMIC_OLD = 17;
@@ -16,14 +25,20 @@ const COMMENT_TYPE_VIDEO = 1;
 
 
 
-//获取转发用户列表
-async function getDynamicRepostList(dynamic_id) {
+
+/**
+ * 获取转发和点赞用户列表
+ * @param {number} dynamic_id 
+ * @param {string} action_type 
+ * @returns 
+ */
+async function getDynamicRepostAndLikeList(dynamic_id, action_type) {
 
     let result;
     let hasMore = true;
     let errorTime = 0;
     let blocked = false;
-    let users = new user_type.Users();
+    let users = new user_type.ArrayReactionUser();
 
     let query = { id: dynamic_id };
 
@@ -33,7 +48,7 @@ async function getDynamicRepostList(dynamic_id) {
     do {
         //单次提取20条转发记录
         //console.log(URL_REPOST_LIST+'?dynamic_id='+query.dynamic_id+'&offset='+query.offset);
-        let response = await http.get(URL_REPOST_LIST, query);
+        let response = await http.get(URL_REACTION_LIST, query);
         const response_data = response.data;
 
         //console.log(response);
@@ -55,7 +70,7 @@ async function getDynamicRepostList(dynamic_id) {
         } else {
 
             //保存新获取到的用户数据到 数组里
-            users.add(response_data);
+            users.add(response_data, action_type);
 
             //统计总用户数
             if (response_data.hasOwnProperty('data') && response_data.data.hasOwnProperty('items') && Array.isArray(response_data.data.items) && response_data.data.items.length > 0) {
@@ -70,9 +85,9 @@ async function getDynamicRepostList(dynamic_id) {
                 hasMore = false;
             }
 
-            console.log('暂停: 当前列表长度' + totalUserCount);
-            //暂停2秒钟
-            await sleep_loop(1000 * 6);
+            console.log('当前列表长度' + totalUserCount);
+            // //暂停2秒钟
+            // await sleep_loop(1000 * 6);
         }
 
 
@@ -320,7 +335,15 @@ async function getDynamicCommentList(dynamic_id) {
 }
 
 
-//获取点赞用户列表
+
+
+/**
+ * @deprecated
+ * 获取点赞用户列表
+ * 
+ * @param {number} dynamic_id 
+ * @returns 
+ */
 async function getDynamicLikeList(dynamic_id) {
 
     let result;
@@ -551,6 +574,6 @@ function delay_by_promise(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-module.exports.getDynamicRepostList = getDynamicRepostList;
+module.exports.getDynamicRepostAndLikeList = getDynamicRepostAndLikeList;
 module.exports.getDynamicCommentList = getDynamicCommentList;
 module.exports.getDynamicLikeList = getDynamicLikeList;

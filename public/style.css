@@ -8,6 +8,11 @@
     height: 125px;
 }
 
+.user-list div img:hover{
+    opacity: 0.5;
+    transition: 0.25s;
+}
+
 /*
 .user-list .name {
     width: 40%;

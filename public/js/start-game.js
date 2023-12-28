@@ -106,5 +106,10 @@ function endGame() {
 
     $('.toast2 .toast-title').html("抽选已结束");
     $('.toast2 .toast-body').html("恭喜中奖者: " + winnerName);
+
+    //高量中奖者
+    $('.user-list .user-item').addClass('border-success border-2');
+    $('.user-list .user-item .name').addClass('text-success fw-bold');
+    
 }
 

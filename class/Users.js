@@ -53,15 +53,15 @@ class Users extends Array {
     //从转发列表获取用户
     add(result) {
 
-        if(result.hasOwnProperty('data') && result.data &&  result.data.hasOwnProperty('items')){
+        if (result.hasOwnProperty('data') && result.data && result.data.hasOwnProperty('items')) {
 
             let items = result.data.items;
 
             if (Array.isArray(items) && items.length > 0) {
 
                 //提取数据, 遍历添加到用户数组
-                for(const item of items){
-                    
+                for (const item of items) {
+
                     let user = new User(item);
 
                     //如果用户数据不完整, 或者 已经存在过 (避免重复转发)
@@ -70,12 +70,12 @@ class Users extends Array {
                     }
 
                 }
-    
+
             }
 
         }
 
-      
+
     }
 
 
@@ -112,7 +112,7 @@ class CommentUser {
 
 }
 
-//评论用户
+//点赞用户
 class LikeUser {
 
     constructor(member) {
@@ -121,23 +121,23 @@ class LikeUser {
         this.name = member["uname"];
         this.avatar = member["face_url"];
 
-        if(member.hasOwnProperty('user_info')){
+        if (member.hasOwnProperty('user_info')) {
 
             const user_info = member['user_info'];
 
             if (user_info.hasOwnProperty('level_info')) {
                 this.level = user_info.level_info.current_level || '';
             }
-    
+
             //如果是大会员
             if (user_info.hasOwnProperty('vip') && user_info.vip.hasOwnProperty('label')) {
-    
+
                 this.vip = user_info.vip.label.text || '';
-    
+
             }
 
         }
-      
+
 
 
 
@@ -240,9 +240,68 @@ class LikeUsers extends Array {
 
 }
 
+/*
+============================================================================
+*/
+
+
+//评论用户
+class ReactionUser {
+
+    constructor(member) {
+        this.uid = member["mid"];
+        this.name = member["name"];
+        this.avatar = member["face"];
+    }
+
+    /**
+     * 如果有空值, 说明用户信息获取不完整
+     */
+    isNull() {
+        return !(this.uid && this.name && this.avatar);
+    }
+
+}
+
+//点赞和转发用户数组
+class ArrayReactionUser extends Array {
+
+
+    //从评论列表获取用户
+    add(result, action_type) {
+
+        if (result.hasOwnProperty('data') && result["data"].hasOwnProperty('items') && Array.isArray(result.data.items) && result.data.items.length > 0) {
+
+
+            //提取数据, 遍历添加到用户数组
+            for (const member of result.data.items) {
+
+                //只记录 执行了对应动作类型的用户
+                if (member.action === action_type) {
+
+                    let user = new ReactionUser(member);
+
+                    //如果用户数据完整 并且还未保存过 (避免重复转发)
+                    if (!user.isNull() && !this.find(element => element.uid === user.uid)) {
+                        this.push(user);
+                    }
+                }
+
+            }
+
+
+        }
+
+
+
+    }
+
+}
+
 
 module.exports = {
     Users,
     CommentUsers,
     LikeUsers,
+    ArrayReactionUser,
 };

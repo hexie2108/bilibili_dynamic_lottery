@@ -168,17 +168,25 @@ function sendRequest(dynamicId, user_type) {
 
                     //创建插入元素到页面
                     let newElement = `
-<div class="border col-3 m-2 p-2 rounded">
+<div class="col user-item-container">
 
-   <div class="row">
-        <div class="col-auto">
-           
-                <div>
-                    <a href="https://space.bilibili.com/${user.uid}"  target="_blank" class="text-dark text-decoration-none">
-                        <img class="img-fluid rounded-circle" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
+    <div class="user-item border rounded p-2 text-center">
+      
+                <div class="my-2">
+                        <div>
+                            <a href="https://space.bilibili.com/${user.uid}"  target="_blank">
+                                <img class="img-fluid rounded-circle" src="${user.avatar}" alt="${user.name}" referrerPolicy="no-referrer"/>
+                            </a>
+                        </div>
+                      
+                </div>
+                <div class="my-2">
+                    <a href="https://space.bilibili.com/${user.uid}"  target="_blank" class="d-block text-dark text-decoration-none overflow-hidden" style="height:40px">
+                        <span class="name small">${user.name}</span>
                     </a>
                 </div>
-                <div class="mt-2" style="height:20px">
+
+                <div class="my-2" style="height:20px">
 
                     <span class="d-inline-block badge me-1 ${getBgColorClassByLevel(user.level)}">
                         Lv ${user.level}
@@ -189,20 +197,9 @@ function sendRequest(dynamicId, user_type) {
 
                 </div>
 
-
-              
-            
         </div>
-        <div class="col">
-            <a href="https://space.bilibili.com/${user.uid}"  target="_blank" class="text-dark text-decoration-none">
-                <span class="name small">${user.name}</span>
-            </a>
-        </div>
-
-   </div>
-
    
-   
+    </div>
 </div>`;
                     $userListElement.append(newElement);
                 }
