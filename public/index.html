@@ -8,8 +8,7 @@
 
     <link rel="shortcut icon" href="img/favicon.ico">
 
-    <link rel="stylesheet" type="text/css"
-        href="https://cdn.staticfile.org/bootstrap/5.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/bootstrap/5.3.1/css/bootstrap.min.css">
     <!-- <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/font-awesome/5.15.3/css/all.min.css"> -->
     <link rel="stylesheet" type="text/css" href="style.css?ver=7">
     <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"> -->
@@ -89,10 +88,18 @@
                                 </div>
 
                                 <div class="form-check form-check-inline m-2">
+                                    <input class="form-check-input" type="radio" name="user_type" id="user_type_2"
+                                        value="comment" checked>
+                                    <label class="form-check-label" for="user_type_2">
+                                        评论用户
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline m-2">
                                     <input class="form-check-input" type="radio" name="user_type" id="user_type_1"
-                                        value="forward" >
+                                        value="forward">
                                     <label class="form-check-label" for="user_type_1">
-                                        转发用户 (只能获取到最后500名)
+                                        转发用户 (只能获取到最后300名转发+点赞)
                                     </label>
                                 </div>
 
@@ -100,18 +107,11 @@
                                     <input class="form-check-input" type="radio" name="user_type" id="user_type_3"
                                         value="like">
                                     <label class="form-check-label" for="user_type_1">
-                                        点赞用户
+                                        点赞用户 (只能获取到最后300名转发+点赞)
                                     </label>
                                 </div>
 
 
-                                <div class="form-check form-check-inline m-2">
-                                    <input class="form-check-input" type="radio" name="user_type" id="user_type_2"
-                                        value="comment" checked>
-                                    <label class="form-check-label" for="user_type_2">
-                                        评论用户
-                                    </label>
-                                </div>
 
                             </div>
 
