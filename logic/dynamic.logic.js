@@ -23,7 +23,8 @@ const COMMENT_TYPE_DYNAMIC = 11;
 const COMMENT_TYPE_DYNAMIC_OLD = 17;
 const COMMENT_TYPE_VIDEO = 1;
 
-
+//点赞转发列表的获取上限
+const MAX_LIKE_LIST = 2000;
 
 
 /**
@@ -82,6 +83,14 @@ async function getDynamicRepostAndLikeList(dynamic_id, action_type) {
                 //设置下一页的变量
                 query.offset = response_data.data['offset'];
             } else {
+                hasMore = false;
+            }
+
+            //如果已经超过上限
+            if(totalUserCount >= MAX_LIKE_LIST){
+                //重设统计总数
+                totalUserCount = MAX_LIKE_LIST;
+                //终止运行
                 hasMore = false;
             }
 
