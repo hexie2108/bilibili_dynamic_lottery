@@ -24,7 +24,7 @@ const COMMENT_TYPE_DYNAMIC_OLD = 17;
 const COMMENT_TYPE_VIDEO = 1;
 
 //点赞转发列表的获取上限
-const MAX_LIKE_LIST = 2000;
+const MAX_LIKE_LIST = 1000000;
 
 
 /**
