@@ -305,6 +305,8 @@ async function getDynamicCommentList(dynamic_id) {
                 totalUserCount += response_data.data.replies.length;
             }
 
+            console.log('当前列表长度' + totalUserCount);
+
         }
     }
     //还有更多, 并且错误次数低于10
