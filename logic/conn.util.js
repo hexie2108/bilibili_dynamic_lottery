@@ -51,7 +51,7 @@ async function request(url, options, timeOutTime) {
 
         //parse response data
         response.data = await parseResponseData(response);
-        return  response;
+        return response;
     }
     catch (error) {
 
@@ -92,6 +92,8 @@ async function get(url, queryData = null) {
         "headers": jsonHeaders,
     };
 
+    // console.log('请求地址: ' + url + query);
+
     return await request(url + query, options, timeOutTime);
 }
 
@@ -121,7 +123,7 @@ async function parseResponseData(response) {
             data = await response.text();
         }
     }
-    else{
+    else {
         data = await response.text();
     }
 
