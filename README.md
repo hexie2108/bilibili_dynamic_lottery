@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./vue/public/logo.png" width="250" height="200">
+    <img src="./vue/public/logo.png" width="250" height="250">
 </p>
 
 # B站在线抽奖工具
