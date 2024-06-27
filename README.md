@@ -16,14 +16,14 @@
 [2024-06-27] 新版已更换为 前端Vue3+后端PHP的组合, 用Nodejs开发的旧版已移动到分支里 [old-nodejs-jquery-version](https://github.com/hexie2108/bilibili_dynamic_lottery/tree/old-nodejs-jquery-version "old-nodejs-jquery-version")
 为了省事我把前端和后端两个项目扔在同一个GIT库里了, API目录里是后端代码, VUE目录里前端代码
 
-##后端的部署方法
+# 后端的部署方法
 1. 需要一台支持PHP环境的服务器
 2. 把项目除了 `vue` 目录以外的文件部署到网站的目录下
 3. 重命名`config`目录里的 `cookie.example.txt` 改成 `cookie.txt` 
 4. 然后创建一个B站小号登陆B站, 把账号使用的cookie字符串复制到 `cookie.txt` 文件内
 5. 项目的访问入口为api目录里的 `index.php` , 部署完成后就能通过 api路径访问 例子: https://www.abcd/api/index.php
 
-##前端的部署方法
+# 前端的部署方法
 1. 安装Nodejs+npm
 2. 在`vue`目录里打开命令行 运行 `npm install` 安装下载依赖文件
 3. 重命名vue目录里的 `.env.example` 改成 `.env`
