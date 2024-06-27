@@ -41,10 +41,10 @@ class Reaction_Service  extends Base_Service
         $result = $this->get_reaction_list($id, User_Model::ACTION_FORWARD);
 
         //只保留来自于转发列表的用户
-        $result = array_filter($result, function (User_Model $user)
+        $result = array_values(array_filter($result, function (User_Model $user)
         {
             return $user->action === User_Model::ACTION_FORWARD;
-        });
+        }));
 
 
         return $result;
@@ -62,10 +62,10 @@ class Reaction_Service  extends Base_Service
         $result = $this->get_reaction_list($id, User_Model::ACTION_LIKE);
 
         //只保留来自于转发列表的用户
-        $result = array_filter($result, function (User_Model $user)
+        $result = array_values(array_filter($result, function (User_Model $user)
         {
             return $user->action === User_Model::ACTION_LIKE;
-        });
+        }));
 
 
         return $result;

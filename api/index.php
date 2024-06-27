@@ -17,6 +17,9 @@ class Action
     const GET_REQUEST_STATUS = 'get_request_status';
 }
 
+//启动会话
+// Session_Cache::start();
+
 $action = $_REQUEST['action'] ?? null;
 
 //要获取的动态ID/视频BV号
@@ -38,6 +41,7 @@ $reaction_service = new Reaction_Service($id_request);
 
 try
 {
+
     $result = '';
 
     switch ($action)
@@ -100,6 +104,7 @@ try
             {
                 throw new Exception('缺少id_request参数', 400);
             }
+
 
             $result = Base_Service::get_request_progress($id_request);
 

@@ -10,6 +10,15 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-regular-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@vuepic/vue-datepicker": "^8.8.0",
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5",
+    "moment": "^2.30.1",
     "vue": "^3.4.29"
   },
   "devDependencies": {

@@ -1,0 +1,72 @@
+@import './base.css';
+
+/* 取消所有链接的下划线 */
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    color: var(--color-miku);
+    transition: .25s;
+}
+
+/**
+自定义颜色 初音绿
+ */
+
+.text-miku {
+    color: var(--color-miku) !important;
+}
+
+.bg-miku {
+    background-color: var(--color-miku) !important;
+}
+
+.border-miku {
+    border-color: var(--color-miku) !important;
+}
+
+.text-bg-miku {
+    color: #fff !important;
+    background-color: var(--color-miku) !important;
+}
+
+
+.text-pink {
+    color: var(--color-pink) !important;
+}
+
+.border-pink {
+    border-color: var(--color-pink) !important;
+}
+
+.bg-pink {
+    background-color: var(--color-pink) !important;
+}
+
+/**
+自定义 初音绿按钮
+ */
+
+.btn-miku {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--color-miku);
+    --bs-btn-border-color: var(--color-miku);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--color-miku-dark);
+    --bs-btn-hover-border-color: var(--color-miku-dark);
+    --bs-btn-focus-shadow-rgb: 60, 153, 110;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--color-miku-dark);
+    --bs-btn-active-border-color: var(--color-miku-dark);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--color-miku-transparent);
+    --bs-btn-disabled-border-color: var(--color-miku-transparent);
+
+}
+
+.smaller {
+    font-size: 0.675em;
+}

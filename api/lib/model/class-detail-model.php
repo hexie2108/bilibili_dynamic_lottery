@@ -6,6 +6,8 @@ class Detail_Model
 {
     //视频的评论类型
     const COMMENT_TYPE_VIDEO = 1;
+    const SOURCE_TYPE_VIDEO = 'video';
+    const SOURCE_TYPE_DYNAMIC = 'dynamic';
 
 
     /**
@@ -69,6 +71,13 @@ class Detail_Model
      */
     public $comment_type;
 
+    /**
+     * 说明数据来源类型
+     *
+     * @var string
+     */
+    public $source_type;
+
 
     //避免被直接创建实例
     private function __construct()
@@ -98,6 +107,8 @@ class Detail_Model
         // $model->comment_area_id = bv_to_av($id);
         $model->comment_area_id = $video_data['aid'] ?? null;
         $model->comment_type = static::COMMENT_TYPE_VIDEO;
+
+        $model->source_type = static::SOURCE_TYPE_VIDEO;
 
         //如果无法提取到数据
         throw_exception_if_is_null($model->comment_area_id, '评论区ID 获取失败');
@@ -133,6 +144,8 @@ class Detail_Model
         //从动态详情中提取 评论区ID 和 评论类型
         $model->comment_area_id = $dynamic_data['item']['basic']['comment_id_str'] ?? null;
         $model->comment_type = $dynamic_data['item']['basic']['comment_type'] ?? null;
+
+        $model->source_type = static::SOURCE_TYPE_DYNAMIC;
 
         //如果无法提取到数据
         throw_exception_if_is_null($model->comment_area_id, '评论区ID 获取失败');
