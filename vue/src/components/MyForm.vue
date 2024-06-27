@@ -126,16 +126,17 @@ function extra_url_id(url) {
         <!-- 搜索框 -->
         <div class="col-12 col-xl-10">
 
-            <div class="row g-1">
-                <div class="col">
-                    <div class="bg-body-secondary rounded p-2 my-2">
-                        视频地址只支持 <strong>评论</strong> 抽取 | 动态地址支持 <strong>评论</strong> , <strong>点赞</strong> 和
-                        <strong>转发</strong> 抽取
-                    </div>
-                </div>
-
-
+            <div class="bg-miku text-bg-miku rounded p-2 my-2 fw-bold">
+                本工具可以从B站 (视频/动态) 中提取出 (评论/转发/点赞) 用户列表, 然后随机选出中奖者
             </div>
+            
+            <div class="bg-body-secondary rounded p-2 my-2">
+                视频地址只支持 <strong>评论</strong> 抽取 | 动态地址支持 <strong>评论</strong>/<strong>点赞</strong>/<strong>转发</strong> 抽取
+            </div>
+             
+
+
+          
 
             <div class="input-group input-group-lg">
                 <input class="form-control" type="url" v-model.trim="url" placeholder="请输入B站网页版里的视频地址/动态地址"

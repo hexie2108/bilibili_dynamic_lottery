@@ -8,6 +8,7 @@ import { ref } from "vue";
 import { get_random_top_banner } from "../utils/random-top-banner";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBilibili, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { faAt, faEnvelope, faFileCode } from "@fortawesome/free-solid-svg-icons";
 
 
 //准备一个随机头图
@@ -15,10 +16,11 @@ const banner1 = ref(get_random_top_banner(0))
 //再指定一个固定头图
 const banner2 = ref(get_random_top_banner())
 
-const title = ref('B站在线抽奖工具|初音社')
+const title = ref('B站在线抽奖工具 | 初音社')
 
 const bilibili_link = ref(import.meta.env.VITE_BILIBLI_LINK);
 const github_link = ref(import.meta.env.VITE_GITHUB_LINK)
+const version_data = ref(import.meta.env.VITE_APP_VERSION || '')
 
 
 </script>
@@ -46,16 +48,21 @@ const github_link = ref(import.meta.env.VITE_GITHUB_LINK)
     </div>
 
     <div class="top-menu row justify-content-end my-2 px-3 px-md-4">
-      <div class="col-auto me-auto d-none d-lg-block">
-        <div class="">
-          本工具可以从B站 (视频/动态) 中提取出 (评论/转发/点赞) 用户列表, 然后随机选出中奖者
-        </div>
+      <div class="col-auto d-none d-md-block">
+        <font-awesome-icon :icon="faFileCode" class="align-middle me-1" /> 版本 <span
+          class="badge text-bg-secondary">{{ version_data }}</span>
+      </div>
+      <div class="col-auto d-none d-md-block me-auto">
+        <font-awesome-icon :icon="faEnvelope" class="align-middle me-1" /> 问题反馈邮箱 <span
+          class="badge text-bg-secondary">hexie2109@gmail.com</span>
       </div>
       <div class="col-auto ">
-        <a :href="bilibili_link" class="" target="_blank"> <font-awesome-icon :icon="faBilibili" class="align-middle me-1" /> 初音社B站频道 <span class="badge text-bg-miku">欢迎给我充电</span></a>
+        <a :href="bilibili_link" class="" target="_blank"> <font-awesome-icon :icon="faBilibili"
+            class="align-middle me-1" /> 初音社B站频道 <span class="badge text-bg-miku">欢迎给我充电</span></a>
       </div>
       <div class="col-auto">
-        <a :href="github_link" class="" target="_blank"> <font-awesome-icon :icon="faGithub" class="align-middle me-1" /> GITHUB地址</a>
+        <a :href="github_link" class="" target="_blank"> <font-awesome-icon :icon="faGithub"
+            class="align-middle me-1" /> GITHUB地址</a>
       </div>
     </div>
 

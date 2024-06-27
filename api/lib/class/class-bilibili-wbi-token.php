@@ -80,7 +80,8 @@ class Bilibili_Wbi_Token
         $is_login = $response['data']['isLogin'] ?? false;
         if ($is_login === false)
         {
-            throw new Exception('程序使用的COOKIE凭证已失效, 请通知管理员更新凭证');
+            // throw new Exception(json_encode($response));
+            // throw new Exception('程序使用的COOKIE凭证已失效, 请通知管理员更新凭证');
         }
 
 
