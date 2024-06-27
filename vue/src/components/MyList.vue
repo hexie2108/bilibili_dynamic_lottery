@@ -23,7 +23,7 @@ const { list, result_status } = defineProps({
 <template>
 
     <!-- 用户列表 -->
-    <div class="row align-items-center g-1">
+    <div class="row align-items-center g-1 position-relative" >
         <TransitionGroup name="fade">
             <div v-for="(user, index) of list" :key="user.id" class="col-6">
                 <div class="bg-body-tertiary p-2 rounded-1 border border-white"
@@ -107,14 +107,16 @@ const { list, result_status } = defineProps({
 .fade-move,
 .fade-enter-active,
 .fade-leave-active {
-    transition: all 0.5s ease;
+    /* transition: all 0.5s ease; */
+    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
 }
 
 
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
-    transform: translateX(30px);
+    /* transform: translateX(30px); */
+    transform: scaleY(0.01) translate(30px, 0);
 }
 
 /* 确保将离开的元素从布局流中删除
