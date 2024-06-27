@@ -17,7 +17,7 @@ class Response_flusher
 
 
         // 允许所有来源访问
-        header("Access-Control-Allow-Origin: " . FRONT_END_JS_DOMAIN);
+        header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
 
         // 允许跨域请求携带凭证
         header('Access-Control-Allow-Credentials: true');

@@ -4,16 +4,20 @@ namespace bilibili_dynamic_lottery;
 
 use Exception;
 
-require_once __DIR__ .DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-try
+// @phpstan-ignore-next-line
+if (DEBUG)
 {
-    // 输出页面内容
-    echo_page(get_content());
-}
-catch (Exception $e)
-{
-    echo($e->getMessage());
+    try
+    {
+        // 输出页面内容
+        echo_page(get_content());
+    }
+    catch (Exception $e)
+    {
+        echo ($e->getMessage());
+    }
 }
 
 function get_content()

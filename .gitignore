@@ -110,3 +110,5 @@ dist
 ignore
 
 config/cookie.txt
+
+update_cookie*
