@@ -12,12 +12,12 @@ import './assets/style.css'
 // import 'bootstrap/dist/js/bootstrap.bundle.js'
 
 import { createApp } from 'vue'
-import App from './app.vue'
+import App from './App.vue'
 
 // console.log(import.meta.env);
 
 
-const app = createApp(App).mount('#app')
+createApp(App).mount('#app')
 
 //关闭生产环境提示
 // app.config.productionTip = false
