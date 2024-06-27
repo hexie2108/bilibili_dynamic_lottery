@@ -1,7 +1,7 @@
 <script setup>
 
 import MyForm from '@/components/MyForm.vue'
-import MyList from '@/components/MyList.vue'
+import MyListContainer from '@/components/MyListContainer.vue'
 import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { User_Model } from '@/model/user-model';
@@ -115,7 +115,7 @@ function set_timeout_get_request_status() {
 
         <my-form @get_list="get_list" @clear_list="clear_list" />
 
-        <my-list v-if="user_list.length" :user_list="user_list" 
+        <my-list-container v-if="user_list.length" :user_list="user_list" 
             :user_list_type="user_list_type" />
 
 
