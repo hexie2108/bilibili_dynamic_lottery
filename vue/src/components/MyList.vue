@@ -41,7 +41,7 @@ const list_min_height = computed(() => {
     <!-- 用户列表 -->
     <div class="row align-items-center g-1 position-relative" :style="{ 'min-height': list_min_height + 'px' }">
         <TransitionGroup name="fade">
-            <div v-for="(user, index) of props.list" :key="user.id + '' + user.date" class="col-6">
+            <div v-for="(user, index) of props.list" :key="user.key" class="col-6">
                 <div class="bg-body-tertiary p-2 rounded-1 border border-white"
                     :class="{ 'border-white': !props.result_status, 'border-pink': props.result_status }">
                     <div class="row align-items-center">

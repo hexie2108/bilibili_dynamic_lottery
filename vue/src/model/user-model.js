@@ -1,3 +1,5 @@
+import { get_random_int } from "@/utils/utils";
+
 export class User_Model {
 
     /**
@@ -70,5 +72,8 @@ export class User_Model {
          * @type {string}
          */
         this.action = data.action || '';
+
+        //生成一个随机KEY, 用来避免vue重复渲染
+        this.key = this.id + '' + get_random_int(1, 1000)
     }
 }

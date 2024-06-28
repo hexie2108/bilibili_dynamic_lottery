@@ -84,19 +84,20 @@ const filtered_list = computed(() => {
 
         let result = true;
 
+        //过滤重复评论用户
+        if (repeat_comment_filter.value === true) {
+
+            //使用set 和id属性 来过滤掉数组里重复的用户
+            if (id_set.has(user.id)) {
+                result = false;
+            } else {
+                id_set.add(user.id);
+            }
+        }
+
         //只有是评论列表的时候 才启用的过滤器
         if (is_comment_list.value) {
 
-            //过滤重复评论用户
-            if (repeat_comment_filter.value === true) {
-
-                //使用set 和id属性 来过滤掉数组里重复的用户
-                if (id_set.has(user.id)) {
-                    result = false;
-                } else {
-                    id_set.add(user.id);
-                }
-            }
 
             //用户等级过滤
             if (result && min_level_filter.value !== '') {
@@ -337,16 +338,16 @@ onMounted(() => {
                     <input v-model.number="number_people_selected_filter" class="form-control" type="number" min=1
                         :disabled="result_status" />
 
+                    <div class="input-group-text">
+                        <span v-if="is_comment_list">同用户多次评论</span>
+                        <span v-else>同用户多次转发/点赞</span>
+                    </div>
+                    <select class="form-select" v-model="repeat_comment_filter" :disabled="result_status">
+                        <option :value="false">不限制</option>
+                        <option :value="true">只保留一次</option>
+                    </select>
+
                     <template v-if="is_comment_list">
-
-                        <div class="input-group-text">
-                            <span>同用户多次评论</span>
-                        </div>
-                        <select class="form-select" v-model="repeat_comment_filter" :disabled="result_status">
-                            <option :value="false">不限制</option>
-                            <option :value="true">只保留一次</option>
-                        </select>
-
 
 
                         <div class="input-group-text">
@@ -434,10 +435,12 @@ onMounted(() => {
         <hr />
 
         <!-- 参加用户列表 -->
-        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status" :offset="list_offset" :is_comment_list="is_comment_list" />
+        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status"
+            :offset="list_offset" :is_comment_list="is_comment_list" />
 
         <!-- 中奖用户列表 -->
-        <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" :is_comment_list="is_comment_list"/>
+        <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status"
+            :is_comment_list="is_comment_list" />
 
 
         <!-- 分页切换 -->
