@@ -434,10 +434,10 @@ onMounted(() => {
         <hr />
 
         <!-- 参加用户列表 -->
-        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status" :offset="list_offset" />
+        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status" :offset="list_offset" :is_comment_list="is_comment_list" />
 
         <!-- 中奖用户列表 -->
-        <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" />
+        <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" :is_comment_list="is_comment_list"/>
 
 
         <!-- 分页切换 -->

@@ -19,13 +19,18 @@ const props = defineProps({
     offset: {
         type: Number,
         default: 0,
-    }
+    },
 
+    is_comment_list: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 //动态设置列表的最低高度
 const list_min_height = computed(() => {
-    return 100 / 2 * props.list.length;
+    const element_height = props.is_comment_list ? 100 : 72.5
+    return element_height * (Math.ceil(props.list.length / 2));
 })
 
 
