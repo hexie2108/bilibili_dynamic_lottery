@@ -155,12 +155,12 @@ const filtered_list = computed(() => {
 })
 
 //页面上显示用的数组
-const display_filtered_list = computed(() => {
+// const display_filtered_list = computed(() => {
 
-    //限制页面上显示的元素数量, 避免浏览器卡死
-    return filtered_list.value.slice(0, MAX_DISPLAY_USER_LIST);
+//     //限制页面上显示的元素数量, 避免浏览器卡死
+//     return filtered_list.value.slice(0, MAX_DISPLAY_USER_LIST);
 
-})
+// })
 
 //如果源列表发生变化 重置抽奖状态
 watch(user_list, () => {
@@ -369,13 +369,14 @@ onMounted(() => {
         <hr />
 
         <!-- 参加用户列表 -->
-        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status" />
+        <MyList v-show="!result_status" :list="filtered_list.slice(0, MAX_DISPLAY_USER_LIST)"
+            :result_status="result_status" />
         <!-- 中奖用户列表 -->
         <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" />
 
 
         <!-- 如果列表超过显示上限-->
-        <div v-if="filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
+        <div v-if="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
             <div class="bg-secondary text-bg-secondary rounded p-2 my-2 fw-bold text-center">
                 列表长度已超过显示上限 {{ MAX_DISPLAY_USER_LIST }}， 为避免浏览器卡顿 后续数据不会直接在页面上显示，这不影响参加抽选
             </div>
@@ -384,6 +385,4 @@ onMounted(() => {
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
