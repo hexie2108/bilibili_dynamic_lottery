@@ -2,7 +2,7 @@
 
 
 import MyList from '@/components/MyList.vue'
-import { computed, onMounted, reactive, ref, inject, watch } from "vue"
+import { computed, onMounted, reactive, ref, inject, watch, watchEffect } from "vue"
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock, faCrown } from "@fortawesome/free-solid-svg-icons";
 import VueDatePicker from '@vuepic/vue-datepicker';
@@ -12,7 +12,7 @@ import { INJECTION_KEY } from '@/constants/injection-key';
 import { API_ENDPOINT } from "@/constants/constants";
 
 //最大页面上展示的列表数量
-const MAX_DISPLAY_USER_LIST = 500
+const MAX_DISPLAY_USER_LIST = 100
 
 const ARRAY_LEVEL_OPTION = [
     '',
@@ -24,7 +24,7 @@ const ARRAY_LEVEL_OPTION = [
     6
 ]
 
-const { user_list, user_list_type } = defineProps({
+const props = defineProps({
     user_list: {
         type: Array,
         default() {
@@ -58,6 +58,8 @@ const content_filter = ref('')
 const date_comment_filter_start = ref(null)
 const date_comment_filter_end = ref(null)
 
+const list_offset = ref(0)
+
 /**
  * 抽选结果控制器
  */
@@ -71,101 +73,164 @@ const result_winner_list = reactive([])
 
 //当前是否是评论列表
 const is_comment_list = computed(() => {
-    return user_list_type === API_ENDPOINT.GET_COMMENT_LIST
+    return props.user_list_type === API_ENDPOINT.GET_COMMENT_LIST
 })
 
 const filtered_list = computed(() => {
 
-    let user_list_to_filter = user_list
+    const id_set = new Set();
 
-    //只有是评论列表的时候 才启用的过滤器
-    if (is_comment_list.value) {
+    return props.user_list.filter(user => {
 
-        //过滤重复评论用户
-        if (repeat_comment_filter.value === true) {
-            const id_set = new Set();
-            //使用set 和id属性 来过滤掉数组里重复的用户
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                let result;
+        let result = true;
+
+        //只有是评论列表的时候 才启用的过滤器
+        if (is_comment_list.value) {
+
+            //过滤重复评论用户
+            if (repeat_comment_filter.value === true) {
+
+                //使用set 和id属性 来过滤掉数组里重复的用户
                 if (id_set.has(user.id)) {
                     result = false;
                 } else {
-                    result = true;
                     id_set.add(user.id);
                 }
-                return result;
-            });
+            }
+
+            //用户等级过滤
+            if (result && min_level_filter.value !== '') {
+                result = user.level >= min_level_filter.value;
+            }
+
+            //VIP过滤
+            if (result && vip_filter.value === true) {
+                result = user.vip !== '';
+            }
+
+            //评论内容过滤
+            if (content_filter.value !== '') {
+                result = user.content.includes(content_filter.value);
+            }
+
+            //如果最早评论时间
+            if (date_comment_filter_start.value) {
+                result = parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
+            }
+
+            //如果最晚评论时间
+            if (date_comment_filter_end.value) {
+                result = parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
+            }
+
         }
 
+        return result;
 
+    });
 
-
-
-        //用户等级过滤
-        if (min_level_filter.value !== '') {
-
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                return user.level >= min_level_filter.value
-            });
-
-        }
-
-        //VIP过滤
-        if (vip_filter.value === true) {
-
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                return user.vip !== ''
-            });
-
-        }
-
-        //评论内容过滤
-        if (content_filter.value !== '') {
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                return user.content.includes(content_filter.value)
-            });
-        }
-
-        //如果最早评论时间
-        if (date_comment_filter_start.value) {
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                return parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
-            });
-        }
-
-        //如果最晚评论时间
-        if (date_comment_filter_end.value) {
-            user_list_to_filter = user_list_to_filter.filter(user => {
-                return parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
-            });
-        }
-
-    }
-
-    // //如果已抽完
-    // if (result_status.value) {
-
-    //     //只显示中奖用户
-    //     user_list_to_filter = user_list_to_filter.filter(user => {
-    //         return result_user_id_list.includes(user.id)
-    //     });
-    // }
-
-    return user_list_to_filter
 })
 
-//页面上显示用的数组
-// const display_filtered_list = computed(() => {
 
-//     //限制页面上显示的元素数量, 避免浏览器卡死
-//     return filtered_list.value.slice(0, MAX_DISPLAY_USER_LIST);
+// const filtered_list = computed(() => {
 
+//     let user_list_to_filter = user_list
+
+//     //只有是评论列表的时候 才启用的过滤器
+//     if (is_comment_list.value) {
+
+//         //过滤重复评论用户
+//         if (repeat_comment_filter.value === true) {
+//             const id_set = new Set();
+//             //使用set 和id属性 来过滤掉数组里重复的用户
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 let result;
+//                 if (id_set.has(user.id)) {
+//                     result = false;
+//                 } else {
+//                     result = true;
+//                     id_set.add(user.id);
+//                 }
+//                 return result;
+//             });
+//         }
+
+
+
+
+
+//         //用户等级过滤
+//         if (min_level_filter.value !== '') {
+
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 return user.level >= min_level_filter.value
+//             });
+
+//         }
+
+//         //VIP过滤
+//         if (vip_filter.value === true) {
+
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 return user.vip !== ''
+//             });
+
+//         }
+
+//         //评论内容过滤
+//         if (content_filter.value !== '') {
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 return user.content.includes(content_filter.value)
+//             });
+//         }
+
+//         //如果最早评论时间
+//         if (date_comment_filter_start.value) {
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 return parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
+//             });
+//         }
+
+//         //如果最晚评论时间
+//         if (date_comment_filter_end.value) {
+//             user_list_to_filter = user_list_to_filter.filter(user => {
+//                 return parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
+//             });
+//         }
+
+//     }
+
+//     // //如果已抽完
+//     // if (result_status.value) {
+
+//     //     //只显示中奖用户
+//     //     user_list_to_filter = user_list_to_filter.filter(user => {
+//     //         return result_user_id_list.includes(user.id)
+//     //     });
+//     // }
+
+//     return user_list_to_filter
 // })
 
+//页面上显示用的数组
+const display_filtered_list = computed(() => {
+
+    //限制页面上显示的元素数量, 避免浏览器卡死
+    return filtered_list.value.slice(list_offset.value, list_offset.value + MAX_DISPLAY_USER_LIST);
+
+})
+
 //如果源列表发生变化 重置抽奖状态
-watch(user_list, () => {
+watch(props.user_list, () => {
     reset_result_status()
 })
+
+watchEffect(() => {
+
+    //通过监听器, 在过滤列表产生变化的时候重置 offset分页    
+    list_offset.value = filtered_list.value ? 0 : 0;
+
+});
 
 /**
  * 随机选出胜利者
@@ -338,7 +403,7 @@ onMounted(() => {
                 <div class="row justify-content-center">
                     <div class="col-4">
                         <div class="bg-body-secondary rounded p-2 my-2">
-                            总提取到的人数 <span class="fw-bold">{{ user_list.length }}</span>
+                            总提取到的人数 <span class="fw-bold">{{ props.user_list.length }}</span>
                         </div>
                     </div>
                     <div class="col-4">
@@ -369,18 +434,38 @@ onMounted(() => {
         <hr />
 
         <!-- 参加用户列表 -->
-        <MyList v-show="!result_status" :list="filtered_list.slice(0, MAX_DISPLAY_USER_LIST)"
-            :result_status="result_status" />
+        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status" :offset="list_offset" />
+
         <!-- 中奖用户列表 -->
         <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" />
 
 
+        <!-- 分页切换 -->
+        <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST"
+            class="my-2 row justify-content-center align-items-center">
+            <div class="col-auto">
+                <button v-show="list_offset > 0" class="btn btn-outline-secondary px-4"
+                    @click="list_offset -= MAX_DISPLAY_USER_LIST">上一页</button>
+            </div>
+            <div class="col-1">
+                <div class="bg-body-secondary rounded p-2 my-2 text-center"> {{ list_offset / MAX_DISPLAY_USER_LIST + 1
+                    }} / {{
+                        Math.ceil(filtered_list.length / MAX_DISPLAY_USER_LIST) }} </div>
+            </div>
+            <div class="col-auto">
+                <button v-show="(list_offset + MAX_DISPLAY_USER_LIST) < filtered_list.length"
+                    class="btn btn-outline-secondary px-4" @click="list_offset += MAX_DISPLAY_USER_LIST">下一页</button>
+            </div>
+        </div>
+
         <!-- 如果列表超过显示上限-->
-        <div v-if="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
+        <!-- <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
             <div class="bg-secondary text-bg-secondary rounded p-2 my-2 fw-bold text-center">
                 列表长度已超过显示上限 {{ MAX_DISPLAY_USER_LIST }}， 为避免浏览器卡顿 后续数据不会直接在页面上显示，这不影响参加抽选
             </div>
-        </div>
+        </div> -->
+
+
     </div>
 
 </template>

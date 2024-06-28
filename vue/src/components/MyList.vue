@@ -2,8 +2,9 @@
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock, faCrown } from "@fortawesome/free-solid-svg-icons";
+import { computed } from 'vue';
 
-const { list, result_status } = defineProps({
+const props = defineProps({
     list: {
         type: Array,
         default() {
@@ -13,8 +14,18 @@ const { list, result_status } = defineProps({
     result_status: {
         type: Boolean,
         default: false,
+    },
+
+    offset: {
+        type: Number,
+        default: 0,
     }
 
+})
+
+//动态设置列表的最低高度
+const list_min_height = computed(() => {
+    return 100 / 2 * props.list.length;
 })
 
 
@@ -23,11 +34,11 @@ const { list, result_status } = defineProps({
 <template>
 
     <!-- 用户列表 -->
-    <div class="row align-items-center g-1 position-relative" >
+    <div class="row align-items-center g-1 position-relative" :style="{ 'min-height': list_min_height + 'px' }">
         <TransitionGroup name="fade">
-            <div v-for="(user, index) of list" :key="user.id" class="col-6">
+            <div v-for="(user, index) of props.list" :key="user.id + '' + user.date" class="col-6">
                 <div class="bg-body-tertiary p-2 rounded-1 border border-white"
-                    :class="{ 'border-white': !result_status, 'border-pink': result_status }">
+                    :class="{ 'border-white': !props.result_status, 'border-pink': props.result_status }">
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <div class="position-relative">
@@ -66,8 +77,8 @@ const { list, result_status } = defineProps({
                                 {{ user.content }}
                             </div>
                         </div>
-                        <div class="col-auto" :class="{ 'text-pink': result_status }">
-                            <font-awesome-icon :icon="faCrown" class="me-1" /> {{ index + 1 }}
+                        <div class="col-auto" :class="{ 'text-pink': props.result_status }">
+                            <font-awesome-icon :icon="faCrown" class="me-1" /> {{ offset + index + 1 }}
                         </div>
 
                     </div>
@@ -81,7 +92,6 @@ const { list, result_status } = defineProps({
 </template>
 
 <style scoped>
-
 .one-line-text {
     white-space: nowrap;
     /* 禁止文本换行 */
@@ -124,5 +134,4 @@ const { list, result_status } = defineProps({
 .fade-leave-active {
     position: absolute;
 }
-
 </style>
