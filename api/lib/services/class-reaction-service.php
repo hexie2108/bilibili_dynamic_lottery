@@ -184,15 +184,17 @@ class Reaction_Service  extends Base_Service
         $this->forward_count = $detail_model->forward_count;
         $this->like_count = $detail_model->like_count;
 
-        //根据请求类型, 设置对应用户列表的总数
-        if ($action === User_Model::ACTION_FORWARD)
-        {
-            $this->total_count =  $this->forward_count;
-        }
-        else
-        {
-            $this->total_count = $this->like_count;
-        }
+        // //根据请求类型, 设置对应用户列表的总数
+        // if ($action === User_Model::ACTION_FORWARD)
+        // {
+        //     $this->total_count =  $this->forward_count;
+        // }
+        // else
+        // {
+        //     $this->total_count = $this->like_count;
+        // }
+
+        $this->total_count = $this->forward_count + $this->like_count;
     }
 }
 
