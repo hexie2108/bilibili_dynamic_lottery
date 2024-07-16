@@ -17,6 +17,9 @@ class Action
     const GET_REQUEST_STATUS = 'get_request_status';
 }
 
+//设置超时时间
+set_time_limit(60 * 30);
+
 //启动会话
 // Session_Cache::start();
 
