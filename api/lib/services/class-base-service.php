@@ -125,11 +125,12 @@ class Base_Service
     protected function check_is_triggered_bilibili_firewall($code)
     {
         //B站服务器风控错误码
-        $firewall_error_code = -412;
+        $firewall_error_code = 412;
 
-        if ($code === $firewall_error_code)
+
+        if (abs($code) === $firewall_error_code)
         {
-            throw new Curl_response_exception('请求过于频繁, 导致触发了B站服务器风控, 请过1小时后再试');
+            throw new Curl_response_exception('请求过于频繁, 导致触发了B站服务器风控, 请过段时间后再重试');
         }
     }
 

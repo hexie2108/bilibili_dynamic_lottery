@@ -12,7 +12,8 @@ class Curl_Manager
 
     const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36';
 
-
+    const ORIGIN = 'https://www.bilibili.com';
+    const REFERER = 'https://www.bilibili.com';
 
 
     /**
@@ -112,6 +113,11 @@ class Curl_Manager
             CURLOPT_TIMEOUT => 60,
             CURLOPT_CONNECTTIMEOUT => 10,
             // CURLOPT_NOBODY => true,
+
+            CURLOPT_HTTPHEADER => [
+                'Origin: ' . static::ORIGIN,
+                'Referer: ' . static::REFERER,
+            ]
 
         ];
 
