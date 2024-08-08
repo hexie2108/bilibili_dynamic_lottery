@@ -101,7 +101,10 @@ class Comment_List_Service extends Base_Service
                 write_array_to_file($temp_result_file, $array_user_model, $first_write);
                 //累计结果数量
                 $result_count += count($array_user_model);
-                $first_write = false;
+                //不是空数组
+                if(count($array_user_model) > 0){
+                    $first_write = false;
+                }
 
                 //实时把请求进度更新在会话缓存里
                 $this->update_request_progress($result_count, $this->comment_count);

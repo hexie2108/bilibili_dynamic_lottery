@@ -94,14 +94,14 @@ function write_array_to_file($file, $array_data, $first_write = false)
     $array_data_in_json = rtrim($array_data_in_json, ']');
 
     //如果不是首次写入
-    if (!$first_write)
+    if (!$first_write )
     {
         //增加上 , 连接字符 + 移除 '[' 开始字符 
         $array_data_in_json =  ',' . ltrim($array_data_in_json, '[');
     }
 
-    //如果是首次写入 或者 不是空数组
-    if ($first_write || count($array_data) > 0)
+    //数组不是空的
+    if (count($array_data) > 0)
     {
         //把内容写入文件
         fwrite($file, $array_data_in_json);
