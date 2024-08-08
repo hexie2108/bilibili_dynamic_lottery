@@ -93,8 +93,8 @@ function write_array_to_file($file, $array_data, $first_write = false)
     //移除结尾的 ']' 结束字符
     $array_data_in_json = rtrim($array_data_in_json, ']');
 
-    //如果不是首次写入
-    if (!$first_write)
+    //如果不是首次写入 并且不是空数组
+    if (!$first_write && count($array_data) > 0)
     {
         //增加上 , 连接字符 + 移除 '[' 开始字符 
         $array_data_in_json =  ',' . ltrim($array_data_in_json, '[');
