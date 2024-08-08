@@ -76,3 +76,42 @@ function throw_exception_if_is_null($value, $error_message)
         throw new Exception($error_message);
     }
 }
+
+
+/**
+ * 把数组数据 自动转换成JSON写入到文件中
+ *
+ * @param resource $file
+ * @param array<int, mixed> $array_data 要写入的数组
+ * @param boolean $first_write 判断是否是首次写入
+ * @return void
+ */
+function write_array_to_file($file, $array_data, $first_write = false)
+{
+
+    $array_data_in_json = json_encode($array_data);
+    //移除结尾的 ']' 结束字符
+    $array_data_in_json = rtrim($array_data_in_json, ']');
+
+    //如果不是首次写入
+    if (!$first_write)
+    {
+        //增加上 , 连接字符 + 移除 '[' 开始字符 
+        $array_data_in_json =  ',' . ltrim($array_data_in_json, '[');
+    }
+
+    //把内容写入文件
+    fwrite($file, $array_data_in_json);
+}
+
+/**
+ * 把JSON数组结束符写入到文件中
+ *
+ * @param resource $file
+ * @return void
+ */
+function write_end_array_to_file($file)
+{
+    //把数组结束符写入文件
+    fwrite($file, ']');
+}

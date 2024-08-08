@@ -34,7 +34,7 @@ class Comment_List_Service extends Base_Service
      * 获取评论列表里的用户
      * 
      * @param string $id
-     * @return User_Model[]
+     * @return resource 包含请求结果的临时文件路径
      */
     public function get_comment_list($id)
     {
@@ -49,8 +49,14 @@ class Comment_List_Service extends Base_Service
         ];
 
 
-        $global_array_reply = [];
+        // $global_array_reply = [];
         $continue_while_flag = true;
+        //统计结果进度
+        $result_count = 0;
+        // 创建一个临时文件用来储存结果
+        $temp_result_file = tmpfile();
+        //首次写入
+        $first_write = true;
 
         do
         {
@@ -72,11 +78,33 @@ class Comment_List_Service extends Base_Service
                     throw new Exception('无法获取评论列表');
                 }
 
-                //累计储存结果
-                $global_array_reply = array_merge($global_array_reply, $array_reply);
+                // $global_array_reply = array_merge($global_array_reply, $array_reply);
+
+                //把评论回复 转换成用户对象
+                $array_user_model = [];
+                foreach ($array_reply as $reply_comment)
+                {
+                    $model = User_Model::create_by_comment($reply_comment);
+
+                    $array_user_model[] = $model;
+
+                    //如果当前评论有子评论
+                    foreach ($model->array_replies as $child_reply_user_model)
+                    {
+                        //添加到主结果列表
+                        $array_user_model[] = $child_reply_user_model;
+                    }
+                    //清空子评论列表
+                    $model->array_replies = [];
+                }
+                //把结果数据写入临时文件
+                write_array_to_file($temp_result_file, $array_user_model, $first_write);
+                //累计结果数量
+                $result_count += count($array_user_model);
+                $first_write = false;
 
                 //实时把请求进度更新在会话缓存里
-                $this->update_request_progress(count($global_array_reply), $this->comment_count);
+                $this->update_request_progress($result_count, $this->comment_count);
 
                 $cursor = $response_data['cursor'] ?? null;
                 throw_exception_if_is_null($cursor, '无法获取 cursor 数据');
@@ -116,27 +144,30 @@ class Comment_List_Service extends Base_Service
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);
 
+        write_end_array_to_file($temp_result_file);
 
-        $result = [];
+        return $temp_result_file;
 
-        //把评论回复 转换成用户对象
-        foreach ($global_array_reply as $reply_comment)
-        {
-            $model = User_Model::create_by_comment($reply_comment);
+        // $result = [];
 
-            $result[] = $model;
+        // //把评论回复 转换成用户对象
+        // foreach ($global_array_reply as $reply_comment)
+        // {
+        //     $model = User_Model::create_by_comment($reply_comment);
 
-            //如果当前评论有子评论
-            foreach ($model->array_replies as $child_reply_user_model)
-            {
-                //添加到主结果列表
-                $result[] = $child_reply_user_model;
-            }
-            //清空子评论列表
-            $model->array_replies = [];
-        }
+        //     $result[] = $model;
 
-        return $result;
+        //     //如果当前评论有子评论
+        //     foreach ($model->array_replies as $child_reply_user_model)
+        //     {
+        //         //添加到主结果列表
+        //         $result[] = $child_reply_user_model;
+        //     }
+        //     //清空子评论列表
+        //     $model->array_replies = [];
+        // }
+
+        // return $result;
     }
 
 

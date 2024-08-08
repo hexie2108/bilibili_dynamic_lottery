@@ -57,6 +57,7 @@ try
             }
 
             $result = $detail_service->get_detail($id);
+            Response_flusher::flush_data($result);
 
             break;
 
@@ -68,6 +69,7 @@ try
             }
 
             $result = $comment_list_service->get_comment_list($id);
+            Response_flusher::flush_file($result);
 
             break;
 
@@ -83,6 +85,7 @@ try
             }
 
             $result = $reaction_service->get_forward_list($id);
+            Response_flusher::flush_file($result);
 
             break;
 
@@ -98,6 +101,7 @@ try
             }
 
             $result = $reaction_service->get_like_list($id);
+            Response_flusher::flush_file($result);
 
             break;
 
@@ -110,6 +114,7 @@ try
 
 
             $result = Base_Service::get_request_progress($id_request);
+            Response_flusher::flush_data($result);
 
             break;
 
@@ -117,7 +122,7 @@ try
             throw new Exception('缺少Action参数', 400);
     }
 
-    Response_flusher::flush_data($result);
+    
 }
 
 catch (Exception $e)

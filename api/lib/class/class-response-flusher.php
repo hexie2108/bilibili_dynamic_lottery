@@ -15,9 +15,10 @@ class Response_flusher
     private static function add_cors_header()
     {
 
-
-        // 允许所有来源访问
-        header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+        if(isset($_SERVER['HTTP_ORIGIN'])){
+            // 允许所有来源访问
+            header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+        }
 
         // 允许跨域请求携带凭证
         header('Access-Control-Allow-Credentials: true');
@@ -34,6 +35,31 @@ class Response_flusher
             http_response_code(200);
             exit();
         }
+    }
+
+    /**
+     * 输出文件
+     *
+     * @param resource $file
+     * @return void
+     */
+    public static function flush_file($file)
+    {
+        // 获取临时文件的元数据，包括文件路径
+        $file_meta_data = stream_get_meta_data($file);
+        $file_path = $file_meta_data['uri'];
+
+        self::add_cors_header();
+
+        // 设置内容类型为 JSON
+        header('Content-Type: application/json');
+        //避免浏览器缓存
+        header('Cache-Control: no-cache, must-revalidate');
+
+        readfile($file_path);
+
+        // 关闭并删除临时文件
+        fclose($file);
     }
 
     /**

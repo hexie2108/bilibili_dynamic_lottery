@@ -33,18 +33,18 @@ class Reaction_Service  extends Base_Service
      * 获取转发列表里的用户
      * 
      * @param string $id
-     * @return User_Model[]
+     * @return resource 包含请求结果的临时文件路径
      */
     public function get_forward_list($id)
     {
 
         $result = $this->get_reaction_list($id, User_Model::ACTION_FORWARD);
 
-        //只保留来自于转发列表的用户
-        $result = array_values(array_filter($result, function (User_Model $user)
-        {
-            return $user->action === User_Model::ACTION_FORWARD;
-        }));
+        // //只保留来自于转发列表的用户
+        // $result = array_values(array_filter($result, function (User_Model $user)
+        // {
+        //     return $user->action === User_Model::ACTION_FORWARD;
+        // }));
 
 
         return $result;
@@ -54,18 +54,18 @@ class Reaction_Service  extends Base_Service
      * 获取点赞列表里的用户
      * 
      * @param string $id
-     * @return User_Model[]
+     * @return resource 包含请求结果的临时文件路径
      */
     public function get_like_list($id)
     {
 
         $result = $this->get_reaction_list($id, User_Model::ACTION_LIKE);
 
-        //只保留来自于转发列表的用户
-        $result = array_values(array_filter($result, function (User_Model $user)
-        {
-            return $user->action === User_Model::ACTION_LIKE;
-        }));
+        // //只保留来自于转发列表的用户
+        // $result = array_values(array_filter($result, function (User_Model $user)
+        // {
+        //     return $user->action === User_Model::ACTION_LIKE;
+        // }));
 
 
         return $result;
@@ -77,7 +77,7 @@ class Reaction_Service  extends Base_Service
      * 
      * @param string $id
      * @param string $action 用来判断要使用的统计列表
-     * @return User_Model[]
+     * @return resource 包含请求结果的临时文件路径
      */
     private function get_reaction_list($id, $action)
     {
@@ -91,6 +91,12 @@ class Reaction_Service  extends Base_Service
 
         $global_array_reaction = [];
         $continue_while_flag = true;
+        //统计结果进度
+        $result_count = 0;
+        // 创建一个临时文件用来储存结果
+        $temp_result_file = tmpfile();
+        //首次写入
+        $first_write = true;
 
         do
         {
@@ -119,7 +125,24 @@ class Reaction_Service  extends Base_Service
                 }
 
                 //累计储存结果
-                $global_array_reaction = array_merge($global_array_reaction, $array_reaction);
+                // $global_array_reaction = array_merge($global_array_reaction, $array_reaction);
+
+                //把点赞/转发记录 转换成用户对象
+                $array_user_model = array_map(function ($reaction)
+                {
+                    return User_Model::create_by_reaction($reaction);
+                }, $array_reaction);
+                //根据动作只保留对应对应类型的用户
+                $array_user_model_filtered = array_values(array_filter($array_user_model, function (User_Model $user) use ($action)
+                {
+                    return $user->action === $action;
+                }));
+
+                //把结果数据写入临时文件
+                write_array_to_file($temp_result_file, $array_user_model_filtered, $first_write);
+                //累计结果数量
+                $result_count += count($array_user_model);
+                $first_write = false;
 
                 //实时把请求进度更新在会话缓存里
                 $this->update_request_progress(count($global_array_reaction), $this->total_count);
@@ -155,13 +178,17 @@ class Reaction_Service  extends Base_Service
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);
 
-        //把点赞/转发数据 转换成用户对象
-        $result = array_map(function ($reaction)
-        {
-            return User_Model::create_by_reaction($reaction);
-        }, $global_array_reaction);
+        write_end_array_to_file($temp_result_file);
 
-        return $result;
+        return $temp_result_file;
+
+        // //把点赞/转发数据 转换成用户对象
+        // $result = array_map(function ($reaction)
+        // {
+        //     return User_Model::create_by_reaction($reaction);
+        // }, $global_array_reaction);
+
+        // return $result;
     }
 
 
