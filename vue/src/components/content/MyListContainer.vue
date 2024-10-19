@@ -1,7 +1,7 @@
 <script setup>
 
 
-import MyList from '@/components/MyList.vue'
+import MyList from '@/components/content/MyList.vue'
 import { computed, onMounted, reactive, ref, inject, watch, watchEffect } from "vue"
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock, faCrown } from "@fortawesome/free-solid-svg-icons";
@@ -41,8 +41,8 @@ const props = defineProps({
     },
 })
 
-const set_error_modal_options = inject(INJECTION_KEY.SET_ERROR_MODAL_OPTIONS)
-const set_loading_modal_options = inject(INJECTION_KEY.SET_LOADING_MODAL_OPTIONS)
+const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
 
 //避免DOM复用导致图片无法加载
 // const user_list_key_local = ref(1)
@@ -240,18 +240,18 @@ function calculate_array_result_list() {
 
     // 检查 抽选人数 是否是大于 1 的整数
     if (!Number.isInteger(number_people_selected_filter.value) || number_people_selected_filter.value < 1) {
-        set_error_modal_options(true, '抽选人数无效')
+        show_error_modal(true, '抽选人数无效')
         return
     }
 
     // 检查 抽选人数 是否小于或等于数组的长度
     if (number_people_selected_filter.value > filtered_list.value.length) {
-        set_error_modal_options(true, '抽选人数必须小于或等于参加人数')
+        show_error_modal(true, '抽选人数必须小于或等于参加人数')
         return
     }
 
     //显示加载框
-    set_loading_modal_options(true, '抽选中')
+    show_loading_modal(true, '抽选中')
 
     //记录抽出的index
     const index_list = new Set();
@@ -276,7 +276,7 @@ function calculate_array_result_list() {
     while (result_winner_list.length < number_people_selected_filter.value)
 
     //隐藏加载框
-    set_loading_modal_options(false, '')
+    show_loading_modal(false, '')
 
     //抽完后 激活抽选结果flag
     result_status.value = true

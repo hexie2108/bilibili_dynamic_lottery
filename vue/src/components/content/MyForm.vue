@@ -10,8 +10,8 @@ import { faComment, faShare, faThumbsUp } from '@fortawesome/free-solid-svg-icon
 
 const emit = defineEmits(['get_list', 'clear_list'])
 
-const set_error_modal_options = inject(INJECTION_KEY.SET_ERROR_MODAL_OPTIONS)
-const set_loading_modal_options = inject(INJECTION_KEY.SET_LOADING_MODAL_OPTIONS)
+const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
 
 const url = ref('')
 const id = ref('')
@@ -40,7 +40,8 @@ function get_detail() {
         https://www.bilibili.com/opus/XXX, <br/> 
         https://t.bilibili.com/XXXXX
         `
-        set_error_modal_options(true, error_message);
+        show_error_modal(true, error_message);
+        return;
     }
 
 
@@ -52,7 +53,7 @@ function get_detail() {
         },
         () => {
             //显示加载框
-            set_loading_modal_options(true);
+            show_loading_modal(true);
         },
         (response_data) => {
             detail.assign(response_data);
@@ -61,11 +62,11 @@ function get_detail() {
             //清空详情对象属性
             clear_object(detail);
             //显示错误框
-            set_error_modal_options(true, error.message);
+            show_error_modal(true, error.message);
         },
         () => {
             //隐藏加载框
-            set_loading_modal_options(false);
+            show_loading_modal(false);
 
             //重置抽选方式
             selected_method.value = '';

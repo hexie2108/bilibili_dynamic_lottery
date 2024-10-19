@@ -15,13 +15,22 @@ class Action
     const GET_LIKE_LIST = 'get_like_list';
 
     const GET_REQUEST_STATUS = 'get_request_status';
+
+    const GET_LOGIN_URL = 'get_login_url';
+    const CHECK_LOGIN_STATUS = 'check_login_status';
+
+    const CHECK_IS_LOGGED_IN = 'check_is_logged_in';
+
+    const GET_LOGGED_USER_INFO = 'get_logged_user_info';
+
+    const TEST = 'test';
 }
 
 //设置超时时间
 set_time_limit(60 * 30);
 
 //启动会话
-// Session_Cache::start();
+Session_Cache::start();
 
 $action = $_REQUEST['action'] ?? null;
 
@@ -29,6 +38,10 @@ $action = $_REQUEST['action'] ?? null;
 $id = $_REQUEST['id'] ?? null;
 //用来实时跟踪进度的请求ID
 $id_request = $_REQUEST['id_request'] ?? null;
+
+$qrcode_key = $_REQUEST['qrcode_key'] ?? null;
+
+$url = $_REQUEST['url'] ?? '';
 
 // //等级过滤器
 // $level_filter = $_REQUEST['level_filter'] ?? null;
@@ -41,6 +54,7 @@ $id_request = $_REQUEST['id_request'] ?? null;
 $detail_service = new Detail_Service($id_request);
 $comment_list_service = new Comment_List_Service($id_request);
 $reaction_service = new Reaction_Service($id_request);
+$login_service = new Login_Service();
 
 try
 {
@@ -118,11 +132,52 @@ try
 
             break;
 
-        default:
-            throw new Exception('缺少Action参数', 400);
-    }
+        case Action::GET_LOGIN_URL:
 
-    
+            $result = $login_service->get_login_url();
+            Response_flusher::flush_data($result);
+
+            break;
+
+        case Action::CHECK_LOGIN_STATUS:
+
+            if (empty($qrcode_key))
+            {
+                throw new Exception('缺少qrcode_key参数', 400);
+            }
+
+            $result = $login_service->check_login_status($qrcode_key);
+            Response_flusher::flush_data($result);
+
+            break;
+
+            //non è usato
+        case Action::CHECK_IS_LOGGED_IN:
+
+            $result = $login_service->check_is_logged_in();
+            Response_flusher::flush_data($result);
+
+            break;
+
+
+        case Action::GET_LOGGED_USER_INFO:
+
+            $result = $login_service->get_logged_user_info();
+            Response_flusher::flush_data($result);
+
+            break;
+
+
+
+            //测试接口用
+        case Action::TEST:
+            $response = Curl_Manager::get_json($url, []);
+            Response_flusher::flush_data($response);
+            break;
+
+        default:
+            throw new Exception('缺少Action参数: ' . $action, 400);
+    }
 }
 
 catch (Exception $e)

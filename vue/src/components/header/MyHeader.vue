@@ -4,11 +4,15 @@
  */
 
 
-import { ref } from "vue";
-import { get_random_top_banner } from "../utils/random-top-banner";
+import { inject, reactive, ref } from 'vue';
+import { get_random_top_banner } from "@/utils/random-top-banner";
+import { get_by_fetch } from '@/utils/request-by-fetch';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBilibili, faGithub } from "@fortawesome/free-brands-svg-icons";
-import { faAt, faEnvelope, faFileCode } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faEnvelope, faFileCode, faHouse } from "@fortawesome/free-solid-svg-icons";
+import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
+import { INJECTION_KEY } from "@/constants/injection-key";
+import MyLoginUser from '@/components/header/MyLoginUser.vue';
 
 
 //准备一个随机头图
@@ -20,8 +24,23 @@ const title = ref('B站在线抽奖工具 | 初音社')
 
 const bilibili_link = ref(import.meta.env.VITE_BILIBLI_LINK);
 const github_link = ref(import.meta.env.VITE_GITHUB_LINK)
-const version_data = ref(import.meta.env.VITE_APP_VERSION || '')
+const github_bilibili_api_collect_link = ref(import.meta.env.VITE_GITHUB_BILIBILI_API_COLLECT_LINK)
 
+const show_login_modal = inject(INJECTION_KEY.SHOW_LOGIN_MODAL)
+const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
+const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+
+
+/**
+ * 登陆按钮点击事件
+ */
+function on_click_login() {
+
+  //显示二维码登陆窗口
+  show_login_modal(true);
+
+
+}
 
 </script>
 
@@ -47,24 +66,48 @@ const version_data = ref(import.meta.env.VITE_APP_VERSION || '')
       </div>
     </div>
 
-    <div class="top-menu row justify-content-end my-2 px-3 px-md-4">
-      <div class="col-auto d-none d-md-block">
-        <font-awesome-icon :icon="faFileCode" class="align-middle me-1" /> 版本 <span
-          class="badge text-bg-secondary">{{ version_data }}</span>
+    <nav class="navbar navbar-expand-md">
+      <div class="container-fluid">
+        <a class="navbar-brand d-md-none" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#top-menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="top-menu">
+          <ul class="navbar-nav ">
+            <li class="nav-item">
+              <a href="/" class="nav-link"><font-awesome-icon :icon="faHouse" class="align-middle me-1" /> 首页</a>
+            </li>
+            <li class="nav-item">
+              <a :href="bilibili_link" class="nav-link" target="_blank"><font-awesome-icon :icon="faBilibili"
+                  class="align-middle me-1" /> 初音社B站频道</a>
+            </li>
+            <li class="nav-item">
+              <a :href="github_link" class="nav-link" target="_blank"> <font-awesome-icon :icon="faGithub"
+                  class="align-middle me-1" />
+                项目GITHUB地址</a>
+            </li>
+            <li class="nav-item">
+              <a :href="github_bilibili_api_collect_link" class="nav-link" target="_blank"> <font-awesome-icon
+                  :icon="faGithub" class="align-middle me-1" />
+                野生B站API文档</a>
+            </li>
+
+          </ul>
+          <ul class="navbar-nav ms-auto ">
+            <li class="nav-item ps-auto">
+              <a href="#" class="nav-link" @click="on_click_login">
+                <my-login-user></my-login-user>
+              </a>
+            </li>
+          </ul>
+
+        </div>
       </div>
-      <div class="col-auto d-none d-md-block me-auto">
-        <font-awesome-icon :icon="faEnvelope" class="align-middle me-1" /> 问题反馈邮箱 <span
-          class="badge text-bg-secondary">hexie2109@gmail.com</span>
-      </div>
-      <div class="col-auto ">
-        <a :href="bilibili_link" class="" target="_blank"> <font-awesome-icon :icon="faBilibili"
-            class="align-middle me-1" /> 初音社B站频道 <span class="badge text-bg-miku">欢迎给我充电</span></a>
-      </div>
-      <div class="col-auto">
-        <a :href="github_link" class="" target="_blank"> <font-awesome-icon :icon="faGithub"
-            class="align-middle me-1" /> GITHUB地址</a>
-      </div>
-    </div>
+
+
+    </nav>
+
+
 
   </div>
 

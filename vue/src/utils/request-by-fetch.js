@@ -51,7 +51,7 @@ function request_by_fetch(method, url, data, pre_callback, done_callback, fail_c
         })
         .then(data => {
             //如果回复里包含了code 并且不是200 
-            if (data.code && data.code !== 200) {
+            if (data instanceof Object && data.code && data.code !== 200) {
                 //抛出错误
                 throw new Error(data.message);
             }

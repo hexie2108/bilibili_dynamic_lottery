@@ -9,10 +9,11 @@ import './assets/style.css'
 
 
 // 导入 Bootstrap 的 JavaScript 文件
-// import 'bootstrap/dist/js/bootstrap.bundle.js'
+import 'bootstrap/dist/js/bootstrap.bundle.js'
 
 import { createApp } from 'vue'
 import App from './App.vue'
+
 
 // console.log(import.meta.env);
 

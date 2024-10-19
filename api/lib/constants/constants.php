@@ -13,6 +13,15 @@ class Config
 
 class Bilibili_Api
 {
+    //申请登陆二维码地址
+    const GET_LOGIN_URL = 'https://passport.bilibili.com/x/passport-login/web/qrcode/generate';
+
+    //检查二维码扫码状态
+    const CHECK_LOGIN_STATUS = 'https://passport.bilibili.com/x/passport-login/web/qrcode/poll';
+
+    //获取登陆用户的信息
+    const GET_LOGIN_USER_INFO = 'https://api.bilibili.com/x/web-interface/nav';
+
 
     //WBI密钥的API请求接口
     const GET_WBI_KEYS = 'https://api.bilibili.com/x/web-interface/nav';

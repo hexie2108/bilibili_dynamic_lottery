@@ -22,7 +22,7 @@ class Base_Service
      * 构造函数
      * @param int|null $id_request
      */
-    public function __construct($id_request)
+    public function __construct($id_request = null)
     {
         //储存请求ID
         $this->id_request = $id_request;
@@ -93,7 +93,7 @@ class Base_Service
 
             $key = $this->id_request . Session_Cache::kEY_REQUEST_PROGRESS;
             Session_Cache::set($key, $progress_string);
-            Session_Cache::close_write();
+            // Session_Cache::close_write();
         }
     }
 
@@ -144,7 +144,7 @@ class Base_Service
     {
         $key = $id_request . Session_Cache::kEY_REQUEST_PROGRESS;
         $result = Session_Cache::get($key);
-        Session_Cache::close_write();
+        // Session_Cache::close_write();
 
         return [
             'data' => $result,

@@ -1,17 +1,23 @@
 <script setup>
 
-import MyForm from '@/components/MyForm.vue'
-import MyListContainer from '@/components/MyListContainer.vue'
+import MyForm from '@/components/content/MyForm.vue'
+import MyListContainer from '@/components/content/MyListContainer.vue'
 import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { User_Model } from '@/model/user-model';
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { get_random_int } from '@/utils/utils';
 import { inject, reactive, ref } from 'vue';
+import MyContentFirst from '@/components/content/MyContentFirst.vue';
+import MyContentSecond from '@/components/content/MyContentSecond.vue';
 
 
-const set_error_modal_options = inject(INJECTION_KEY.SET_ERROR_MODAL_OPTIONS)
-const set_loading_modal_options = inject(INJECTION_KEY.SET_LOADING_MODAL_OPTIONS)
+
+const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
+
+const video_id = inject(INJECTION_KEY.VIDEO_ID)
+
 
 const user_list = reactive([]);
 const id_request = ref(0);
@@ -44,7 +50,7 @@ function get_list(selected_method, id) {
         },
         () => {
             //显示加载框
-            set_loading_modal_options(true);
+            show_loading_modal(true);
             //定时检查请求进度
             set_timeout_get_request_status();
         },
@@ -57,11 +63,11 @@ function get_list(selected_method, id) {
         (error) => {
 
             //显示错误框
-            set_error_modal_options(true, error.message);
+            show_error_modal(true, error.message);
         },
         () => {
             //隐藏加载框
-            set_loading_modal_options(false);
+            show_loading_modal(false);
 
             //重置请求ID
             id_request.value = 0;
@@ -93,7 +99,7 @@ function set_timeout_get_request_status() {
             null,
             (response_data) => {
                 //更新加载进度条的内容
-                set_loading_modal_options(null, response_data.data);
+                show_loading_modal(null, response_data.data);
             },
             null,
             () => {
@@ -113,10 +119,11 @@ function set_timeout_get_request_status() {
 
     <div>
 
-        <my-form @get_list="get_list" @clear_list="clear_list" />
+        <my-content-first></my-content-first>
+        <my-content-second v-if="video_id"></my-content-second>
+        <!-- <my-form @get_list="get_list" @clear_list="clear_list" /> -->
 
-        <my-list-container v-if="user_list.length" :user_list="user_list" 
-            :user_list_type="user_list_type" />
+        <my-list-container v-if="user_list.length" :user_list="user_list" :user_list_type="user_list_type" />
 
 
     </div>

@@ -1,7 +1,8 @@
 <script setup>
 
 const emit = defineEmits([
-    'close'
+    'close',
+    'confirm',
 ])
 
 const props = defineProps({
@@ -22,6 +23,10 @@ const props = defineProps({
         default: '',
     },
     show_cancel_button: {
+        type: Boolean,
+        default: false,
+    },
+    show_confirm_button: {
         type: Boolean,
         default: false,
     },
@@ -57,10 +62,14 @@ const props = defineProps({
                             </div>
                         </div>
                         <div v-html="content"></div>
+                        <slot name="content"></slot>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary px-4 me-2 cancel"
                             :class="{ 'd-none': !show_cancel_button }" @click="$emit('close')">关闭</button>
+                        <button type="button" class="btn btn-primary px-4 me-2 confirm"
+                            :class="{ 'd-none': !show_confirm_button }" @click="$emit('confirm')">确认</button>
                     </div>
                 </div>
             </div>

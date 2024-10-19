@@ -13,7 +13,12 @@ const API_ENDPOINT = {
     GET_LIKE_LIST: 'get_like_list',
     GET_REQUEST_STATUS: 'get_request_status',
 
+    GET_LOGIN_URL: 'get_login_url',
+    CHECK_LOGIN_STATUS: 'check_login_status',
 
+    CHECK_IS_LOGGED_IN: 'check_is_logged_in',
+
+    GET_LOGGED_USER_INFO: 'get_logged_user_info',
 }
 
 export { API_ROOT_URL, API_ENDPOINT }
