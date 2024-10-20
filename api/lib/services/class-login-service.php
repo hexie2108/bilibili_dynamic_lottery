@@ -76,19 +76,6 @@ class Login_Service extends Base_Service
         return true;
     }
 
-    /**
-     * 判断用户是否已登陆 (有cookie信息)
-     *
-     * @return boolean
-     */
-    public function check_is_logged_in()
-    {
-
-        $cookies_string = Session_Cache::get(Session_Cache::BILIBILI_COOKIE);
-
-        // return $cookies_string;
-        return $cookies_string ? true : false;
-    }
 
     /**
      * 获取已登陆用户信息
@@ -114,5 +101,54 @@ class Login_Service extends Base_Service
 
         $result = new Login_User_Model($response_data);
         return $result;
+    }
+
+
+    /**
+     * 检测目标用户是否是 已登陆用户的粉丝
+     *
+     * @param int $user_id
+     * @return Relation_Model 
+     * @throws Exception
+     */
+    public function check_is_my_fans($user_id)
+    {
+
+        $is_logged = $this->check_is_logged_in();
+        if ($is_logged === false)
+        {
+            throw new Exception('用户未登陆');
+        }
+
+        $query_data = ['mid' => $user_id];
+        $query_data = Bilibili_Wbi_Token::add_wbi_token($query_data);
+
+        $response = Curl_Manager::get_json(Bilibili_Api::CHECK_IS_MY_FANS, $query_data);
+        Curl_Manager::check_response_error_code($response);
+        $response_data = $response['data'] ?? null;
+        $be_relation = $response_data['be_relation'] ?? null;
+        if (empty($response_data) || empty($be_relation))
+        {
+            throw new Exception('无法获取用户是否关注信息');
+        }
+
+        $result = new Relation_Model($be_relation);
+        return $result;
+    }
+
+
+
+    /**
+     * 判断用户是否已登陆 (有cookie信息)
+     *
+     * @return boolean
+     */
+    private function check_is_logged_in()
+    {
+
+        $cookies_string = Session_Cache::get(Session_Cache::BILIBILI_COOKIE);
+
+        // return $cookies_string;
+        return $cookies_string ? true : false;
     }
 }

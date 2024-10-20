@@ -73,6 +73,16 @@ export class User_Model {
          */
         this.action = data.action || '';
 
+
+
+        //用户关系相关
+        this.relation_type = null;
+        this.relation_type_description = '';
+        this.relation_date = '';
+
+
+
+
         //生成一个随机KEY, 用来避免vue重复渲染
         this.key = this.id + '' + get_random_int(1, 1000)
     }

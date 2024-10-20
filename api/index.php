@@ -11,17 +11,22 @@ class Action
     const GET_DETAIL = 'get_detail';
 
     const GET_COMMENT_LIST = 'get_comment_list';
-    const GET_FORWARD_LIST = 'get_forward_list';
-    const GET_LIKE_LIST = 'get_like_list';
+    const GET_REACTION_LIST = 'get_reaction_list';
+
+    // const GET_FORWARD_LIST = 'get_forward_list';
+    // const GET_LIKE_LIST = 'get_like_list';
 
     const GET_REQUEST_STATUS = 'get_request_status';
 
     const GET_LOGIN_URL = 'get_login_url';
     const CHECK_LOGIN_STATUS = 'check_login_status';
 
-    const CHECK_IS_LOGGED_IN = 'check_is_logged_in';
+    // const CHECK_IS_LOGGED_IN = 'check_is_logged_in';
 
     const GET_LOGGED_USER_INFO = 'get_logged_user_info';
+
+    //检测目标用户是否为 当前登陆用户的粉丝
+    const CHECK_IS_MY_FANS = 'check_is_my_fans';
 
     const TEST = 'test';
 }
@@ -29,8 +34,8 @@ class Action
 //设置超时时间
 set_time_limit(60 * 30);
 
-//启动会话
-Session_Cache::start();
+// //启动会话
+// Session_Cache::start();
 
 $action = $_REQUEST['action'] ?? null;
 
@@ -41,14 +46,10 @@ $id_request = $_REQUEST['id_request'] ?? null;
 
 $qrcode_key = $_REQUEST['qrcode_key'] ?? null;
 
+$user_id = $_REQUEST['user_id'] ?? null;
+
 $url = $_REQUEST['url'] ?? '';
 
-// //等级过滤器
-// $level_filter = $_REQUEST['level_filter'] ?? null;
-// //会员过滤器
-// $vip_filter = $_REQUEST['vip_filter'] ?? null;
-// //评论内容过滤器
-// $content_filter = $_REQUEST['content_filter'] ?? null;
 
 
 $detail_service = new Detail_Service($id_request);
@@ -87,23 +88,7 @@ try
 
             break;
 
-        case Action::GET_FORWARD_LIST:
-
-            if (empty($id))
-            {
-                throw new Exception('缺少id参数', 400);
-            }
-            if (is_bvid($id))
-            {
-                throw new Exception('转发列表不支持BV号', 400);
-            }
-
-            $result = $reaction_service->get_forward_list($id);
-            Response_flusher::flush_file($result);
-
-            break;
-
-        case Action::GET_LIKE_LIST:
+        case Action::GET_REACTION_LIST:
 
             if (empty($id))
             {
@@ -114,10 +99,45 @@ try
                 throw new Exception('点赞列表不支持BV号', 400);
             }
 
-            $result = $reaction_service->get_like_list($id);
+            $result = $reaction_service->get_reaction_list($id);
             Response_flusher::flush_file($result);
 
             break;
+
+            //@deprecated 
+        // case Action::GET_LIKE_LIST:
+
+        //     if (empty($id))
+        //     {
+        //         throw new Exception('缺少id参数', 400);
+        //     }
+        //     if (is_bvid($id))
+        //     {
+        //         throw new Exception('点赞列表不支持BV号', 400);
+        //     }
+
+        //     $result = $reaction_service->get_like_list($id);
+        //     Response_flusher::flush_file($result);
+
+        //     break;
+
+            //@deprecated 
+        // case Action::GET_FORWARD_LIST:
+
+        //     if (empty($id))
+        //     {
+        //         throw new Exception('缺少id参数', 400);
+        //     }
+        //     if (is_bvid($id))
+        //     {
+        //         throw new Exception('转发列表不支持BV号', 400);
+        //     }
+
+        //     $result = $reaction_service->get_forward_list($id);
+        //     Response_flusher::flush_file($result);
+
+        //     break;
+
 
         case Action::GET_REQUEST_STATUS:
 
@@ -151,13 +171,13 @@ try
 
             break;
 
-            //non è usato
-        case Action::CHECK_IS_LOGGED_IN:
+            //@deprecated 
+        // case Action::CHECK_IS_LOGGED_IN:
 
-            $result = $login_service->check_is_logged_in();
-            Response_flusher::flush_data($result);
+        //     $result = $login_service->check_is_logged_in();
+        //     Response_flusher::flush_data($result);
 
-            break;
+        //     break;
 
 
         case Action::GET_LOGGED_USER_INFO:
@@ -167,13 +187,21 @@ try
 
             break;
 
+        case Action::CHECK_IS_MY_FANS:
 
+            $result = $login_service->check_is_my_fans($user_id);
+            Response_flusher::flush_data($result);
 
-            //测试接口用
-        case Action::TEST:
-            $response = Curl_Manager::get_json($url, []);
-            Response_flusher::flush_data($response);
             break;
+
+        //     //测试接口用
+        // case Action::TEST:
+
+        //     $query_data =  ['mid' => $id];
+        //     $query_data = Bilibili_Wbi_Token::add_wbi_token($query_data);
+        //     $response = Curl_Manager::get_json($url, $query_data);
+        //     Response_flusher::flush_data($response);
+        //     break;
 
         default:
             throw new Exception('缺少Action参数: ' . $action, 400);

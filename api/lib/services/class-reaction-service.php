@@ -30,6 +30,7 @@ class Reaction_Service  extends Base_Service
     private $total_count = 0;
 
     /**
+     * @deprecated 
      * 获取转发列表里的用户
      * 
      * @param string $id
@@ -51,6 +52,7 @@ class Reaction_Service  extends Base_Service
     }
 
     /**
+     * @deprecated
      * 获取点赞列表里的用户
      * 
      * @param string $id
@@ -76,20 +78,20 @@ class Reaction_Service  extends Base_Service
      * 获取 转发+点赞合并列表的用户
      * 
      * @param string $id
-     * @param string $action 用来判断要使用的统计列表
+     * @param string $action 用来判断要使用的统计列表 (废弃)
      * @return resource 包含请求结果的临时文件路径
      */
-    private function get_reaction_list($id, $action)
+    public function get_reaction_list($id, $action = '')
     {
 
         //设置 转发总数 和 点赞总数
-        $this->set_forward_count_and_like_count($id, $action);
+        $this->set_forward_count_and_like_count($id);
 
         $query_data = [
             'id' => $id,
         ];
 
-        $global_array_reaction = [];
+        // $global_array_reaction = [];
         $continue_while_flag = true;
         //统计结果进度
         $result_count = 0;
@@ -132,28 +134,28 @@ class Reaction_Service  extends Base_Service
                 {
                     return User_Model::create_by_reaction($reaction);
                 }, $array_reaction);
-                //根据动作只保留对应对应类型的用户
-                $array_user_model_filtered = array_values(array_filter($array_user_model, function (User_Model $user) use ($action)
-                {
-                    return $user->action === $action;
-                }));
+                // //根据动作只保留对应对应类型的用户
+                // $array_user_model_filtered = array_values(array_filter($array_user_model, function (User_Model $user) use ($action)
+                // {
+                //     return $user->action === $action;
+                // }));
 
                 //把结果数据写入临时文件
-                write_array_to_file($temp_result_file, $array_user_model_filtered, $first_write);
+                write_array_to_file($temp_result_file, $array_user_model, $first_write);
                 //累计结果数量
                 $result_count += count($array_user_model);
                 //不是空数组
-                if(count($array_user_model_filtered) > 0){
+                if(count($array_user_model) > 0){
                     $first_write = false;
                 }
 
                 //实时把请求进度更新在会话缓存里
-                $this->update_request_progress(count($global_array_reaction), $this->total_count);
+                $this->update_request_progress($result_count, $this->total_count);
 
                 $has_more = $response_data['has_more'] ?? false;
                 $offset = $response_data['offset'] ?? '';
                 //如果还有下一页 并且 结果列表长度还是小于 动态详情里的 转发+点赞总数
-                if ($has_more === true && count($global_array_reaction) < ($this->forward_count + $this->like_count))
+                if ($has_more === true && $result_count < ($this->total_count))
                 {
                     //更新请求参数
                     $query_data['offset'] = $offset;
@@ -201,11 +203,10 @@ class Reaction_Service  extends Base_Service
      * 设置 转发总数 和 点赞总数
      *
      * @param string $id
-     * @param string $action 用来判断要使用的统计列表
      * @return void
      * @throws Exception
      */
-    private function set_forward_count_and_like_count($id, $action)
+    private function set_forward_count_and_like_count($id)
     {
         //获取详情数据
         $detail_model = $this->get_detail($id);

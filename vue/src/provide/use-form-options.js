@@ -1,10 +1,9 @@
-import { inject, provide, reactive, ref } from 'vue'
+import { provide, reactive, ref } from 'vue'
 import { INJECTION_KEY } from '@/constants/injection-key'
 
-import { get_by_fetch } from '@/utils/request-by-fetch';
-import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
+
 import { Detail_Model } from '@/model/detail-model';
-import { clear_object } from '@/utils/utils';
+
 
 function useProvideFormOptions() {
     const video_id = ref('');

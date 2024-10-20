@@ -22,6 +22,9 @@ class Bilibili_Api
     //获取登陆用户的信息
     const GET_LOGIN_USER_INFO = 'https://api.bilibili.com/x/web-interface/nav';
 
+    //查询用户与自己关系（互相关系）
+    const CHECK_IS_MY_FANS = 'https://api.bilibili.com/x/space/wbi/acc/relation';
+
 
     //WBI密钥的API请求接口
     const GET_WBI_KEYS = 'https://api.bilibili.com/x/web-interface/nav';

@@ -38,6 +38,9 @@ class Comment_List_Service extends Base_Service
      */
     public function get_comment_list($id)
     {
+        //关闭session写入, 避免锁会话
+        Session_Cache::close_write();
+
         //设置 评论区ID 和 评论类型
         $this->set_comment_area_id_and_comment_type_id($id);
 

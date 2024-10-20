@@ -117,27 +117,27 @@ function on_click_confirm() {
 }
 
 
-get_by_fetch(
-     API_ROOT_URL,
-     {
-          action: API_ENDPOINT.CHECK_IS_LOGGED_IN,
-     },
-     () => {
+// get_by_fetch(
+//      API_ROOT_URL,
+//      {
+//           action: API_ENDPOINT.CHECK_IS_LOGGED_IN,
+//      },
+//      () => {
 
-     },
-     (response_data) => {
+//      },
+//      (response_data) => {
 
-          console.log(response_data);
+//           console.log(response_data);
 
-     },
-     (error) => {
-          //显示错误框
-          show_error_modal(true, error.message);
-     },
-     () => {
+//      },
+//      (error) => {
+//           //显示错误框
+//           show_error_modal(true, error.message);
+//      },
+//      () => {
 
-     }
-);
+//      }
+// );
 
 
 onMounted(() => {

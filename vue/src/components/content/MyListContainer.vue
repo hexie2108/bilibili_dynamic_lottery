@@ -4,12 +4,31 @@
 import MyList from '@/components/content/MyList.vue'
 import { computed, onMounted, reactive, ref, inject, watch, watchEffect } from "vue"
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faClock, faCrown } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCrown, faFilter, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import { clear_object, format_date_to_string, parse_date_string } from "@/utils/utils";
 
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { API_ENDPOINT } from "@/constants/constants";
+
+const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
+
+const video_id = inject(INJECTION_KEY.VIDEO_ID)
+const video_detail = inject(INJECTION_KEY.VIDEO_DETAIL)
+const enable_comment_list = inject(INJECTION_KEY.ENABLE_COMMENT_LIST)
+const enable_like_list = inject(INJECTION_KEY.ENABLE_LIKE_LIST)
+const enable_forward_list = inject(INJECTION_KEY.ENABLE_FORWARD_LIST)
+
+const show_list = inject(INJECTION_KEY.SHOW_LIST);
+const comment_list = inject(INJECTION_KEY.COMMENT_LIST);
+const like_list = inject(INJECTION_KEY.LIKE_LIST);
+const forward_list = inject(INJECTION_KEY.FORWARD_LIST);
+const user_list = inject(INJECTION_KEY.USER_LIST);
+
+
+const login_user = inject(INJECTION_KEY.LOGIN_USER)
+const show_login_modal = inject(INJECTION_KEY.SHOW_LOGIN_MODAL)
 
 //最大页面上展示的列表数量
 const MAX_DISPLAY_USER_LIST = 100
@@ -24,28 +43,7 @@ const ARRAY_LEVEL_OPTION = [
     6
 ]
 
-const props = defineProps({
-    user_list: {
-        type: Array,
-        default() {
-            return []
-        }
-    },
-    // user_list_key: {
-    //     type: Number,
-    //     default: 0,
-    // },
-    user_list_type: {
-        type: String,
-        default: '',
-    },
-})
 
-const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
-const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
-
-//避免DOM复用导致图片无法加载
-// const user_list_key_local = ref(1)
 
 /**
  * 过滤器
@@ -57,6 +55,7 @@ const vip_filter = ref(false)
 const content_filter = ref('')
 const date_comment_filter_start = ref(null)
 const date_comment_filter_end = ref(null)
+const only_fans = ref(false);
 
 const list_offset = ref(0)
 
@@ -66,21 +65,22 @@ const list_offset = ref(0)
 
 const result_status = ref(false)
 const result_end_time = ref('')
-//被抽中的用户ID列表
-// const result_user_id_list = reactive([])
+
 //中奖者用户列表
 const result_winner_list = reactive([])
 
-//当前是否是评论列表
-const is_comment_list = computed(() => {
-    return props.user_list_type === API_ENDPOINT.GET_COMMENT_LIST
-})
+// //当前是否是评论列表
+// const is_only_comment_list = computed(() => {
+//     return enable_comment_list.value && !enable_like_list.value && !enable_forward_list.value
+// })
 
 const filtered_list = computed(() => {
 
+
     const id_set = new Set();
 
-    return props.user_list.filter(user => {
+
+    return user_list.filter(user => {
 
         let result = true;
 
@@ -96,7 +96,7 @@ const filtered_list = computed(() => {
         }
 
         //只有是评论列表的时候 才启用的过滤器
-        if (is_comment_list.value) {
+        if (enable_comment_list.value) {
 
 
             //用户等级过滤
@@ -133,85 +133,6 @@ const filtered_list = computed(() => {
 })
 
 
-// const filtered_list = computed(() => {
-
-//     let user_list_to_filter = user_list
-
-//     //只有是评论列表的时候 才启用的过滤器
-//     if (is_comment_list.value) {
-
-//         //过滤重复评论用户
-//         if (repeat_comment_filter.value === true) {
-//             const id_set = new Set();
-//             //使用set 和id属性 来过滤掉数组里重复的用户
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 let result;
-//                 if (id_set.has(user.id)) {
-//                     result = false;
-//                 } else {
-//                     result = true;
-//                     id_set.add(user.id);
-//                 }
-//                 return result;
-//             });
-//         }
-
-
-
-
-
-//         //用户等级过滤
-//         if (min_level_filter.value !== '') {
-
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 return user.level >= min_level_filter.value
-//             });
-
-//         }
-
-//         //VIP过滤
-//         if (vip_filter.value === true) {
-
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 return user.vip !== ''
-//             });
-
-//         }
-
-//         //评论内容过滤
-//         if (content_filter.value !== '') {
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 return user.content.includes(content_filter.value)
-//             });
-//         }
-
-//         //如果最早评论时间
-//         if (date_comment_filter_start.value) {
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 return parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
-//             });
-//         }
-
-//         //如果最晚评论时间
-//         if (date_comment_filter_end.value) {
-//             user_list_to_filter = user_list_to_filter.filter(user => {
-//                 return parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
-//             });
-//         }
-
-//     }
-
-//     // //如果已抽完
-//     // if (result_status.value) {
-
-//     //     //只显示中奖用户
-//     //     user_list_to_filter = user_list_to_filter.filter(user => {
-//     //         return result_user_id_list.includes(user.id)
-//     //     });
-//     // }
-
-//     return user_list_to_filter
-// })
 
 //页面上显示用的数组
 const display_filtered_list = computed(() => {
@@ -221,10 +142,10 @@ const display_filtered_list = computed(() => {
 
 })
 
-//如果源列表发生变化 重置抽奖状态
-watch(props.user_list, () => {
-    reset_result_status()
-})
+// //如果源列表发生变化 重置抽奖状态
+// watch(props.user_list, () => {
+//     reset_result_status()
+// })
 
 watchEffect(() => {
 
@@ -305,10 +226,16 @@ function reset_result_status() {
 }
 
 
-onMounted(() => {
-    // date_comment_filter_start.value = new Date();
-    // date_comment_filter_end.value = new Date();
-})
+
+
+
+
+
+
+// onMounted(() => {
+//     // date_comment_filter_start.value = new Date();
+//     // date_comment_filter_end.value = new Date();
+// })
 
 
 
@@ -316,159 +243,164 @@ onMounted(() => {
 </script>
 
 <template>
-
     <div>
+        <div v-if="user_list.length > 0">
 
-        <hr />
-
-        <div class="row justify-content-center gy-2">
-            <div class="col-12 col-xl-10 ">
-                <div class="bg-body-secondary rounded p-2 my-2 text-center">
-                    请选择想要开启的过滤器
-                    <span v-show="!is_comment_list" class="small">(更多的过滤器只有在抽取评论的时候才能用)</span>
+            <div class="row justify-content-center gy-2">
+                <div class="col-12 ">
+                    <div class="p-2 my-2 text-center">
+                        <h3><font-awesome-icon :icon="faFilter" class=" me-1" /> 请选择想要开启的过滤器</h3>
+                        <div v-show="!enable_comment_list" class="small">(更多的过滤器只有在抽取评论的时候才能用)</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-12 col-xl-10">
-
-                <div class="input-group">
-                    <div class="input-group-text">
-                        要抽选的人数
+                <div class="col-3">
+                    <div class="p-2 my-2 fs-5 text-center">
+                        未过滤前的用户人数 <span class="fw-bold">{{ user_list.length }}</span>
                     </div>
-                    <input v-model.number="number_people_selected_filter" class="form-control" type="number" min=1
-                        :disabled="result_status" />
-
-                    <div class="input-group-text">
-                        <span v-if="is_comment_list">同用户多次评论</span>
-                        <span v-else>同用户多次转发/点赞</span>
+                </div>
+                <div class="col-3">
+                    <div class="rounded p-2 my-2 fs-5 text-center">
+                        过滤后的用户人数 <span class="fw-bold">{{ filtered_list.length }}</span>
                     </div>
-                    <select class="form-select" v-model="repeat_comment_filter" :disabled="result_status">
-                        <option :value="false">不限制</option>
-                        <option :value="true">只保留一次</option>
-                    </select>
+                </div>
 
-                    <template v-if="is_comment_list">
+                <div class="col-12 col-xl-10">
 
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            要抽选的人数
+                        </div>
+                        <input v-model.number="number_people_selected_filter" class="form-control" type="number" min=1
+                            :disabled="result_status" />
 
                         <div class="input-group-text">
-                            最低等级
+                            <span>过滤重复用户</span>
+                            <!-- <span v-if="enable_comment_list">同用户多次评论</span>
+                        <span v-else>同用户多次转发/点赞</span> -->
                         </div>
-                        <select class="form-select" v-model="min_level_filter" :disabled="result_status">
-                            <option v-for="(value, index) of ARRAY_LEVEL_OPTION" :key="index" :value="value">{{
-                                value === '' ? '不限制' : value }}</option>
-                        </select>
-                        <div class="input-group-text">
-                            VIP会员
-                        </div>
-                        <select class="form-select" v-model="vip_filter" :disabled="result_status">
+                        <select class="form-select" v-model="repeat_comment_filter" :disabled="result_status">
                             <option :value="false">不限制</option>
-                            <option :value="true">只保留VIP会员用户</option>
+                            <option :value="true">只保留一次</option>
                         </select>
-                    </template>
+
+                        <template v-if="enable_comment_list">
+
+
+                            <div class="input-group-text">
+                                最低等级
+                            </div>
+                            <select class="form-select" v-model="min_level_filter" :disabled="result_status">
+                                <option v-for="(value, index) of ARRAY_LEVEL_OPTION" :key="index" :value="value">{{
+                                    value === '' ? '不限制' : value }}</option>
+                            </select>
+                            <div class="input-group-text">
+                                VIP会员
+                            </div>
+                            <select class="form-select" v-model="vip_filter" :disabled="result_status">
+                                <option :value="false">不限制</option>
+                                <option :value="true">只保留VIP会员用户</option>
+                            </select>
+                        </template>
+                    </div>
+
+
                 </div>
 
+                <div v-if="enable_comment_list" class="col-12 col-xl-10">
 
-            </div>
-
-            <div v-if="is_comment_list" class="col-12 col-xl-10">
-
-                <div class="input-group">
-                    <div class="input-group-text">
-                        评论内容包含
-                    </div>
-                    <input v-model.lazy="content_filter" class="form-control" type="text" placeholder="不限制"
-                        :disabled="result_status" />
-                    <div class="input-group-text">
-                        最早评论时间
-                    </div>
-                    <div>
-                        <VueDatePicker v-model="date_comment_filter_start" auto-apply placeholder="不限制" locale="zh"
-                            format="yyyy-MM-dd HH:mm:ss" :disabled="result_status" />
-                    </div>
-
-                    <div class="input-group-text">
-                        最晚评论时间
-                    </div>
-
-                    <div>
-                        <VueDatePicker v-model="date_comment_filter_end" auto-apply placeholder="不限制" locale="zh"
-                            format="yyyy-MM-dd HH:mm:ss" :disabled="result_status" />
-                    </div>
-                </div>
-
-
-            </div>
-
-            <div class="col-12 col-xl-10 text-center">
-
-                <div class="row justify-content-center">
-                    <div class="col-4">
-                        <div class="bg-body-secondary rounded p-2 my-2">
-                            总提取到的人数 <span class="fw-bold">{{ props.user_list.length }}</span>
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            评论内容包含
                         </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="bg-body-secondary rounded p-2 my-2 ">
-                            过滤后的参加抽选人数 <span class="fw-bold">{{ filtered_list.length }}</span>
+                        <input v-model.lazy="content_filter" class="form-control" type="text" placeholder="不限制"
+                            :disabled="result_status" />
+                        <div class="input-group-text">
+                            最早评论时间
                         </div>
+                        <div>
+                            <VueDatePicker v-model="date_comment_filter_start" auto-apply placeholder="不限制" locale="zh"
+                                format="yyyy-MM-dd HH:mm:ss" :disabled="result_status" />
+                        </div>
+
+                        <div class="input-group-text">
+                            最晚评论时间
+                        </div>
+
+                        <div>
+                            <VueDatePicker v-model="date_comment_filter_end" auto-apply placeholder="不限制" locale="zh"
+                                format="yyyy-MM-dd HH:mm:ss" :disabled="result_status" />
+                        </div>
+                       
+                    </div>
+
+
+                </div>
+
+                <div class="col-12 col-xl-10 text-center">
+
+
+
+                    <button v-show="!result_status" class="btn btn-miku btn-lg mt-2"
+                        @click="calculate_array_result_list">开始抽选</button>
+                    <button v-show="result_status" class="btn btn-secondary btn-lg mt-2"
+                        @click="reset_result_status">重置列表&重新抽选</button>
+
+                </div>
+
+                <div v-show="result_status" class="col-12 col-xl-10 text-center">
+
+                    <div class="bg-pink text-bg-success rounded p-2 my-2 fw-bold">
+                        {{ result_end_time }} 抽选完成 结果如下
                     </div>
 
                 </div>
 
-                <button v-show="!result_status" class="btn btn-outline-primary btn-lg mt-2"
-                    @click="calculate_array_result_list">开始抽选</button>
-                <button v-show="result_status" class="btn btn-outline-secondary btn-lg mt-2"
-                    @click="reset_result_status">重置列表&重新抽选</button>
-
             </div>
 
-            <div v-show="result_status" class="col-12 col-xl-10 text-center">
+            <hr />
 
-                <div class="bg-pink text-bg-success rounded p-2 my-2 fw-bold">
-                    {{ result_end_time }} 抽选完成 结果如下
+            <!-- 参加用户列表 -->
+            <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status"
+                :offset="list_offset"  />
+
+            <!-- 中奖用户列表 -->
+            <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status"
+                 />
+
+
+            <!-- 分页切换 -->
+            <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST"
+                class="my-2 row justify-content-center align-items-center">
+                <div class="col-auto">
+                    <button v-show="list_offset > 0" class="btn btn-outline-secondary px-4"
+                        @click="list_offset -= MAX_DISPLAY_USER_LIST">上一页</button>
                 </div>
-
+                <div class="col-1">
+                    <div class="bg-body-secondary rounded p-2 my-2 text-center"> {{ list_offset / MAX_DISPLAY_USER_LIST
+                        + 1
+                        }} / {{
+                            Math.ceil(filtered_list.length / MAX_DISPLAY_USER_LIST) }} </div>
+                </div>
+                <div class="col-auto">
+                    <button v-show="(list_offset + MAX_DISPLAY_USER_LIST) < filtered_list.length"
+                        class="btn btn-outline-secondary px-4"
+                        @click="list_offset += MAX_DISPLAY_USER_LIST">下一页</button>
+                </div>
             </div>
 
-        </div>
-
-        <hr />
-
-        <!-- 参加用户列表 -->
-        <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status"
-            :offset="list_offset" :is_comment_list="is_comment_list" />
-
-        <!-- 中奖用户列表 -->
-        <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status"
-            :is_comment_list="is_comment_list" />
-
-
-        <!-- 分页切换 -->
-        <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST"
-            class="my-2 row justify-content-center align-items-center">
-            <div class="col-auto">
-                <button v-show="list_offset > 0" class="btn btn-outline-secondary px-4"
-                    @click="list_offset -= MAX_DISPLAY_USER_LIST">上一页</button>
-            </div>
-            <div class="col-1">
-                <div class="bg-body-secondary rounded p-2 my-2 text-center"> {{ list_offset / MAX_DISPLAY_USER_LIST + 1
-                    }} / {{
-                        Math.ceil(filtered_list.length / MAX_DISPLAY_USER_LIST) }} </div>
-            </div>
-            <div class="col-auto">
-                <button v-show="(list_offset + MAX_DISPLAY_USER_LIST) < filtered_list.length"
-                    class="btn btn-outline-secondary px-4" @click="list_offset += MAX_DISPLAY_USER_LIST">下一页</button>
-            </div>
-        </div>
-
-        <!-- 如果列表超过显示上限-->
-        <!-- <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
+            <!-- 如果列表超过显示上限-->
+            <!-- <div v-show="!result_status && filtered_list.length > MAX_DISPLAY_USER_LIST" class=" my-2">
             <div class="bg-secondary text-bg-secondary rounded p-2 my-2 fw-bold text-center">
                 列表长度已超过显示上限 {{ MAX_DISPLAY_USER_LIST }}， 为避免浏览器卡顿 后续数据不会直接在页面上显示，这不影响参加抽选
             </div>
         </div> -->
 
-
+        </div>
+        <div v-else>
+            <h3 class="text-center my-4"><font-awesome-icon :icon="faTriangleExclamation" class=" me-1" /> 未提取到符合要求的用户
+            </h3>
+        </div>
     </div>
 
 </template>

@@ -1,4 +1,4 @@
-import { inject, provide, reactive } from 'vue'
+import { provide, reactive } from 'vue'
 import { INJECTION_KEY } from '@/constants/injection-key'
 
 import { get_by_fetch } from '@/utils/request-by-fetch';

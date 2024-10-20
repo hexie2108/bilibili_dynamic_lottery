@@ -21,7 +21,7 @@ class Session_Cache
     public static function get($key)
     {
         //确保已启动会话缓存
-        // static::start();
+        static::start();
 
         return $_SESSION[$key] ?? null;
     }
@@ -36,9 +36,11 @@ class Session_Cache
     public static function set($key, $value)
     {
         //确保已启动会话缓存
-        // static::start();
+        static::start();
 
         $_SESSION[$key] = $value;
+
+        static::close_write();
     }
 
     /**
@@ -50,9 +52,11 @@ class Session_Cache
     public static function delete($key)
     {
         //确保已启动会话缓存
-        // static::start();
+        static::start();
 
         unset($_SESSION[$key]);
+
+        static::close_write();
     }
 
     /**
@@ -62,15 +66,7 @@ class Session_Cache
      */
     public static function start()
     {
-        //允许跨域设置COOKIE
-        ini_set('session.cookie_samesite', 'None');
-        //开启只允许 HTTPS 传输 Cookie
-        ini_set('session.cookie_secure', '1');
-        // 设置会话的最大存活时间
-        ini_set('session.gc_maxlifetime', SESSION_TIMEOUT);
-        // 设置会话 Cookie 的过期时间
-        session_set_cookie_params(SESSION_TIMEOUT);
-
+        
         if (session_status() == PHP_SESSION_NONE)
         {
             session_start();

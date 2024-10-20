@@ -20,8 +20,17 @@ const INJECTION_KEY = {
     VIDEO_DETAIL: 'video_detail',
 
     ENABLE_COMMENT_LIST : 'enable_comment_list',
-    ENABLE_FORWARD_LIST : 'enable_forward_list',
     ENABLE_LIKE_LIST : 'enable_like_list',
+    ENABLE_FORWARD_LIST : 'enable_forward_list',
+
+    COMMENT_LIST : 'comment_list',
+    LIKE_LIST : 'like_list',
+    FORWARD_LIST : 'forward_list',
+    USER_LIST : 'user_list',
+    
+
+    //判断什么时候展示列表
+    SHOW_LIST : 'show_list',
 
 }
 
