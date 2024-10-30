@@ -371,18 +371,22 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
+                <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)" class="my-2 alert alert-warning">
+                    <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为 <strong>点赞</strong> 和 <strong>转发</strong> 的数量限制, 在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制), 这种情况建议 只使用评论用户列表来抽奖
+                </div>
+
                 <div class="my-2">
                     视频地址只支持加载 <strong>评论用户</strong> | 动态地址支持加载同时
                     <strong>评论</strong>+<strong>点赞</strong>+<strong>转发</strong> 的用户
 
                 </div>
                 <div class="my-2">
-                    <span class="badge text-bg-danger">注意</span> <strong>评论</strong> 抽取只能读取到一级评论和回复评论的二级子评论,
+                    <span class="badge text-bg-danger">注意</span> <strong>评论</strong> 加载只能读取到一级评论和回复评论的二级子评论,
                     不包含回复二级子评论的三级子评论
                 </div>
                 <div class="my-2">
-                    <span class="badge text-bg-danger">注意</span> <strong>点赞</strong> 和 <strong>转发</strong> 抽取有上限限制,
-                    在点赞+转发=总数超过1500的情况 有可能会无法加载出完整列表 (B站接口限制)
+                    <span class="badge text-bg-danger">注意</span> <strong>点赞</strong> 和 <strong>转发</strong> 加载有数量限制,
+                    在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制), 这种情况建议 只使用评论用户列表来抽奖
                 </div>
 
             </div>
