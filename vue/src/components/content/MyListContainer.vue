@@ -110,17 +110,17 @@ const filtered_list = computed(() => {
             }
 
             //评论内容过滤
-            if (content_filter.value !== '') {
+            if (result && content_filter.value !== '') {
                 result = user.content.includes(content_filter.value);
             }
 
             //如果最早评论时间
-            if (date_comment_filter_start.value) {
+            if (result && date_comment_filter_start.value) {
                 result = parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
             }
 
             //如果最晚评论时间
-            if (date_comment_filter_end.value) {
+            if (result && date_comment_filter_end.value) {
                 result = parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
             }
 
