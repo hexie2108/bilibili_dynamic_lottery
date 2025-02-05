@@ -18,6 +18,8 @@ const INJECTION_KEY = {
     //视频/动态详情
     VIDEO_ID: 'video_id',
     VIDEO_DETAIL: 'video_detail',
+    //链接地址
+    VIDEO_URL : 'video_url',
 
     ENABLE_COMMENT_LIST : 'enable_comment_list',
     ENABLE_LIKE_LIST : 'enable_like_list',
@@ -31,6 +33,8 @@ const INJECTION_KEY = {
 
     //判断什么时候展示列表
     SHOW_LIST : 'show_list',
+
+    
 
 }
 

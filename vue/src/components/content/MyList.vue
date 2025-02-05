@@ -1,7 +1,7 @@
 <script setup>
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faClock, faCrown } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCrown, faLink } from "@fortawesome/free-solid-svg-icons";
 import { computed, inject } from 'vue';
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { get_by_fetch } from '@/utils/request-by-fetch';
@@ -33,7 +33,7 @@ const login_user = inject(INJECTION_KEY.LOGIN_USER)
 const enable_comment_list = inject(INJECTION_KEY.ENABLE_COMMENT_LIST)
 const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
 const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
-
+const video_url = inject(INJECTION_KEY.VIDEO_URL)
 
 //动态设置列表的最低高度
 const list_min_height = computed(() => {
@@ -128,6 +128,9 @@ function on_click_is_my_fans(user) {
                             </div>
                             <div v-show="user.content" class="small text-muted one-line-text" :title="user.content">
                                 {{ user.content }}
+                                <!-- 如果有回复ID, 就输出定位链接 -->
+                                <a v-if="user.reply_id" :href="video_url + '#reply' + user.reply_id" class="ms-2" title="定位到评论位置" target="_blank"><font-awesome-icon
+                                        :icon="faLink"/></a>
                             </div>
                         </div>
                         <div class="d-xxl-none"></div>

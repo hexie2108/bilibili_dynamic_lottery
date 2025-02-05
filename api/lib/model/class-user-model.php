@@ -91,6 +91,13 @@ class User_Model
      */
     public $action;
 
+    /**
+     * 评论列表专用, 回复ID地址, 用来定位回复位置
+     *
+     * @var int
+     */
+    public $reply_id;
+
     //避免被直接创建实例
     private function __construct()
     {
@@ -147,6 +154,7 @@ class User_Model
             }
         }
 
+        $model->reply_id = $comment['rpid'] ?? 0;
 
         return $model;
     }

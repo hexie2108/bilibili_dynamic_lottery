@@ -14,7 +14,7 @@ const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
 
 const video_id = inject(INJECTION_KEY.VIDEO_ID)
 const video_detail = inject(INJECTION_KEY.VIDEO_DETAIL)
-
+const video_url = inject(INJECTION_KEY.VIDEO_URL)
 const url = ref('')
 
 
@@ -38,6 +38,16 @@ function on_click_get_detail() {
         https://www.bilibili.com/opus/XXX, <br/> 
         https://t.bilibili.com/XXXXX
         `
+        show_error_modal(true, error_message);
+        return;
+    }
+
+    //提取保存 纯净的视频/动态地址, 移除其他额外参数
+    try {
+        const url_object = new URL(url.value);
+        video_url.value = url_object.origin + url_object.pathname;
+    } catch (error) {
+        const error_message = '无法把链接转换成URL对象';
         show_error_modal(true, error_message);
         return;
     }

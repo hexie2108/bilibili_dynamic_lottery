@@ -9,6 +9,9 @@ function useProvideFormOptions() {
     const video_id = ref('');
     provide(INJECTION_KEY.VIDEO_ID, video_id)
 
+    const video_url =  ref('');
+    provide(INJECTION_KEY.VIDEO_URL, video_url)
+
     const video_detail = reactive(new Detail_Model())
     provide(INJECTION_KEY.VIDEO_DETAIL, video_detail)
 

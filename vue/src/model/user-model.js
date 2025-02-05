@@ -73,6 +73,12 @@ export class User_Model {
          */
         this.action = data.action || '';
 
+        /**
+         * 评论列表专用, 回复ID地址, 用来定位回复位置
+         *
+         * @type {number}
+        */
+        this.reply_id = data.reply_id || 0;
 
 
         //用户关系相关
