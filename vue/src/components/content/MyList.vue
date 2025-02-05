@@ -127,10 +127,13 @@ function on_click_is_my_fans(user) {
                                     user.vip_description }}</span>
                             </div>
                             <div v-show="user.content" class="small text-muted one-line-text" :title="user.content">
-                                {{ user.content }}
+
                                 <!-- 如果有回复ID, 就输出定位链接 -->
-                                <a v-if="user.reply_id" :href="video_url + '#reply' + user.reply_id" class="ms-2" title="定位到评论位置" target="_blank"><font-awesome-icon
-                                        :icon="faLink"/></a>
+                                <a v-if="user.reply_id" :href="video_url + '#reply' + user.reply_id" class="ms-2"
+                                    title="定位到评论位置" target="_blank"><font-awesome-icon :icon="faLink" /></a>
+
+                                {{ user.content }}
+
                             </div>
                         </div>
                         <div class="d-xxl-none"></div>
