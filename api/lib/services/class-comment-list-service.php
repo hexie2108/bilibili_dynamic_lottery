@@ -76,7 +76,7 @@ class Comment_List_Service extends Base_Service
                 if (!is_array($array_reply))
                 {
                     //检测是否触发了B站服务器风控
-                    $this->check_is_triggered_bilibili_firewall($response['code']);
+                    $this->check_is_triggered_bilibili_firewall($response);
 
                     $url = Bilibili_Api::GET_COMMENT_LIST . '?' . http_build_query($query_data);
                     //抛出错误 来增加错误计数
@@ -147,6 +147,8 @@ class Comment_List_Service extends Base_Service
                 //记录错误信息
                 error_log($e->getMessage());
 
+                //检测是否触发了B站服务器风控
+                $this->check_is_triggered_bilibili_firewall($e->getMessage());
                 //记录错误次数, 如果错误次数达到了上限, 抛出错误
                 $this->add_error_time_and_check_max_error_time();
                 //休息2秒后再重试

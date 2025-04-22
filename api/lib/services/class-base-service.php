@@ -106,6 +106,7 @@ class Base_Service
      */
     protected function add_error_time_and_check_max_error_time()
     {
+
         $this->error_time++;
 
         //如果错误次数达到了上限, 说明请求循环是被强行中断的
@@ -118,19 +119,34 @@ class Base_Service
     /**
      * 判断是否触发了B站服务器风控 导致请求被拦截
      *
-     * @param int $code
+     * @param array<string,mixed>|string $response
      * @return void
      * @throws Curl_response_exception 如果触发了B站服务器风控
      */
-    protected function check_is_triggered_bilibili_firewall($code)
+    protected function check_is_triggered_bilibili_firewall($response)
     {
         //B站服务器风控错误码
         $firewall_error_code = 412;
 
+        $exception = new Curl_response_exception('请求过于频繁, 导致触发了B站服务器风控, 请过段时间后再重试');
 
-        if (abs($code) === $firewall_error_code)
+        //如果是正常JSON回复
+        if (is_array($response))
         {
-            throw new Curl_response_exception('请求过于频繁, 导致触发了B站服务器风控, 请过段时间后再重试');
+            //但是错误码是412
+            $code = $response['code'] ?? 0;
+            if (abs($code) === $firewall_error_code)
+            {
+                throw $exception;
+            }
+        }
+        else if (is_string($response))
+        {
+            //如果是HTML报错页面 并且包含关键词 412 风控
+            if (str_contains($response, 'html') && str_contains($response, $firewall_error_code))
+            {
+                throw $exception;
+            }
         }
     }
 
