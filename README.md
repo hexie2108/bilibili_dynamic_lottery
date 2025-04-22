@@ -20,9 +20,10 @@
 # 后端的部署方法
 1. 需要一台支持PHP环境的服务器
 2. 把项目除了 `vue` 目录以外的文件部署到网站的目录下
-3. 重命名`config`目录里的 `cookie.example.txt` 改成 `cookie.txt` 
-4. 然后创建一个B站小号登陆B站, 把账号使用的cookie字符串复制到 `cookie.txt` 文件内
-5. 项目的访问入口为api目录里的 `index.php` , 部署完成后就能通过 api路径访问 例子: https://www.abcd/api/index.php
+3. 重命名`api`目录里的 `.env.example.php` 改成 `.env.php`
+4. 重命名`config`目录里的 `cookie.example.txt` 改成 `cookie.txt` 
+5. 然后创建一个B站小号登陆B站, 把账号使用的cookie字符串复制到 `cookie.txt` 文件内
+6. 项目的访问入口为api目录里的 `index.php` , 部署完成后就能通过 api路径访问 例子: https://www.abcd/api/index.php
 
 # 前端的部署方法
 1. 安装Nodejs+npm
