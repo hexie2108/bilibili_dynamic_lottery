@@ -140,10 +140,11 @@ class Base_Service
                 throw $exception;
             }
         }
+        //如果是非JSON回复 或者 回复状态码异常导致的报错
         else if (is_string($response))
         {
-            //如果是HTML报错页面 并且包含关键词 412 风控
-            if (str_contains($response, 'html') && str_contains($response, $firewall_error_code))
+            //检测是否包含关键词 412 风控错误码
+            if (str_contains($response, $firewall_error_code))
             {
                 throw $exception;
             }
