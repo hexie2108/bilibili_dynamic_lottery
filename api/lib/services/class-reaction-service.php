@@ -106,7 +106,11 @@ class Reaction_Service  extends Base_Service
 
             try
             {
-                $response = Curl_Manager::get_json(Bilibili_Api::GET_REACTION_LIST, $query_data);
+
+                $url = Bilibili_Api::GET_REACTION_LIST;
+                //使用代理API域名来访问, 降低被风控拦截的几率
+                $url = Bilibili_Api::use_custom_proxy_api_bilibili_domain($url);
+                $response = Curl_Manager::get_json($url, $query_data);
                 $response_data = $response['data'] ?? null;
 
                 //提取转发/点赞列表
@@ -117,7 +121,7 @@ class Reaction_Service  extends Base_Service
                     //检测是否触发了B站服务器风控
                     $this->check_is_triggered_bilibili_firewall($response);
 
-                    $url = Bilibili_Api::GET_REACTION_LIST . '?' . http_build_query($query_data);
+                    $url .=  '?' . http_build_query($query_data);
                     //抛出错误 来增加错误计数
                     throw new Exception('无法获取reaction列表:  ' . $url . ' => ' . json_encode($response));
                 }
@@ -184,10 +188,10 @@ class Reaction_Service  extends Base_Service
                 $this->check_is_triggered_bilibili_firewall($e->getMessage());
                 //记录错误次数, 如果错误次数达到了上限, 抛出错误
                 $this->add_error_time_and_check_max_error_time();
-            }
 
-            //休息1秒后再请求 避免风控
-            sleep(1);
+                //休息2秒后再请求
+                sleep(2);
+            }
         }
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);

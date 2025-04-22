@@ -13,6 +13,9 @@ class Config
 
 class Bilibili_Api
 {
+    //B站默认的API域名
+    const ROOT_DOMAIN = 'api.bilibili.com';
+
     //申请登陆二维码地址
     const GET_LOGIN_URL = 'https://passport.bilibili.com/x/passport-login/web/qrcode/generate';
 
@@ -43,4 +46,32 @@ class Bilibili_Api
 
     //获取点赞与转发列表
     const GET_REACTION_LIST = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail/reaction';
+
+
+    /**
+     * 如果有提供自定义的代理API域名, 则随机使用一个代理域名
+     *
+     * @param string $url
+     * @return string
+     */
+    public static function use_custom_proxy_api_bilibili_domain($url)
+    {
+        //如果有提供自定义的代理API域名数组
+        if (defined('CUSTOM_PROXY_API_BILIBILI_DOMAIN'))
+        {
+            $array_proxy_domain = CUSTOM_PROXY_API_BILIBILI_DOMAIN;
+
+            //不是空数组
+            if (is_array($array_proxy_domain) && count($array_proxy_domain) > 0)
+            {
+                //随机获取一个代理API域名
+                $index = array_rand($array_proxy_domain);
+                $proxy_proxy_domain = $array_proxy_domain[$index];
+                //替换默认的API域名
+                $url = str_replace(self::ROOT_DOMAIN, $proxy_proxy_domain, $url);
+            }
+        }
+
+        return $url;
+    }
 }
