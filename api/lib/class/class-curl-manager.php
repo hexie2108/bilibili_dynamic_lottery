@@ -77,7 +77,7 @@ class Curl_Manager
             //如果有错误
             if (json_last_error() !== JSON_ERROR_NONE)
             {
-                throw new Exception('Failed to decode JSON response');
+                throw new Exception('Failed to decode JSON response: '. $response );
             }
 
             //如果要获取头部信息
