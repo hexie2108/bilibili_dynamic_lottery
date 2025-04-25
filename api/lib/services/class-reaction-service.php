@@ -188,10 +188,10 @@ class Reaction_Service  extends Base_Service
                 $this->check_is_triggered_bilibili_firewall($e->getMessage());
                 //记录错误次数, 如果错误次数达到了上限, 抛出错误
                 $this->add_error_time_and_check_max_error_time();
-
-                //休息2秒后再请求
-                sleep(2);
             }
+
+            //休息1秒后再请求
+            sleep(1);
         }
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);
