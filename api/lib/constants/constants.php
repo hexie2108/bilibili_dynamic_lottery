@@ -56,6 +56,9 @@ class Bilibili_Api
      */
     public static function use_custom_proxy_api_bilibili_domain($url)
     {
+        //使用一个计数器来达到能够按顺序平均分配请求到各个代理API域名的目的
+        static $count = 0;
+
         //如果有提供自定义的代理API域名数组
         if (defined('CUSTOM_PROXY_API_BILIBILI_DOMAIN'))
         {
@@ -65,10 +68,12 @@ class Bilibili_Api
             if (is_array($array_proxy_domain) && count($array_proxy_domain) > 0)
             {
                 //随机获取一个代理API域名
-                $index = array_rand($array_proxy_domain);
+                $index = $count % count($array_proxy_domain);
                 $proxy_proxy_domain = $array_proxy_domain[$index];
                 //替换默认的API域名
                 $url = str_replace(self::ROOT_DOMAIN, $proxy_proxy_domain, $url);
+
+                $count++;
             }
         }
 
