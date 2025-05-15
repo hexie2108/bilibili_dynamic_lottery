@@ -153,4 +153,77 @@ class Detail_Model
 
         return $model;
     }
+
+    /**
+     * 通过动态数据创建详情对象 (旧版)
+     *
+     * @param array<string, mixed> $dynamic_data
+     * @return Detail_Model
+     */
+    public static function create_by_dynamic_data_old($dynamic_data)
+    {
+
+        $model = new self();
+
+        $card = $dynamic_data['card'] ?? null;
+        throw_exception_if_is_null($card, '无法从动态详情(旧版) 中获取 card');
+        $desc = $card['desc'] ?? null;
+        throw_exception_if_is_null($desc, '无法从动态详情(旧版) 中获取 desc');
+
+        $model->author_id = $desc['user_profile']['info']['uid'] ?? 0;
+        $model->author_name = $desc['user_profile']['info']['uname'] ?? '';
+        $model->author_avatar = $desc['user_profile']['info']['face']  ?? '';
+
+        $json_card = json_decode($card['card'] ?? '[]', true);
+        $model->description = $json_card['item']['description'] ?? '';
+
+        $model->comment_count =  $desc['comment'] ?? 0;
+        $model->forward_count =  $desc['repost'] ?? 0;
+        $model->like_count =  $desc['like'] ?? 0;
+
+        //从动态详情中提取 评论区ID 和 评论类型
+        $model->comment_area_id = $desc['rid_str'] ?? null;
+        $model->comment_type = self::get_comment_type_by_old_dynamic_type($desc['type'] ?? null);
+
+        $model->source_type = static::SOURCE_TYPE_DYNAMIC;
+
+        //如果无法提取到数据
+        throw_exception_if_is_null($model->comment_area_id, '评论区ID 获取失败');
+        throw_exception_if_is_null($model->comment_type, '评论类型 获取失败');
+
+        return $model;
+    }
+
+    /**
+     * 根据动态类型获取对应的评论类型ID
+     *
+     * @param int|null $old_type
+     * @return int|null
+     */
+    private static function get_comment_type_by_old_dynamic_type($old_type)
+    {
+        $result = $old_type;
+        switch ($old_type)
+        {
+            //转发动态
+            case 1:
+                $result = 17;
+                break;
+            //普通动态
+            case 2:
+            case 4:
+                $result = 11;
+                break;
+            //视频投稿动态
+            case 8:
+                $result = 1;
+                break;
+            //专栏投稿动态
+            case 64:
+                $result = 12;
+                break;
+        }
+
+        return $result;
+    }
 }

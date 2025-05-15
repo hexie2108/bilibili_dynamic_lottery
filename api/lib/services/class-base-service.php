@@ -62,13 +62,31 @@ class Base_Service
             //发送请求获取动态详情
             $response = Curl_Manager::get_json(Bilibili_Api::GET_DYNAMIC_DETAIL, ['id' => $id]);
             $response_data = $response['data'] ?? null;
-            if (empty($response_data))
+
+            if ($response_data)
+            {
+                //使用动态数据生成详情数据
+                $result = Detail_Model::create_by_dynamic_data($response_data);
+            }
+
+            //如果获取失败, 尝试使用旧的API获取动态详情
+            if (empty($result))
+            {
+                //尝试使用旧的API获取动态详情
+                $response = Curl_Manager::get_json(Bilibili_Api::GET_DYNAMIC_DETAIL_OLD, ['dynamic_id' => $id]);
+                $response_data = $response['data'] ?? null;
+
+                if ($response_data)
+                {
+                    $result = Detail_Model::create_by_dynamic_data_old($response_data);
+                }
+            }
+
+            //如果还是获取失败
+            if (empty($result))
             {
                 throw new Exception('无法获取动态详情');
             }
-
-            //使用动态数据生成详情数据
-            $result = Detail_Model::create_by_dynamic_data($response_data);
         }
         else
         {

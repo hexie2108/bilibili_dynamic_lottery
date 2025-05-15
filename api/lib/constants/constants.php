@@ -37,6 +37,8 @@ class Bilibili_Api
 
     //动态详情接口
     const GET_DYNAMIC_DETAIL = 'https://api.bilibili.com/x/polymer/web-dynamic/v1/detail';
+    //动态详情接口(旧版)
+    const GET_DYNAMIC_DETAIL_OLD = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail';
 
     //获取评论列表
     const GET_COMMENT_LIST = 'https://api.bilibili.com/x/v2/reply/wbi/main';
