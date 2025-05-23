@@ -31,8 +31,8 @@ class Action
     const TEST = 'test';
 }
 
-//设置超时时间
-set_time_limit(60 * 30);
+//设置超时时间 3小时
+set_time_limit(60 * 60 * 3);
 
 // //启动会话
 // Session_Cache::start();
