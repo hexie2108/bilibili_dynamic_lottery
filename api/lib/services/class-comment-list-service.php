@@ -159,7 +159,7 @@ class Comment_List_Service extends Base_Service
             }
 
             //休息1秒后再请求
-            sleep(2);
+            sleep(1);
         }
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);
