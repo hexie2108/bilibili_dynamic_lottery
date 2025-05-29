@@ -86,8 +86,9 @@ export class User_Model {
         this.relation_type_description = '';
         this.relation_date = '';
 
-
-
+        //相关评论
+        this.relation_comment = {}
+        this.relation_comment_is_slef = null
 
         //生成一个随机KEY, 用来避免vue重复渲染
         this.key = this.id + '' + get_random_int(1, 1000)

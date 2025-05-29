@@ -90,7 +90,8 @@ function make_comment_dict(){
         earliestDatesByContent[processedContent]={}
       }
       earliestDatesByContent[processedContent][userDateTimestamp] = user
-      }
+      user.relation_comment = earliestDatesByContent[processedContent]
+    }
 }
 
 const filtered_list = computed(() => {
@@ -160,7 +161,11 @@ const filtered_list = computed(() => {
           let comment_time = parse_date_string_to_timestamp(user.date)
           for (const other_comment_time in earliestDatesByContent[processedContent]) {
             if (other_comment_time < comment_time && earliestDatesByContent[processedContent][other_comment_time].id !== user.id){
+              user.relation_comment_is_slef = false
               result = false;
+            }
+            else {
+              user.relation_comment_is_slef = true
             }
           }
         }

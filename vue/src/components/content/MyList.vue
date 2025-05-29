@@ -115,7 +115,7 @@ function on_click_is_my_fans(user) {
                                     {{ user.user_name }}
                                 </a>
                             </div>
-                            <div v-show="user.date || user.level || user.vip_description" class="smaller my-2">
+                            <div v-show="user.date || user.level || user.vip_description || user.relation_comment" class="smaller my-2">
                                 <span v-show="user.date"
                                     class="bg-secondary text-bg-secondary rounded-1 me-1 p-1"><font-awesome-icon
                                         :icon="faClock" class="me-1" /> {{ user.date }}</span>
@@ -125,6 +125,15 @@ function on_click_is_my_fans(user) {
                                         'Lv' + user.level : '' }}</span>
                                 <span v-show="user.vip_description" class="bg-miku text-bg-miku rounded-1 ms-1 p-1">{{
                                     user.vip_description }}</span>
+                                <span v-show="user.relation_comment" class="bg-miku text-bg-miku rounded-1 ms-1 p-1" style="background-color: #8f6e9b !important;">{{
+                                    Object.keys(user.relation_comment).length - 1 }}个相同评论</span>
+                                <span v-show="user.relation_comment" class="bg-miku text-bg-miku rounded-1 ms-1 p-1" style="background-color: #e27520 !important;">
+                                    {{
+                                    user.relation_comment_is_slef === null ? '未计算' :
+                                        user.relation_comment_is_slef ? '原创评论' :
+                                            '复制评论'
+                                  }}
+                                </span>
                             </div>
                             <div v-show="user.content" class="small text-muted one-line-text" :title="user.content">
 
