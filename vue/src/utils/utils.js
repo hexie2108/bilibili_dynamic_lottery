@@ -2,7 +2,7 @@ import moment from 'moment';
 
 /**
  * 判断是否为函数
- * @param {*} variable 
+ * @param {*} variable
  * @returns {boolean}
  */
 function is_function(variable) {
@@ -11,7 +11,7 @@ function is_function(variable) {
 
 /**
  * 判断对象是否为空
- * @param {object} obj 
+ * @param {object} obj
  * @returns {boolean}
  */
 function is_empty_object(obj) {
@@ -20,7 +20,7 @@ function is_empty_object(obj) {
 
 /**
  * 清空对象的所有属性
- * @param {object} obj 
+ * @param {object} obj
  * @returns {void}
  */
 function clear_object(obj) {
@@ -32,8 +32,8 @@ function clear_object(obj) {
 
 /**
  * 生成随机整数
- * @param {number} min 
- * @param {number} max 
+ * @param {number} min
+ * @param {number} max
  * @returns {number}
  */
 function get_random_int(min, max) {
@@ -42,8 +42,8 @@ function get_random_int(min, max) {
 
 /**
  * 解析日期时间字符串
- * @param {string} date_string 
- * @param {string} date_format 
+ * @param {string} date_string
+ * @param {string} date_format
  * @returns {Date|null}
  */
 function parse_date_string(date_string, date_format = 'YYYY-MM-DD HH:mm:ss') {
@@ -54,10 +54,15 @@ function parse_date_string(date_string, date_format = 'YYYY-MM-DD HH:mm:ss') {
 
     return result;
 }
-
+function parse_date_string_to_timestamp(date_string, date_format = 'YYYY-MM-DD HH:mm:ss') {
+    if (date_string) {
+        return moment(date_string, date_format).valueOf(); // 返回时间戳
+    }
+    return null;
+}
 /**
  * 解析时间对象 转换成字符串
- * @param {Date|null} date 
+ * @param {Date|null} date
  * @returns {string}
  */
 function format_date_to_string(date) {
@@ -79,4 +84,5 @@ export {
     get_random_int,
     parse_date_string,
     format_date_to_string,
+    parse_date_string_to_timestamp,
 }
