@@ -157,7 +157,7 @@ const filtered_list = computed(() => {
           processedContent = user.content.replace(content_filter, '');
         }
         // 用户评论的日期必须等于预计算的该内容的最早日期
-        if (processedContent.length >=10){
+        if (processedContent.length >=8){
           let comment_time = parse_date_string_to_timestamp(user.date)
           for (const other_comment_time in earliestDatesByContent[processedContent]) {
             if (other_comment_time < comment_time && earliestDatesByContent[processedContent][other_comment_time].id !== user.id){
