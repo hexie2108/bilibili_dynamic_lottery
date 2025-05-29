@@ -6,7 +6,7 @@ import { computed, onMounted, reactive, ref, inject, watch, watchEffect } from "
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock, faCrown, faFilter, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import VueDatePicker from '@vuepic/vue-datepicker';
-import { clear_object, format_date_to_string, parse_date_string } from "@/utils/utils";
+import {clear_object, format_date_to_string, parse_date_string, parse_date_string_to_timestamp} from "@/utils/utils";
 
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { API_ENDPOINT } from "@/constants/constants";
@@ -49,7 +49,7 @@ const ARRAY_LEVEL_OPTION = [
  * 过滤器
  */
 const number_people_selected_filter = ref(1)
-const repeat_comment_filter = ref(true)
+const repeat_comment_filter = ref('earliest_long_identical')
 const min_level_filter = ref('')
 const vip_filter = ref(false)
 const content_filter = ref('')
@@ -74,63 +74,114 @@ const result_winner_list = reactive([])
 //     return enable_comment_list.value && !enable_like_list.value && !enable_forward_list.value
 // })
 
+// 为 "earliest_long_identical" 过滤器预计算每种处理后内容的最早日期
+const earliestDatesByContent = {};
+function make_comment_dict(){
+    for (const user of user_list) {
+      let processedContent = user.content;
+      if (content_filter.value !== '') {
+        // 假设 content_filter.value 是一个普通字符串，需要全局替换
+        // 为了安全起见，如果 content_filter.value 可能包含正则特殊字符，需要先转义
+        processedContent = user.content.replace(content_filter, '');
+      }
+      const userDateTimestamp = parse_date_string_to_timestamp(user.date); // 确保返回可比较的值，如时间戳
+
+      if (!earliestDatesByContent[processedContent]) {
+        earliestDatesByContent[processedContent]={}
+      }
+      earliestDatesByContent[processedContent][userDateTimestamp] = user
+      user.relation_comment = earliestDatesByContent[processedContent]
+    }
+}
+
 const filtered_list = computed(() => {
+  if (earliestDatesByContent){
+    make_comment_dict()
+  }
 
 
-    const id_set = new Set();
+  const id_set = new Set(); // 用于过滤重复用户ID
 
+  return user_list.filter(user => {
+    let result = true;
 
-    return user_list.filter(user => {
+    // 过滤重复评论用户（基于 user.id）
+    // 注意："last_user_comment" 根据当前逻辑是保留用户首次出现的评论
+    if (["last_user_comment", "earliest_long_identical"].includes(repeat_comment_filter.value)) {
+      if (id_set.has(user.id)) {
+        // 如果 "last_user_comment" 真的是要最后一个，这里的逻辑需要完全重写，
+        // 可能需要对 user_list 按用户和时间排序预处理。
+        // 当前逻辑是：如果用户ID已存在，则过滤掉（即保留第一个出现的）
+        result = false;
+      } else {
+        id_set.add(user.id);
+      }
+    }
 
-        let result = true;
+    // 只有是评论列表的时候 才启用的过滤器
+    if (enable_comment_list.value) {
+      // 用户等级过滤
+      if (result && min_level_filter.value !== '') {
+        result = user.level >= Number(min_level_filter.value); // 确保比较的是数字
+      }
 
-        //过滤重复评论用户
-        if (repeat_comment_filter.value === true) {
+      // VIP过滤
+      if (result && vip_filter.value === true) {
+        result = user.vip && user.vip !== ''; // 确保 user.vip 存在且不为空
+      }
 
-            //使用set 和id属性 来过滤掉数组里重复的用户
-            if (id_set.has(user.id)) {
-                result = false;
-            } else {
-                id_set.add(user.id);
-            }
+      // 评论内容过滤 (包含关键词)
+      if (result && content_filter.value !== '') {
+        result = user.content.includes(content_filter.value);
+      }
+
+      // 最早评论时间过滤
+      if (result && date_comment_filter_start.value) {
+        result = parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
+      }
+
+      // 最晚评论时间过滤
+      if (result && date_comment_filter_end.value) {
+        result = parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
+      }
+
+      // 内容相同但时间最早的评论过滤器 (earliest_long_identical)
+      // 这个过滤器依赖于上面已经通过 id_set 的用户。
+      // 如果一个用户有多条内容相同的评论，并且这条是该用户最早的，但不是所有用户中最早的，行为需要明确。
+      // 当前 id_set 的逻辑会先按用户去重（保留第一个），然后再应用这个。
+      // 如果 earliest_long_identical 应该独立于用户去重，id_set 的条件需要调整。
+      // 假设这里的目的是：在通过了前面的用户去重（如果开启了）之后，再应用此规则。
+      if (result && repeat_comment_filter.value === 'earliest_long_identical') {
+        let processedContent = user.content;
+        if (content_filter.value !== '') {
+          processedContent = user.content.replace(content_filter, '');
         }
-
-        //只有是评论列表的时候 才启用的过滤器
-        if (enable_comment_list.value) {
-
-
-            //用户等级过滤
-            if (result && min_level_filter.value !== '') {
-                result = user.level >= min_level_filter.value;
+        // 用户评论的日期必须等于预计算的该内容的最早日期
+        if (processedContent.length >=8){
+          let comment_time = parse_date_string_to_timestamp(user.date)
+          for (const other_comment_time in earliestDatesByContent[processedContent]) {
+            if (other_comment_time < comment_time && earliestDatesByContent[processedContent][other_comment_time].id !== user.id){
+              user.relation_comment_is_slef = false
+              result = false;
             }
-
-            //VIP过滤
-            if (result && vip_filter.value === true) {
-                result = user.vip !== '';
+            else {
+              user.relation_comment_is_slef = true
             }
-
-            //评论内容过滤
-            if (result && content_filter.value !== '') {
-                result = user.content.includes(content_filter.value);
-            }
-
-            //如果最早评论时间
-            if (result && date_comment_filter_start.value) {
-                result = parse_date_string(user.date) >= parse_date_string(date_comment_filter_start.value);
-            }
-
-            //如果最晚评论时间
-            if (result && date_comment_filter_end.value) {
-                result = parse_date_string(user.date) <= parse_date_string(date_comment_filter_end.value);
-            }
-
+          }
         }
+      }
+    }
+    return result;
+  });
+});
 
-        return result;
-
-    });
-
-})
+// 辅助函数示例 (你需要根据你的日期格式实现)
+// function parse_date_string(dateStr) {
+//     // 例如: return new Date(dateStr).getTime();
+//     // 或使用更健壮的日期解析库如 date-fns 或 moment.js
+//     // 确保能处理你项目中的日期格式
+//     return new Date(dateStr).getTime(); // 示例，返回时间戳以便比较
+// }
 
 
 
@@ -149,7 +200,7 @@ const display_filtered_list = computed(() => {
 
 watchEffect(() => {
 
-    //通过监听器, 在过滤列表产生变化的时候重置 offset分页    
+    //通过监听器, 在过滤列表产生变化的时候重置 offset分页
     list_offset.value = filtered_list.value ? 0 : 0;
 
 });
@@ -164,16 +215,13 @@ function calculate_array_result_list() {
         show_error_modal(true, '抽选人数无效')
         return
     }
-
     // 检查 抽选人数 是否小于或等于数组的长度
     if (number_people_selected_filter.value > filtered_list.value.length) {
         show_error_modal(true, '抽选人数必须小于或等于参加人数')
         return
     }
-
     //显示加载框
     show_loading_modal(true, '抽选中')
-
     //记录抽出的index
     const index_list = new Set();
 
@@ -195,7 +243,6 @@ function calculate_array_result_list() {
     //循环直到抽满所需人数
     // while (result_user_id_list.length < number_people_selected_filter.value)
     while (result_winner_list.length < number_people_selected_filter.value)
-
     //隐藏加载框
     show_loading_modal(false, '')
 
@@ -280,8 +327,9 @@ function reset_result_status() {
                         <span v-else>同用户多次转发/点赞</span> -->
                         </div>
                         <select class="form-select" v-model="repeat_comment_filter" :disabled="result_status">
-                            <option :value="false">不限制</option>
-                            <option :value="true">只保留一次</option>
+                          <option value="no_filter">不限制</option>
+                          <option value="last_user_comment">只保留同用户最后一次评论</option>
+                          <option value="earliest_long_identical">保留相同长评论的最早一次</option>
                         </select>
 
                         <template v-if="enable_comment_list">
@@ -331,7 +379,7 @@ function reset_result_status() {
                             <VueDatePicker v-model="date_comment_filter_end" auto-apply placeholder="不限制" locale="zh"
                                 format="yyyy-MM-dd HH:mm:ss" :disabled="result_status" />
                         </div>
-                       
+
                     </div>
 
 

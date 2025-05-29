@@ -29,12 +29,11 @@ const INJECTION_KEY = {
     LIKE_LIST : 'like_list',
     FORWARD_LIST : 'forward_list',
     USER_LIST : 'user_list',
-    
 
     //判断什么时候展示列表
     SHOW_LIST : 'show_list',
 
-    
+
 
 }
 
