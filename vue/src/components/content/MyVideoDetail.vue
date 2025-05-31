@@ -8,6 +8,7 @@ import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faComment, faShare, faThumbsUp, faVideo, faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { User_Model } from '@/model/user-model';
+import md5 from 'blueimp-md5';
 
 const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
 const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
@@ -49,7 +50,7 @@ function on_click_get_list() {
     like_list.length = 0;
     forward_list.length = 0;
     user_list.length = 0;
-    
+
 
     //清空请求队列
     array_request_queue.length = 0;
@@ -151,6 +152,9 @@ function get_list() {
 
 
 }
+
+
+
 
 
 /**
@@ -259,12 +263,59 @@ function create_user_list() {
         temp_list = [];
     }
 
-    //重新生成最终的用户列表
+    //重新生成最终的用户列表 
     user_list.push(...temp_list);
+    //检测评论是否为原创评论, 并设置相关信息
+    set_comment_duplicate_info();
 
     //显示列表
     show_list.value = true;
 
+}
+
+/**
+ * 检测评论是否为原创评论, 并设置相关信息
+ */
+function set_comment_duplicate_info() {
+
+    //创建个本地静态储存映射 用来记录识别评论是否是原创的
+    const map_hash_content_to_original_comment_info = {};
+
+    //以逆序遍历用户列表 (这样列表将会按照时间顺序从小到大排列被遍历)
+    user_list.slice().reverse().map((user) => {
+
+        // 根据评论内容生成key
+        const key = md5(user.content.trim());
+
+        // 检索映射
+        let original_comment_info = map_hash_content_to_original_comment_info[key] || null;
+
+        //如果当前评论内容已经存在于映射中, 则说明不是原创评论
+        if (original_comment_info) {
+
+            // 不是原创评论，次数加1
+            original_comment_info.count++;
+
+            // 设置相关属性
+            user.original_comment_id = original_comment_info.id;
+            user.duplicate_comment_count = original_comment_info.count;
+
+            console.log(user.user_name + ' '+user.duplicate_comment_count);
+
+        }
+        //如果不存在, 则说明是原创评论
+        else {
+
+            //创建新的映射记录
+            original_comment_info = {
+                id: user.reply_id,
+                count: 0
+            };
+        }
+
+        //更新映射里的原创评论信息
+        map_hash_content_to_original_comment_info[key] = original_comment_info;
+    });
 }
 
 
@@ -283,7 +334,7 @@ watch(video_id, () => {
     like_list.length = 0;
     forward_list.length = 0;
     user_list.length = 0;
-   
+
 })
 
 
@@ -318,7 +369,7 @@ watch(video_id, () => {
         <div class="row justify-content-center align-items-center gy-3 mt-3 border-bottom">
 
             <div class="col-12 text-center">
-                <h3><font-awesome-icon :icon="faListCheck" class="me-1" /> 请选择想要加载的用户列表</h3>
+                <h3><font-awesome-icon :icon="faListCheck" class="me-1" /> 请勾选提取条件</h3>
             </div>
 
             <div class="col-auto text-center ">
@@ -371,8 +422,11 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
-                <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)" class="my-2 alert alert-warning">
-                    <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为 <strong>点赞</strong> 和 <strong>转发</strong> 的数量限制, 在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制), 这种情况建议 只使用评论用户列表来抽奖
+                <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"
+                    class="my-2 alert alert-warning">
+                    <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为
+                    <strong>点赞</strong> 和 <strong>转发</strong> 的数量限制, 在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制),
+                    这种情况建议 只使用评论用户列表来抽奖
                 </div>
 
                 <div class="my-2">

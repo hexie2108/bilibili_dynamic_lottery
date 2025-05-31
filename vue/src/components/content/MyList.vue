@@ -1,7 +1,7 @@
 <script setup>
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faClock, faCrown, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCrown, faLink, faUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { computed, inject } from 'vue';
 import { INJECTION_KEY } from '@/constants/injection-key';
 import { get_by_fetch } from '@/utils/request-by-fetch';
@@ -115,7 +115,8 @@ function on_click_is_my_fans(user) {
                                     {{ user.user_name }}
                                 </a>
                             </div>
-                            <div v-show="user.date || user.level || user.vip_description || user.relation_comment" class="smaller my-2">
+                            <div v-show="user.date || user.level || user.vip_description || user.original_comment_id"
+                                class="smaller my-2">
                                 <span v-show="user.date"
                                     class="bg-secondary text-bg-secondary rounded-1 me-1 p-1"><font-awesome-icon
                                         :icon="faClock" class="me-1" /> {{ user.date }}</span>
@@ -123,24 +124,24 @@ function on_click_is_my_fans(user) {
                                     user.level
                                         ?
                                         'Lv' + user.level : '' }}</span>
-                                <span v-show="user.vip_description" class="bg-miku text-bg-miku rounded-1 ms-1 p-1">{{
+                                <span v-show="user.vip_description" class="text-bg-miku rounded-1 ms-1 p-1">{{
                                     user.vip_description }}</span>
-                                <span v-show="user.relation_comment" class="bg-miku text-bg-miku rounded-1 ms-1 p-1" style="background-color: #8f6e9b !important;">{{
-                                    Object.keys(user.relation_comment).length - 1 }}个相同评论</span>
-                                <span v-show="user.relation_comment" class="bg-miku text-bg-miku rounded-1 ms-1 p-1" style="background-color: #e27520 !important;">
-                                    {{
-                                    user.relation_comment_is_slef === null ? '未计算' :
-                                        user.relation_comment_is_slef ? '原创评论' :
-                                            '复制评论'
-                                  }}
+
+                                <span v-show="user.original_comment_id" class="text-bg-warning rounded-1 ms-1 p-1">
+                                    <a :href="video_url + '#reply' + user.original_comment_id" class="me-1"
+                                        title="定位到对应的原创评论位置" target="_blank">
+                                        <font-awesome-icon :icon="faUpRightFromSquare" />
+                                    </a>
+                                    非原创评论 [第{{ user.duplicate_comment_count }}次重复]
                                 </span>
+
                             </div>
                             <div v-show="user.content" class="small text-muted one-line-text" :title="user.content">
-
                                 <!-- 如果有回复ID, 就输出定位链接 -->
                                 <a v-if="user.reply_id" :href="video_url + '#reply' + user.reply_id" class="ms-2"
-                                    title="定位到评论位置" target="_blank"><font-awesome-icon :icon="faLink" /></a>
-
+                                    title="定位到评论位置" target="_blank">
+                                    <font-awesome-icon :icon="faLink" />
+                                </a>
                                 {{ user.content }}
 
                             </div>
@@ -155,7 +156,7 @@ function on_click_is_my_fans(user) {
                             <!-- 如果还未检测过关系 -->
                             <template v-if="user.relation_type === null">
                                 <!-- 用户已登陆-->
-                                <button :disabled="login_user.id === 0" class="btn btn-secondary btn-sm"
+                                <button :disabled="login_user.id === 0" class="btn btn-secondary btn-sm smaller"
                                     @click="on_click_is_my_fans(user)">检测是否是粉丝</button>
                                 <div v-if="login_user.id === 0" class="smaller mt-2">
                                     (未登陆 无法检测)</div>

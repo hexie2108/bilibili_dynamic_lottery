@@ -92,16 +92,65 @@ class User_Model
     public $action;
 
     /**
-     * 评论列表专用, 回复ID地址, 用来定位回复位置
+     * 评论列表专用, 评论ID
      *
      * @var int
      */
     public $reply_id;
 
+    // /**
+    //  * 如果当前评论非原创, 则记录对应的原创评论ID
+    //  *
+    //  * @var int
+    //  */
+    // public $original_comment_id = 0;
+
+    // /**
+    //  * 如果当前评论非原创, 则记录重复次数
+    //  *
+    //  * @var int
+    //  */
+    // public $duplicate_comment_count = 0;
+
     //避免被直接创建实例
     private function __construct()
     {
     }
+
+    // /**
+    //  * 检测评论是否为原创评论, 并设置相关信息
+    //  *
+    //  * @return void
+    //  */
+    // public function set_comment_duplicate_info()
+    // {
+    //     //创建个本地静态储存映射 用来记录识别评论是否是原创的
+    //     static $map_hash_content_to_original_comment_info = [];
+
+    //     $key = md5(trim($this->content));
+    //     $original_comment_info = $map_hash_content_to_original_comment_info[$key] ?? [];
+
+    //     //如果当前评论内容已经存在于映射中, 则说明不是原创评论
+    //     if (count($original_comment_info) > 0)
+    //     {
+    //         //重复次数+1
+    //         $original_comment_info['count']++;
+
+    //         //设置原创评论ID和重复次数
+    //         $this->original_comment_id = $original_comment_info['id'];
+    //         $this->duplicate_comment_count = $original_comment_info['count'];
+    //     }
+    //     //如果不存在, 则说明是原创评论
+    //     else
+    //     {
+    //         //设置原创评论ID
+    //         $original_comment_info['id'] = $this->reply_id;
+    //         $original_comment_info['count'] = 0;
+    //     }
+
+    //     //更新映射里的原创评论信息
+    //     $map_hash_content_to_original_comment_info[$key] = $original_comment_info;
+    // }
 
     /**
      * 通过评论数据创建用户对象
@@ -155,6 +204,8 @@ class User_Model
         }
 
         $model->reply_id = $comment['rpid'] ?? 0;
+
+        // $model->set_comment_duplicate_info();
 
         return $model;
     }

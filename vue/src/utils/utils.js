@@ -54,11 +54,19 @@ function parse_date_string(date_string, date_format = 'YYYY-MM-DD HH:mm:ss') {
 
     return result;
 }
+
+/**
+ * 解析日期时间字符串 并返回时间戳
+ * @param {string} date_string
+ * @param {string} date_format
+ * @returns {string|null}
+ */
 function parse_date_string_to_timestamp(date_string, date_format = 'YYYY-MM-DD HH:mm:ss') {
+    let result = null;
     if (date_string) {
-        return moment(date_string, date_format).valueOf(); // 返回时间戳
+        result = moment(date_string, date_format).valueOf(); // 返回时间戳
     }
-    return null;
+    return result;
 }
 /**
  * 解析时间对象 转换成字符串

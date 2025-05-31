@@ -12,10 +12,11 @@
 # 参考文档
 [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect/tree/master "SocialSisterYi/bilibili-API-collect")
 
-# 版本说明
-[2024-10-20] 增加了扫码登陆功能和检查用户是否为粉丝的功能
-[2024-06-27] 新版已更换为 前端Vue3+后端PHP的组合, 用Nodejs开发的旧版已移动到分支里 [old-nodejs-jquery-version](https://github.com/hexie2108/bilibili_dynamic_lottery/tree/old-nodejs-jquery-version "old-nodejs-jquery-version")
-为了省事我把前端和后端两个项目扔在同一个GIT库里了, API目录里是后端代码, VUE目录里前端代码
+# 贡献名单
+| 头像 | 用户名 |
+| ---- | ------ |
+| <a href="https://github.com/sakmist"><img src="https://avatars.githubusercontent.com/u/123816165?v=4" width="50" /></a> | [sakmist](https://github.com/sakmist) |
+
 
 # 后端的部署方法
 1. 需要一台支持PHP环境的服务器

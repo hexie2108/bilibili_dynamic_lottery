@@ -80,15 +80,25 @@ export class User_Model {
         */
         this.reply_id = data.reply_id || 0;
 
+        /**
+         * 如果当前评论非原创, 则记录对应的原创评论ID (JS端属性)
+         *
+         * @type {number}
+         */
+        this.original_comment_id = data.$original_comment_id || 0;
+
+        /**
+         * 如果当前评论非原创, 则记录重复次数 (JS端属性)
+         *
+         * @type {number}
+         */
+        this.duplicate_comment_count = data.$duplicate_comment_count || 0;
+
 
         //用户关系相关
         this.relation_type = null;
         this.relation_type_description = '';
         this.relation_date = '';
-
-        //相关评论
-        this.relation_comment = {}
-        this.relation_comment_is_slef = null
 
         //生成一个随机KEY, 用来避免vue重复渲染
         this.key = this.id + '' + get_random_int(1, 1000)

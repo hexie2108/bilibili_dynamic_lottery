@@ -32,6 +32,11 @@ a:hover {
     background-color: var(--color-miku) !important;
 }
 
+.text-bg-violet {
+    color: #fff !important;
+    background-color: var(--color-violet) !important;
+}
+
 
 .text-pink {
     color: var(--color-pink) !important;
