@@ -65,9 +65,11 @@ class Comment_List_Service extends Base_Service
         {
             $query_data = Bilibili_Wbi_Token::add_wbi_token($query_data);
 
+            $url = Bilibili_Api::GET_COMMENT_LIST;
+
             try
             {
-                $url = Bilibili_Api::GET_COMMENT_LIST;
+
                 //使用代理API域名来访问, 降低被风控拦截的几率
                 $url = Bilibili_Api::use_custom_proxy_api_bilibili_domain($url);
 
@@ -149,13 +151,12 @@ class Comment_List_Service extends Base_Service
             catch (Exception $e)
             {
                 //记录错误信息
-                error_log($e->getMessage());
+                error_log($url . ' : ' . $e->getMessage());
 
                 //检测是否触发了B站服务器风控
                 $this->check_is_triggered_bilibili_firewall($e->getMessage());
                 //记录错误次数, 如果错误次数达到了上限, 抛出错误
                 $this->add_error_time_and_check_max_error_time();
-
             }
 
             //休息1秒后再请求
