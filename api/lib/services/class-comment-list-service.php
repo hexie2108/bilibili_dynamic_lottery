@@ -63,6 +63,8 @@ class Comment_List_Service extends Base_Service
 
         do
         {
+            sleep(1);
+
             $query_data = Bilibili_Wbi_Token::add_wbi_token($query_data);
 
             $url = Bilibili_Api::GET_COMMENT_LIST;
