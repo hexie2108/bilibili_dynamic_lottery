@@ -16,7 +16,7 @@ define('CUSTOM_PROXY_API_BILIBILI_DOMAIN', [
     // 'api.example2.com',
 ]); 
 
-//是否开启DEBUG输出
+//是否开启DEBUG输出请求信息到error_log日志
 define('DEBUG', false);
 
 

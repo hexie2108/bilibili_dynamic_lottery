@@ -78,6 +78,11 @@ class Comment_List_Service extends Base_Service
                 $response = Curl_Manager::get_json($url, $query_data);
                 $response_data = $response['data'] ?? null;
 
+                $cursor = $response_data['cursor'] ?? null;
+                throw_exception_if_is_null($cursor, '无法获取 cursor 数据');
+                $all_count = $cursor['all_count'] ?? 0;
+
+
                 //提取评论列表
                 $array_reply = $response_data['replies'] ?? null;
                 //如果评论列表不存在
@@ -89,6 +94,11 @@ class Comment_List_Service extends Base_Service
                     $url .= '?' . http_build_query($query_data);
                     //抛出错误 来增加错误计数
                     throw new Exception('无法获取评论列表: ' . $url . ' => ' . json_encode($response));
+                }
+
+                //如果是第一页, 并且评论数大于3, 但是只返回了3条评论, 说明COOKIE失效了
+                if($first_write && count($array_reply) === 3 && $all_count > 3){
+                    throw new Curl_response_exception('程序使用的COOKIE凭证已失效, 请通知管理员更新凭证, 或者通过右上角扫码登陆自己的B站账号来查询数据');
                 }
 
                 // $global_array_reply = array_merge($global_array_reply, $array_reply);
@@ -123,8 +133,7 @@ class Comment_List_Service extends Base_Service
                 //实时把请求进度更新在会话缓存里
                 $this->update_request_progress($result_count, $this->comment_count);
 
-                $cursor = $response_data['cursor'] ?? null;
-                throw_exception_if_is_null($cursor, '无法获取 cursor 数据');
+                
 
                 //如果还有下一页
                 if ($cursor['is_end'] === false)

@@ -94,7 +94,7 @@ function write_array_to_file($file, $array_data, $first_write = false)
     $array_data_in_json = rtrim($array_data_in_json, ']');
 
     //如果不是首次写入
-    if (!$first_write )
+    if (!$first_write)
     {
         //增加上 , 连接字符 + 移除 '[' 开始字符 
         $array_data_in_json =  ',' . ltrim($array_data_in_json, '[');
@@ -116,6 +116,19 @@ function write_array_to_file($file, $array_data, $first_write = false)
  */
 function write_end_array_to_file($file)
 {
-    //把数组结束符写入文件
-    fwrite($file, ']');
+    // 获取临时文件的元数据
+    $meta = stream_get_meta_data($file);
+    $filename = $meta['uri'];
+
+    //如果临时文件存在并且文件内容不是空
+    if (file_exists($filename) && filesize($filename) > 0)
+    {
+        //把数组结束符写入文件
+        fwrite($file, ']');
+    }
+    else
+    {
+        //否则 写入空数组
+        fwrite($file, '[]');
+    }
 }

@@ -176,7 +176,7 @@ function set_video_id_and_video_detail(id) {
                 <span class="badge text-bg-miku">2024-11</span> 新增检测用户是否完成评论+点赞+转发全部要求的功能: 允许过滤未完成3项的用户
             </div>
             <div class="my-2">
-                <span class="badge text-bg-miku">2024-11</span> 新增B站账号登陆功能: 登陆后再查询, 能增加提取数据的成功率, 还能查询目前用户是否为自己的粉丝
+                <span class="badge text-bg-miku">2024-11</span> 在右上方新增B站账号登陆按钮: 登陆后再查询, 能降低触发B站风控的概率, 还能一键查询目标用户是否为自己的粉丝
             </div>
         </div>
 

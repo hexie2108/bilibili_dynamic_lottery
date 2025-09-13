@@ -32,7 +32,7 @@ const login_user = inject(INJECTION_KEY.LOGIN_USER)
         </template>
         <template v-else>
             <div class="col-auto">
-                <font-awesome-icon :icon="faRightToBracket" class="align-middle me-1" /> 登陆
+                <font-awesome-icon :icon="faRightToBracket" class="align-middle me-1" /> 登陆B站账号
             </div>
         </template>
 

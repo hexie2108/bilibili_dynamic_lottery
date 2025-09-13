@@ -29,7 +29,8 @@ class Curl_Manager
     {
         if (is_debug())
         {
-            var_dump($url, $data);
+            error_log('发送请求: ' . $url);
+            error_log('请求参数' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         }
 
         $ch = curl_init();
@@ -66,7 +67,10 @@ class Curl_Manager
                 $response = substr($response, $header_size);
             }
 
-
+            // if (is_debug())
+            // {
+            //     error_log('请求结果: ' . $response);
+            // }
 
 
             //注销ch资源
@@ -77,7 +81,7 @@ class Curl_Manager
             //如果有错误
             if (json_last_error() !== JSON_ERROR_NONE)
             {
-                throw new Exception('Failed to decode JSON response: '. $response );
+                throw new Exception('Failed to decode JSON response: ' . $response);
             }
 
             //如果要获取头部信息
@@ -89,7 +93,7 @@ class Curl_Manager
 
             if (is_debug())
             {
-                var_dump($response);
+                error_log('请求结果: ' . json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             }
         }
         //如果请求失败
