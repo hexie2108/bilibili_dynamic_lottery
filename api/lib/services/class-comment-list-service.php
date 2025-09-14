@@ -63,7 +63,7 @@ class Comment_List_Service extends Base_Service
 
         do
         {
-            sleep(1);
+            sleep(2);
 
             $query_data = Bilibili_Wbi_Token::add_wbi_token($query_data);
 
@@ -171,7 +171,7 @@ class Comment_List_Service extends Base_Service
             }
 
             //休息1秒后再请求
-            sleep(1);
+            sleep(2);
         }
         //持续循环直到有自定义错误抛出或者 触发结束循环的flag
         while ($continue_while_flag);
