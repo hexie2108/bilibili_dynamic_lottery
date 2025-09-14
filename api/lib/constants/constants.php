@@ -58,13 +58,14 @@ class Bilibili_Api
      */
     public static function use_custom_proxy_api_bilibili_domain($url)
     {
-        //使用一个计数器来达到能够按顺序平均分配请求到各个代理API域名的目的
-        static $count = 0;
 
         //如果有提供自定义的代理API域名数组
         if (defined('CUSTOM_PROXY_API_BILIBILI_DOMAIN'))
         {
             $array_proxy_domain = CUSTOM_PROXY_API_BILIBILI_DOMAIN;
+
+            //使用一个计数器来达到能够按顺序平均分配请求到各个代理API域名的目的
+            static $count = mt_rand(0, count($array_proxy_domain) - 1);
 
             //不是空数组
             if (is_array($array_proxy_domain) && count($array_proxy_domain) > 0)
