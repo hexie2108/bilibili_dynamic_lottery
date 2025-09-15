@@ -422,6 +422,12 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
+                <div class="my-2 alert alert-danger">
+                     <span class="badge text-bg-danger">注意</span> 
+                     因为B站服务器逆天的反爬虫机制, 每次发出一定数量的请求, 就被导致本程序的IP被B站拉黑一段时间, 所以如果提示触发了风控错误, 只能等待1小时后再重试, 没有任何解决办法, 或者你可以从本项目的GITHUB上下载源码, 自行部署到本地或者自己的服务器上使用
+                     <button type="button" class="btn-close ms-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"
                     class="my-2 alert alert-warning">
                     <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为
