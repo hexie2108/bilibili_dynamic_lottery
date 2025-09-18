@@ -36,3 +36,7 @@
 5. 运行  `npm run build` 可以生成 `dist` 目录, 里面包含构建好的前端代码
 6. 把 `dist` 目录里的文件部署到前端的服务器
 
+# 注意事项
+1. 记得手动修改Web服务器软件（Nginx/Apache2）的PHP Fast CGI请求超时时间，不然容易在抓取B站数据的过程中后台返回网关504错误，导致请求被中断 Network response was not ok.
+2. 如果有使用PHP-FPM, 也需要修改单个FPM进程允许的最大执行时间 (request_terminate_timeout)， 避免PHP脚本被强行关闭.
+
