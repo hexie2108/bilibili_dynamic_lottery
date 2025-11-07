@@ -422,10 +422,25 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
-                <div class="my-2 alert alert-danger">
-                     <span class="badge text-bg-danger">注意</span> 
-                     因为B站服务器逆天的反爬虫机制, 每次发出一定数量的请求, 就被导致本程序的IP被B站拉黑一段时间, 所以如果提示触发了风控错误, 只能等待1小时后再重试, 没有任何解决办法, 或者你可以从本项目的GITHUB上下载源码, 自行部署到本地或者自己的服务器上使用
-                     <button type="button" class="btn-close ms-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="my-2 alert alert-danger d-flex flex-wrap align-items-start justify-content-between gap-2">
+                    <div class="text-start">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge text-bg-danger me-2">注意</span>
+                            <strong>频繁请求可能触发B站风控</strong>
+                        </div>
+                        <p class="mb-1">
+                            因为B站服务器严格的反爬虫机制, 连续发送大量请求时本程序的IP会被临时拉黑,
+                            一旦提示触发风控只能等待约1小时后再尝试, 目前没有其他绕过方式。
+                        </p>
+                        <p class="mb-0">
+                            建议下载本地运行的浏览器插件
+                            <a href="https://github.com/sakmist/Bilibili-Lottery-Local-Extension" target="_blank" rel="noopener">
+                                Bilibili Lottery Local Extension
+                            </a>
+                            在自己的环境中独立执行抽奖流程, 以减少被封禁的风险。
+                        </p>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
                 <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"
