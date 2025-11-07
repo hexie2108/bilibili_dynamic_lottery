@@ -184,9 +184,35 @@ function get_list() {
 
         },
         (error) => {
-
-            //显示错误框
-            show_error_modal(true, error.message);
+            const resume_message = `${error.message}，加载已暂停。<div class="text-start">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge text-bg-danger me-2">注意</span>
+                            <strong>
+                                当前获取人数
+                                <template v-if="exceed_request_threshold">
+                                    ({{ selected_user_count }}) 已超过 {{ REQUEST_COUNT_THRESHOLD }}
+                                </template>
+                                ，容易触发B站风控并导致获取失败。
+                            </strong>
+                        </div>
+                        <p class="mb-1">
+                            建议下载本地运行的浏览器插件
+                            <strong class="text-decoration-underline">
+                                Bilibili Lottery Local Extension
+                            </strong>
+                            在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
+                        </p>
+                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+                            <a class="btn btn-warning btn-sm fw-semibold px-3"
+                                href="/extension" target="_blank"
+                                rel="noopener">
+                                立即下载插件
+                            </a>
+                            <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+                        </div>
+                    </div>`;
+          //显示错误框
+            show_error_modal(true, resume_message);
         },
         () => {
             //隐藏加载框

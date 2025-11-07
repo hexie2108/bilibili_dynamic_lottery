@@ -10,6 +10,7 @@ import MyModal from '@/components/modal/MyModal.vue'
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
 import { setLoginUserInfo } from '@/provide/use-provice-login-options';
+import {RouterLink} from "vue-router";
 
 const login_modal_options = inject(INJECTION_KEY.LOGIN_MODAL_OPTIONS);
 const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
@@ -156,14 +157,24 @@ onMounted(() => {
                <div class="text-center">
                     <template v-if="login_url_timeout > 0">
 
-
                          <p>请在 <strong>{{ login_url_timeout }}秒</strong> 内使用哔哩哔哩客户端扫码登陆</p>
                          <vue-qrcode v-if="login_url" :value="login_url" :options="{ width: 250 }"></vue-qrcode>
                          <p>在客户端完成扫码登陆后, 再点击确认</p>
                          <p class="small">提示: 登陆完成后, 你将会看到账号在本程序服务器所属地的IP登陆记录, 这属于正常情况, 你提供的B站账号凭证最长会被服务器保存1小时,
                               1小时后自动销毁,
                               如果使用完本工具后, 过一段时间还发现有异常登陆, 请更改账号密码</p>
-
+                        <p class="mb-1">
+                          如果不信任数据在云端，又要使用检测，建议下载本地运行的浏览器插件
+                          <strong class="text-decoration-underline">
+                            Bilibili Lottery Local Extension
+                          </strong>
+                        </p>
+                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+                          <RouterLink class="btn btn-warning btn-sm fw-semibold px-3" to="/extension">
+                            立即下载插件
+                          </RouterLink>
+                          <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+                        </div>
                     </template>
                     <template v-else>
                          <p>二维码已超时, 请重新打开新的登陆窗口</p>
