@@ -5,6 +5,7 @@
 
 
 import { inject, reactive, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 import { get_random_top_banner } from "@/utils/random-top-banner";
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -75,7 +76,14 @@ function on_click_login() {
         <div class="collapse navbar-collapse" id="top-menu">
           <ul class="navbar-nav ">
             <li class="nav-item">
-              <a href="/" class="nav-link"><font-awesome-icon :icon="faHouse" class="align-middle me-1" /> 首页</a>
+              <RouterLink to="/" class="nav-link">
+                <font-awesome-icon :icon="faHouse" class="align-middle me-1" /> 首页
+              </RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink to="/extension" class="nav-link">
+                <font-awesome-icon :icon="faFileCode" class="align-middle me-1" /> 插件下载
+              </RouterLink>
             </li>
             <li class="nav-item">
               <a :href="bilibili_link" class="nav-link" target="_blank"><font-awesome-icon :icon="faBilibili"

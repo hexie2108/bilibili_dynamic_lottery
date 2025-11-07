@@ -5,6 +5,7 @@ import { Detail_Model } from '@/model/detail-model';
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { clear_object, get_random_int, is_empty_object } from '@/utils/utils';
 import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
+import { RouterLink } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faComment, faShare, faThumbsUp, faVideo, faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { User_Model } from '@/model/user-model';
@@ -108,7 +109,7 @@ function confirm_large_request() {
             <p>建议下载 <strong>Bilibili Lottery Local Extension</strong> 插件在本地执行，确认仍要继续吗？</p>
             <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
                 <a class="btn btn-warning btn-sm fw-semibold px-3"
-                    href="https://github.com/sakmist/Bilibili-Lottery-Local-Extension" target="_blank"
+                    href="/extension" target="_blank"
                     rel="noopener">
                     立即下载插件
                 </a>
@@ -504,11 +505,9 @@ watch(video_id, () => {
                             在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
                         </p>
                         <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
-                            <a class="btn btn-warning btn-sm fw-semibold px-3"
-                                href="https://github.com/sakmist/Bilibili-Lottery-Local-Extension" target="_blank"
-                                rel="noopener">
+                            <RouterLink class="btn btn-warning btn-sm fw-semibold px-3" to="/extension">
                                 立即下载插件
-                            </a>
+                            </RouterLink>
                             <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
                         </div>
                     </div>
