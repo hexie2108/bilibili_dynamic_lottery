@@ -17,7 +17,7 @@
 [https://bilibili.mikuclub.cc/](https://bilibili.mikuclub.cc/ "https://bilibili.mikuclub.cc/")
 
 ## 浏览器插件版本
-
+（此项目库单独存放在[https://github.com/sakmist/Bilibili-Lottery-Local-Extension](https://github.com/sakmist/Bilibili-Lottery-Local-Extension "https://github.com/sakmist/Bilibili-Lottery-Local-Extension")
 为了进一步降低触发B站风控的概率，我们还提供了浏览器插件版本。插件通过本地浏览器读取互动数据，避免服务器高频请求，具有以下优势：
 
 - 减少接口限流风险
