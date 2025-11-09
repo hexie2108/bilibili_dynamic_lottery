@@ -5,6 +5,7 @@ import { Detail_Model } from '@/model/detail-model';
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { clear_object, get_random_int, is_empty_object } from '@/utils/utils';
 import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
+import { RouterLink } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faComment, faShare, faThumbsUp, faVideo, faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { User_Model } from '@/model/user-model';
@@ -12,6 +13,8 @@ import md5 from 'blueimp-md5';
 
 const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
 const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
+const request_warning_modal_options = inject(INJECTION_KEY.REQUEST_WARNING_MODAL_OPTIONS)
+const show_request_warning_modal = inject(INJECTION_KEY.SHOW_REQUEST_WARNING_MODAL)
 
 
 const video_id = inject(INJECTION_KEY.VIDEO_ID)
@@ -30,18 +33,47 @@ const user_list = inject(INJECTION_KEY.USER_LIST);
 const id_request = ref(0);
 const array_request_queue = reactive([]);
 
+const REQUEST_COUNT_THRESHOLD = 3000;
+
+const normalize_count = (count) => {
+    const value = Number(count);
+    return Number.isFinite(value) ? value : 0;
+};
+
 //判断是否要关闭 加载按钮
 const disable_button_get_list = computed(() => {
     return !enable_comment_list.value && !enable_like_list.value && !enable_forward_list.value;
 })
 
+const selected_user_count = computed(() => {
+    let total = 0;
+    if (enable_comment_list.value) {
+        total += normalize_count(video_detail.comment_count);
+    }
+    if (enable_like_list.value) {
+        total += normalize_count(video_detail.like_count);
+    }
+    if (enable_forward_list.value) {
+        total += normalize_count(video_detail.forward_count);
+    }
+    return total;
+});
+
+const exceed_request_threshold = computed(() => selected_user_count.value > REQUEST_COUNT_THRESHOLD);
 
 
 
 /**
  * 加载按钮点击事件
  */
-function on_click_get_list() {
+async function on_click_get_list() {
+
+    if (selected_user_count.value>4000) {
+        const confirmed = await confirm_large_request();
+        if (!confirmed) {
+            return;
+        }
+    }
 
     //隐藏列表组件显示
     show_list.value = false;
@@ -65,6 +97,37 @@ function on_click_get_list() {
 
     get_list();
 
+}
+
+function confirm_large_request() {
+    return new Promise((resolve) => {
+        const total = selected_user_count.value;
+        request_warning_modal_options.title = '提示';
+        request_warning_modal_options.content = `
+            <p>当前预计获取 <strong>${total}</strong> 个用户数据，已超过 ${REQUEST_COUNT_THRESHOLD }。</p>
+            <p>大量请求容易触发B站风控并可能导致获取失败。</p>
+            <p>建议下载 <strong>Bilibili Lottery Local Extension</strong> 插件在本地执行，确认仍要继续吗？</p>
+            <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+                <a class="btn btn-warning btn-sm fw-semibold px-3"
+                    href="/extension" target="_blank"
+                    rel="noopener">
+                    立即下载插件
+                </a>
+                <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+            </div>
+        `;
+
+        const finalize = (result) => {
+            request_warning_modal_options.confirm_handler = null;
+            request_warning_modal_options.cancel_handler = null;
+            resolve(result);
+        };
+
+        request_warning_modal_options.confirm_handler = () => finalize(true);
+        request_warning_modal_options.cancel_handler = () => finalize(false);
+
+        show_request_warning_modal(true);
+    });
 }
 
 
@@ -121,9 +184,35 @@ function get_list() {
 
         },
         (error) => {
-
-            //显示错误框
-            show_error_modal(true, error.message);
+            const resume_message = `${error.message}，加载已暂停。<div class="text-start">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge text-bg-danger me-2">注意</span>
+                            <strong>
+                                当前获取人数
+                                <template v-if="exceed_request_threshold">
+                                    ({{ selected_user_count }}) 已超过 {{ REQUEST_COUNT_THRESHOLD }}
+                                </template>
+                                ，容易触发B站风控并导致获取失败。
+                            </strong>
+                        </div>
+                        <p class="mb-1">
+                            建议下载本地运行的浏览器插件
+                            <strong class="text-decoration-underline">
+                                Bilibili Lottery Local Extension
+                            </strong>
+                            在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
+                        </p>
+                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+                            <a class="btn btn-warning btn-sm fw-semibold px-3"
+                                href="/extension" target="_blank"
+                                rel="noopener">
+                                立即下载插件
+                            </a>
+                            <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+                        </div>
+                    </div>`;
+          //显示错误框
+            show_error_modal(true, resume_message);
         },
         () => {
             //隐藏加载框
@@ -422,10 +511,33 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
-                <div class="my-2 alert alert-danger">
-                     <span class="badge text-bg-danger">注意</span> 
-                     因为B站服务器逆天的反爬虫机制, 每次发出一定数量的请求, 就被导致本程序的IP被B站拉黑一段时间, 所以如果提示触发了风控错误, 只能等待1小时后再重试, 没有任何解决办法, 或者你可以从本项目的GITHUB上下载源码, 自行部署到本地或者自己的服务器上使用
-                     <button type="button" class="btn-close ms-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="my-2 alert alert-danger d-flex flex-wrap align-items-start justify-content-between gap-2" v-if="exceed_request_threshold">
+                    <div class="text-start">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge text-bg-danger me-2">注意</span>
+                            <strong>
+                                当前获取人数
+                                <template v-if="exceed_request_threshold">
+                                    ({{ selected_user_count }}) 已超过 {{ REQUEST_COUNT_THRESHOLD }}
+                                </template>
+                                ，容易触发B站风控并导致获取失败。
+                            </strong>
+                        </div>
+                        <p class="mb-1">
+                            建议下载本地运行的浏览器插件
+                            <strong class="text-decoration-underline">
+                                Bilibili Lottery Local Extension
+                            </strong>
+                            在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
+                        </p>
+                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+                            <RouterLink class="btn btn-warning btn-sm fw-semibold px-3" to="/extension">
+                                立即下载插件
+                            </RouterLink>
+                            <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
                 <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"

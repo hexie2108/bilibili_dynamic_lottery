@@ -13,12 +13,13 @@ import 'bootstrap/dist/js/bootstrap.bundle.js'
 
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router'
 
 
 // console.log(import.meta.env);
 
 
-createApp(App).mount('#app')
+createApp(App).use(router).mount('#app')
 
 //关闭生产环境提示
 // app.config.productionTip = false

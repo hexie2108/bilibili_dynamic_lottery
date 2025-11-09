@@ -92,6 +92,28 @@ function useProvideModalOptions() {
     provide(INJECTION_KEY.SHOW_LOGIN_MODAL, show_login_modal)
 
 
+
+    const request_warning_modal_options = reactive({
+        title: '请求数量提示',
+        title_class: 'text-danger',
+        content: '',
+        content_class: 'text-start',
+        show_cancel_button: true,
+        show_confirm_button: true,
+        show_loading_icon: false,
+        show: false,
+        confirm_handler: null,
+        cancel_handler: null,
+    })
+
+    function show_request_warning_modal(show) {
+        request_warning_modal_options.show = show;
+    }
+
+    provide(INJECTION_KEY.REQUEST_WARNING_MODAL_OPTIONS, request_warning_modal_options)
+    provide(INJECTION_KEY.SHOW_REQUEST_WARNING_MODAL, show_request_warning_modal)
+
+
 }
 
 export { useProvideModalOptions }
