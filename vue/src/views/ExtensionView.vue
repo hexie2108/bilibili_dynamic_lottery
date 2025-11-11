@@ -1,9 +1,19 @@
 <script setup>
+import { onMounted, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faDownload, faPuzzlePiece, faShield } from '@fortawesome/free-solid-svg-icons';
 import { faChrome, faEdge } from '@fortawesome/free-brands-svg-icons';
 
 const downloadLink = 'https://www.modelscope.cn/models/sakmist/Bilibili-Lottery-Local-Extension/resolve/master/Bilibili-Lottery-Local-Extension.zip';
+const edgeStoreLink = 'https://microsoftedge.microsoft.com/addons/detail/bilibili-lottery-local/emklklgjhjjippfejbefinlckfjccicc';
+
+const isEdgeBrowser = ref(false);
+onMounted(() => {
+  if (typeof navigator !== 'undefined') {
+    const ua = navigator.userAgent || '';
+    isEdgeBrowser.value = /\bEdg\//i.test(ua);
+  }
+});
 </script>
 
 <template>
@@ -21,10 +31,56 @@ const downloadLink = 'https://www.modelscope.cn/models/sakmist/Bilibili-Lottery-
           本浏览器插件支持 Chrome / Edge / Firefox。通过本地执行抽奖步骤，避免高频请求触发 B 站风控，同时保留熟悉的操作体验。
         </p>
       </div>
-      <a class="btn btn-miku btn-lg fw-semibold px-4" :href="downloadLink" target="_blank" rel="noopener">
-        <font-awesome-icon :icon="faDownload" class="me-2" />
-        下载 ZIP 安装包
-      </a>
+      <div class="d-flex flex-column flex-md-row align-self-stretch gap-2 w-100">
+        <div v-if="isEdgeBrowser" class="d-flex flex-column gap-2 w-100">
+          <a
+            class="btn btn-outline-dark btn-lg fw-semibold px-4 d-flex align-items-center justify-content-center"
+            :href="edgeStoreLink"
+            target="_blank"
+            rel="noopener"
+          >
+            <font-awesome-icon :icon="faEdge" class="me-2" />
+            Edge 插件商店
+          </a>
+          <p class="small text-danger fw-semibold mb-0">
+            推荐使用 Edge，虽然效果一样支持安装，但是 Edge 已经上架商店（仅 Edge 浏览器可以使用该商店），点击即可安装，无需繁琐操作。
+          </p>
+          <a
+            class="btn btn-link btn-sm fw-semibold px-0 align-self-start"
+            :href="downloadLink"
+            target="_blank"
+            rel="noopener"
+          >
+            或下载 ZIP 安装包
+          </a>
+        </div>
+        <div v-else class="d-flex flex-column flex-md-row gap-3 w-100">
+          <div class="d-flex flex-column flex-grow-1 gap-2">
+            <a
+              class="btn btn-miku btn-lg fw-semibold px-4"
+              :href="downloadLink"
+              target="_blank"
+              rel="noopener"
+            >
+              <font-awesome-icon :icon="faDownload" class="me-2" />
+              下载 ZIP 安装包
+            </a>
+            <div class="d-flex flex-column gap-1 align-items-start">
+              <a
+                class="btn btn-outline-dark btn-sm fw-semibold px-3"
+                :href="edgeStoreLink"
+                target="_blank"
+                rel="noopener"
+              >
+                Edge 插件商店
+              </a>
+              <p class="small text-danger fw-semibold mb-0">
+                推荐使用 Edge，虽然效果一样支持安装，但是 Edge 已经上架商店（仅 Edge 浏览器可以使用该商店），点击即可安装，无需繁琐操作。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

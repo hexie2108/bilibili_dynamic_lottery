@@ -2,7 +2,7 @@
 
 
 import MyList from '@/components/content/MyList.vue'
-import { computed, onMounted, reactive, ref, inject, watch, watchEffect } from "vue"
+import { computed, onMounted, onBeforeUnmount, reactive, ref, inject, watch, watchEffect } from "vue"
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock, faCrown, faFilter, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import VueDatePicker from '@vuepic/vue-datepicker';
@@ -68,6 +68,44 @@ const result_end_time = ref('')
 
 //中奖者用户列表
 const result_winner_list = reactive([])
+
+const copyFormatOptions = [
+    {
+        key: 'nameUid',
+        label: '复制“名字 UID”',
+        example: '小明 12345678',
+        formatter: (user) => `${user.user_name} ${user.id}`,
+        joiner: '\n',
+    },
+    {
+        key: 'mentionUid',
+        label: '复制“@名字 UID”',
+        example: '@小明 12345678',
+        formatter: (user) => `@${user.user_name} ${user.id}`,
+        joiner: '\n',
+    },
+    {
+        key: 'mentionOnly',
+        label: '复制“@名字 …”',
+        example: '@小明 @小红 @小刚',
+        formatter: (user) => `@${user.user_name}`,
+        joiner: ' ',
+    },
+]
+
+const copySignature = '本次抽奖由【初音社】开奖工具开奖'
+
+const copyFormatLookup = copyFormatOptions.reduce((map, option) => {
+    map[option.key] = option
+    return map
+}, {})
+
+const copyStatus = reactive({
+    message: '',
+    type: 'success',
+})
+
+let copyStatusTimer = null
 
 
 const filtered_list = computed(() => {
@@ -226,6 +264,74 @@ function reset_result_status() {
 
 }
 
+function buildWinnerCopyText(formatKey) {
+    const format = copyFormatLookup[formatKey]
+    if (!format || result_winner_list.length === 0) {
+        return ''
+    }
+    const rows = result_winner_list.map((user) => format.formatter(user).trim()).filter(Boolean)
+    if (rows.length === 0) {
+        return ''
+    }
+    const body = rows.join(format.joiner).trim()
+    if (!body) {
+        return copySignature
+    }
+    return `${body}\n\n${copySignature}`
+}
+
+function setCopyStatus(message, type = 'success') {
+    copyStatus.message = message
+    copyStatus.type = type
+    if (copyStatusTimer) {
+        clearTimeout(copyStatusTimer)
+    }
+    copyStatusTimer = setTimeout(() => {
+        copyStatus.message = ''
+    }, 2500)
+}
+
+async function writeTextToClipboard(text) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text)
+        return
+    }
+    if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'absolute'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textarea)
+        if (successful) {
+            return
+        }
+    }
+    throw new Error('Clipboard API is not available')
+}
+
+async function copyWinnerList(formatKey) {
+    const text = buildWinnerCopyText(formatKey)
+    if (!text) {
+        setCopyStatus('暂无可复制的中奖名单', 'danger')
+        return
+    }
+    try {
+        await writeTextToClipboard(text)
+        setCopyStatus('中奖名单复制成功', 'success')
+    } catch (error) {
+        setCopyStatus('复制失败，请手动选择文本复制', 'danger')
+    }
+}
+
+onBeforeUnmount(() => {
+    if (copyStatusTimer) {
+        clearTimeout(copyStatusTimer)
+    }
+})
 
 
 
@@ -368,6 +474,28 @@ function reset_result_status() {
                         {{ result_end_time }} 抽选完成 结果如下
                     </div>
 
+                </div>
+
+                <div v-show="result_status" class="col-12 col-xl-10">
+                    <div class="card shadow-sm p-3 text-start">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="fw-semibold">中奖名单一键复制</div>
+                            <div class="d-flex flex-column flex-md-row flex-wrap gap-3">
+                                <div v-for="option in copyFormatOptions" :key="option.key"
+                                    class="d-flex flex-column gap-1">
+                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold"
+                                        @click="copyWinnerList(option.key)">
+                                        {{ option.label }}
+                                    </button>
+                                    <span class="small text-muted">示例：{{ option.example }}</span>
+                                </div>
+                            </div>
+                            <p v-if="copyStatus.message" class="small mb-0"
+                                :class="copyStatus.type === 'success' ? 'text-success' : 'text-danger'">
+                                {{ copyStatus.message }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
             </div>
