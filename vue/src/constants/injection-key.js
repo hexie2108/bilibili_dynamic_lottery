@@ -10,8 +10,8 @@ const INJECTION_KEY = {
     LOGIN_MODAL_OPTIONS: 'login_modal_options',
     SHOW_LOGIN_MODAL: 'show_login_modal',
 
-    REQUEST_WARNING_MODAL_OPTIONS: 'request_warning_modal_options',
-    SHOW_REQUEST_WARNING_MODAL: 'show_request_warning_modal',
+    // REQUEST_WARNING_MODAL_OPTIONS: 'request_warning_modal_options',
+    // SHOW_REQUEST_WARNING_MODAL: 'show_request_warning_modal',
 
 
     //标记用户是否已登陆

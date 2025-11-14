@@ -10,7 +10,7 @@ import { get_random_top_banner } from "@/utils/random-top-banner";
 import { get_by_fetch } from '@/utils/request-by-fetch';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBilibili, faGithub } from "@fortawesome/free-brands-svg-icons";
-import { faAt, faEnvelope, faFileCode, faHouse } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faEnvelope, faFileCode, faHouse, faPuzzlePiece } from "@fortawesome/free-solid-svg-icons";
 import { API_ENDPOINT, API_ROOT_URL } from '@/constants/constants';
 import { INJECTION_KEY } from "@/constants/injection-key";
 import MyLoginUser from '@/components/header/MyLoginUser.vue';
@@ -82,7 +82,7 @@ function on_click_login() {
             </li>
             <li class="nav-item">
               <RouterLink to="/extension" class="nav-link">
-                <font-awesome-icon :icon="faFileCode" class="align-middle me-1" /> 插件下载
+                <font-awesome-icon :icon="faPuzzlePiece" class="align-middle me-1" /> 插件下载
               </RouterLink>
             </li>
             <li class="nav-item">

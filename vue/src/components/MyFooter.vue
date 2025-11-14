@@ -7,8 +7,7 @@ import { ref } from "vue";
 
 //版本号
 const version_data = ref(import.meta.env.VITE_APP_VERSION || '')
-//管理员地址
-const administrator_email = ref(import.meta.env.VITE_ADMIN_EMAIL || '')
+
 
 
 </script>
@@ -23,7 +22,7 @@ const administrator_email = ref(import.meta.env.VITE_ADMIN_EMAIL || '')
           version_data }}</span>
       </div>
       <div class="col-auto small">
-        问题反馈邮箱 <span class="">{{ administrator_email }}</span>
+        问题反馈请到项目的GITHUB仓库里提交Issue
       </div>
 
     </div>

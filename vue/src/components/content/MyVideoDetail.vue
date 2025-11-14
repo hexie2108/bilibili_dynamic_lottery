@@ -1,430 +1,403 @@
 <script setup>
-import { API_ENDPOINT, API_ROOT_URL, REACTION_TYPE } from '@/constants/constants';
-import { INJECTION_KEY } from '@/constants/injection-key';
-import { Detail_Model } from '@/model/detail-model';
-import { get_by_fetch } from '@/utils/request-by-fetch';
-import { clear_object, get_random_int, is_empty_object } from '@/utils/utils';
-import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
-import { RouterLink } from 'vue-router';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faComment, faShare, faThumbsUp, faVideo, faListCheck } from '@fortawesome/free-solid-svg-icons';
-import { User_Model } from '@/model/user-model';
-import md5 from 'blueimp-md5';
+    import { API_ENDPOINT, API_ROOT_URL, REACTION_TYPE, REQUEST_USER_COUNT_THRESHOLD } from '@/constants/constants';
+    import { INJECTION_KEY } from '@/constants/injection-key';
+    import { Detail_Model } from '@/model/detail-model';
+    import { get_by_fetch } from '@/utils/request-by-fetch';
+    import { clear_object, get_random_int, is_empty_object, parse_number } from '@/utils/utils';
+    import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
+    import { RouterLink } from 'vue-router';
+    import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+    import { faComment, faShare, faThumbsUp, faVideo, faListCheck } from '@fortawesome/free-solid-svg-icons';
+    import { User_Model } from '@/model/user-model';
+    import md5 from 'blueimp-md5';
 
-const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
-const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
-const request_warning_modal_options = inject(INJECTION_KEY.REQUEST_WARNING_MODAL_OPTIONS)
-const show_request_warning_modal = inject(INJECTION_KEY.SHOW_REQUEST_WARNING_MODAL)
-
-
-const video_id = inject(INJECTION_KEY.VIDEO_ID)
-const video_detail = inject(INJECTION_KEY.VIDEO_DETAIL)
-const enable_comment_list = inject(INJECTION_KEY.ENABLE_COMMENT_LIST)
-const enable_like_list = inject(INJECTION_KEY.ENABLE_LIKE_LIST)
-const enable_forward_list = inject(INJECTION_KEY.ENABLE_FORWARD_LIST)
-
-const show_list = inject(INJECTION_KEY.SHOW_LIST);
-const comment_list = inject(INJECTION_KEY.COMMENT_LIST);
-const like_list = inject(INJECTION_KEY.LIKE_LIST);
-const forward_list = inject(INJECTION_KEY.FORWARD_LIST);
-const user_list = inject(INJECTION_KEY.USER_LIST);
+    const show_error_modal = inject(INJECTION_KEY.SHOW_ERROR_MODAL)
+    const show_loading_modal = inject(INJECTION_KEY.SHOW_LOADING_MODAL)
+    // const request_warning_modal_options = inject(INJECTION_KEY.REQUEST_WARNING_MODAL_OPTIONS)
+    // const show_request_warning_modal = inject(INJECTION_KEY.SHOW_REQUEST_WARNING_MODAL)
 
 
-const id_request = ref(0);
-const array_request_queue = reactive([]);
+    const video_id = inject(INJECTION_KEY.VIDEO_ID)
+    const video_detail = inject(INJECTION_KEY.VIDEO_DETAIL)
+    const enable_comment_list = inject(INJECTION_KEY.ENABLE_COMMENT_LIST)
+    const enable_like_list = inject(INJECTION_KEY.ENABLE_LIKE_LIST)
+    const enable_forward_list = inject(INJECTION_KEY.ENABLE_FORWARD_LIST)
 
-const REQUEST_COUNT_THRESHOLD = 3000;
+    const show_list = inject(INJECTION_KEY.SHOW_LIST);
+    const comment_list = inject(INJECTION_KEY.COMMENT_LIST);
+    const like_list = inject(INJECTION_KEY.LIKE_LIST);
+    const forward_list = inject(INJECTION_KEY.FORWARD_LIST);
+    const user_list = inject(INJECTION_KEY.USER_LIST);
 
-const normalize_count = (count) => {
-    const value = Number(count);
-    return Number.isFinite(value) ? value : 0;
-};
 
-//判断是否要关闭 加载按钮
-const disable_button_get_list = computed(() => {
-    return !enable_comment_list.value && !enable_like_list.value && !enable_forward_list.value;
-})
+    const id_request = ref(0);
+    const array_request_queue = reactive([]);
 
-const selected_user_count = computed(() => {
-    let total = 0;
-    if (enable_comment_list.value) {
-        total += normalize_count(video_detail.comment_count);
+
+    //判断是否要关闭 加载按钮
+    const disable_button_get_list = computed(() => {
+        return !enable_comment_list.value && !enable_like_list.value && !enable_forward_list.value;
+    })
+
+    /**
+     * 计算属性： 需要查询的用户总数量
+     */
+    const request_user_count = computed(() => {
+        let total = 0;
+        if (enable_comment_list.value) {
+            total += parse_number(video_detail.comment_count);
+        }
+        if (enable_like_list.value) {
+            total += parse_number(video_detail.like_count);
+        }
+        if (enable_forward_list.value) {
+            total += parse_number(video_detail.forward_count);
+        }
+        return total;
+    });
+
+    /**
+     * 计算属性： 是否超过请求用户数量阈值
+     */
+    const exceed_request_user_count_threshold = computed(() => request_user_count.value > REQUEST_USER_COUNT_THRESHOLD);
+
+
+
+    /**
+     * 加载按钮点击事件
+     */
+    async function on_click_get_list() {
+
+        // if (request_user_count.value > 4000) {
+        //     const confirmed = await confirm_large_request();
+        //     if (!confirmed) {
+        //         return;
+        //     }
+        // }
+
+        //隐藏列表组件显示
+        show_list.value = false;
+        //清空列表
+        comment_list.length = 0;
+        like_list.length = 0;
+        forward_list.length = 0;
+        user_list.length = 0;
+
+
+        //清空请求队列
+        array_request_queue.length = 0;
+        //重新根据加载选项添加对应请求到队列里
+        if (enable_comment_list.value) {
+            array_request_queue.push(API_ENDPOINT.GET_COMMENT_LIST);
+        }
+        if (enable_like_list.value || enable_forward_list.value) {
+            array_request_queue.push(API_ENDPOINT.GET_REACTION_LIST);
+        }
+
+
+        get_list();
+
     }
-    if (enable_like_list.value) {
-        total += normalize_count(video_detail.like_count);
-    }
-    if (enable_forward_list.value) {
-        total += normalize_count(video_detail.forward_count);
-    }
-    return total;
-});
 
-const exceed_request_threshold = computed(() => selected_user_count.value > REQUEST_COUNT_THRESHOLD);
+    // function confirm_large_request() {
+    //     return new Promise((resolve) => {
+    //         const total = request_user_count.value;
+    //         request_warning_modal_options.title = '提示';
+    //         request_warning_modal_options.content = `
+    //         <p>当前预计获取 <strong>${total}</strong> 个用户数据，已超过 ${REQUEST_USER_COUNT_THRESHOLD}。</p>
+    //         <p>大量请求容易触发B站风控并可能导致获取失败。</p>
+    //         <p>建议下载 <strong>Bilibili Lottery Local Extension</strong> 插件在本地执行，确认仍要继续吗？</p>
+    //         <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
+    //             <a class="btn btn-warning btn-sm fw-semibold px-3"
+    //                 href="/extension" target="_blank"
+    //                 rel="noopener">
+    //                 立即下载插件
+    //             </a>
+    //             <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
+    //         </div>
+    //     `;
+
+    //         const finalize = (result) => {
+    //             request_warning_modal_options.confirm_handler = null;
+    //             request_warning_modal_options.cancel_handler = null;
+    //             resolve(result);
+    //         };
+
+    //         request_warning_modal_options.confirm_handler = () => finalize(true);
+    //         request_warning_modal_options.cancel_handler = () => finalize(false);
+
+    //         show_request_warning_modal(true);
+    //     });
+    // }
 
 
+    //发起数据请求
+    function get_list() {
 
-/**
- * 加载按钮点击事件
- */
-async function on_click_get_list() {
-
-    if (selected_user_count.value>4000) {
-        const confirmed = await confirm_large_request();
-        if (!confirmed) {
+        //如果请求队列是空的, 结束运行
+        if (array_request_queue.length === 0) {
             return;
         }
-    }
 
-    //隐藏列表组件显示
-    show_list.value = false;
-    //清空列表
-    comment_list.length = 0;
-    like_list.length = 0;
-    forward_list.length = 0;
-    user_list.length = 0;
+        //从队列里提取 请求名称
+        const action = array_request_queue.pop();
 
-
-    //清空请求队列
-    array_request_queue.length = 0;
-    //重新根据加载选项添加对应请求到队列里
-    if (enable_comment_list.value) {
-        array_request_queue.push(API_ENDPOINT.GET_COMMENT_LIST);
-    }
-    if (enable_like_list.value || enable_forward_list.value) {
-        array_request_queue.push(API_ENDPOINT.GET_REACTION_LIST);
-    }
-
-
-    get_list();
-
-}
-
-function confirm_large_request() {
-    return new Promise((resolve) => {
-        const total = selected_user_count.value;
-        request_warning_modal_options.title = '提示';
-        request_warning_modal_options.content = `
-            <p>当前预计获取 <strong>${total}</strong> 个用户数据，已超过 ${REQUEST_COUNT_THRESHOLD }。</p>
-            <p>大量请求容易触发B站风控并可能导致获取失败。</p>
-            <p>建议下载 <strong>Bilibili Lottery Local Extension</strong> 插件在本地执行，确认仍要继续吗？</p>
-            <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
-                <a class="btn btn-warning btn-sm fw-semibold px-3"
-                    href="/extension" target="_blank"
-                    rel="noopener">
-                    立即下载插件
-                </a>
-                <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
-            </div>
-        `;
-
-        const finalize = (result) => {
-            request_warning_modal_options.confirm_handler = null;
-            request_warning_modal_options.cancel_handler = null;
-            resolve(result);
-        };
-
-        request_warning_modal_options.confirm_handler = () => finalize(true);
-        request_warning_modal_options.cancel_handler = () => finalize(false);
-
-        show_request_warning_modal(true);
-    });
-}
-
-
-//发起数据请求
-function get_list() {
-
-    //如果请求队列是空的, 结束运行
-    if (array_request_queue.length === 0) {
-        return;
-    }
-
-    //从队列里提取 请求名称
-    const action = array_request_queue.pop();
-
-    //生成随机ID 用来跟踪请求进度
-    id_request.value = get_random_int(1, 10000000);
-
-    get_by_fetch(
-        API_ROOT_URL,
-        {
-            action,
-            id: video_id.value,
-            id_request: id_request.value, //传递请求ID
-        },
-        () => {
-            //显示加载框
-            show_loading_modal(true);
-            //定时检查请求进度
-            set_timeout_get_request_status();
-        },
-        (response_data) => {
-
-            const array_user_model = response_data.map((element) => new User_Model(element));
-
-            for (const user_model of array_user_model) {
-                if (action === API_ENDPOINT.GET_COMMENT_LIST) {
-                    comment_list.push(user_model);
-                }
-                else if (action === API_ENDPOINT.GET_REACTION_LIST) {
-
-                    if (user_model.action === REACTION_TYPE.LIKE) {
-                        like_list.push(user_model);
-                    }
-                    else if (user_model.action === REACTION_TYPE.FORWARD) {
-                        forward_list.push(user_model);
-                    }
-                    else {
-                        console.error('未知的互动类型');
-                    }
-
-                }
-            }
-
-
-        },
-        (error) => {
-            const resume_message = `${error.message}，加载已暂停。<div class="text-start">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge text-bg-danger me-2">注意</span>
-                            <strong>
-                                当前获取人数
-                                <template v-if="exceed_request_threshold">
-                                    ({{ selected_user_count }}) 已超过 {{ REQUEST_COUNT_THRESHOLD }}
-                                </template>
-                                ，容易触发B站风控并导致获取失败。
-                            </strong>
-                        </div>
-                        <p class="mb-1">
-                            建议下载本地运行的浏览器插件
-                            <strong class="text-decoration-underline">
-                                Bilibili Lottery Local Extension
-                            </strong>
-                            在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
-                        </p>
-                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
-                            <a class="btn btn-warning btn-sm fw-semibold px-3"
-                                href="/extension" target="_blank"
-                                rel="noopener">
-                                立即下载插件
-                            </a>
-                            <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
-                        </div>
-                    </div>`;
-          //显示错误框
-            show_error_modal(true, resume_message);
-        },
-        () => {
-            //隐藏加载框
-            show_loading_modal(false);
-
-            //取消请求ID
-            id_request.value = 0;
-
-
-
-            //如果请求队列不是空的, 结束运行
-            if (array_request_queue.length > 0) {
-
-                //继续从队列里读取新的请求
-                get_list();
-            }
-            //否则
-            else {
-
-
-                create_user_list();
-            }
-
-        }
-    )
-
-
-}
-
-
-
-
-
-/**
- * 查看请求进度 只要请求ID还存在就 每 3 秒运行一次
- */
-function set_timeout_get_request_status() {
-
-    if (id_request.value) {
+        //生成随机ID 用来跟踪请求进度
+        id_request.value = get_random_int(1, 10000000);
 
         get_by_fetch(
             API_ROOT_URL,
             {
-                action: API_ENDPOINT.GET_REQUEST_STATUS,
+                action,
+                id: video_id.value,
                 id_request: id_request.value, //传递请求ID
             },
-            null,
-            (response_data) => {
-                //更新加载进度条的内容
-                show_loading_modal(null, response_data.data);
-            },
-            null,
             () => {
-                //当前请求完成后 继续预定 新的定时
-                setTimeout(set_timeout_get_request_status, 3000)
+                //显示加载框
+                show_loading_modal(true);
+                //定时检查请求进度
+                set_timeout_get_request_status();
+            },
+            (response_data) => {
+
+                const array_user_model = response_data.map((element) => new User_Model(element));
+
+                for (const user_model of array_user_model) {
+                    if (action === API_ENDPOINT.GET_COMMENT_LIST) {
+                        comment_list.push(user_model);
+                    }
+                    else if (action === API_ENDPOINT.GET_REACTION_LIST) {
+
+                        if (user_model.action === REACTION_TYPE.LIKE) {
+                            like_list.push(user_model);
+                        }
+                        else if (user_model.action === REACTION_TYPE.FORWARD) {
+                            forward_list.push(user_model);
+                        }
+                        else {
+                            console.error('未知的互动类型');
+                        }
+
+                    }
+                }
+
+
+            },
+            (error) => {
+                //显示错误框
+                show_error_modal(true, error.message);
+            },
+            () => {
+                //隐藏加载框
+                show_loading_modal(false);
+
+                //取消请求ID
+                id_request.value = 0;
+
+
+
+                //如果请求队列不是空的, 结束运行
+                if (array_request_queue.length > 0) {
+
+                    //继续从队列里读取新的请求
+                    get_list();
+                }
+                //否则
+                else {
+
+
+                    create_user_list();
+                }
+
             }
         )
 
+
     }
 
-}
 
 
-/**
- * 根据加载选项 合成最终的用户列表
- */
-function create_user_list() {
 
 
-    let temp_list;
+    /**
+     * 查看请求进度 只要请求ID还存在就 每 3 秒运行一次
+     */
+    function set_timeout_get_request_status() {
 
-    if (enable_comment_list.value) {
-        temp_list = comment_list;
+        if (id_request.value) {
 
-        //只保留同时评论和点赞的人
-        if (enable_like_list.value) {
-            console.log('从评论列表里排除未点赞用户');
-
-            temp_list = temp_list.filter((comment_user) => {
-
-                let result = false;
-                for (const like_user of like_list) {
-                    if (comment_user.id === like_user.id) {
-                        result = true;
-                        break;
-                    }
-
+            get_by_fetch(
+                API_ROOT_URL,
+                {
+                    action: API_ENDPOINT.GET_REQUEST_STATUS,
+                    id_request: id_request.value, //传递请求ID
+                },
+                null,
+                (response_data) => {
+                    //更新加载进度条的内容
+                    show_loading_modal(null, response_data.data);
+                },
+                null,
+                () => {
+                    //当前请求完成后 继续预定 新的定时
+                    setTimeout(set_timeout_get_request_status, 3000)
                 }
-                return result;
+            )
 
-            });
         }
-        //只保留同时评论和转发的人
-        if (enable_forward_list.value) {
-            console.log('从评论列表里排除未转发用户');
 
-            temp_list = temp_list.filter((comment_user) => {
+    }
 
-                let result = false;
-                for (const forward_user of forward_list) {
-                    if (comment_user.id === forward_user.id) {
-                        result = true;
-                        break;
+
+    /**
+     * 根据加载选项 合成最终的用户列表
+     */
+    function create_user_list() {
+
+
+        let temp_list;
+
+        if (enable_comment_list.value) {
+            temp_list = comment_list;
+
+            //只保留同时评论和点赞的人
+            if (enable_like_list.value) {
+                console.log('从评论列表里排除未点赞用户');
+
+                temp_list = temp_list.filter((comment_user) => {
+
+                    let result = false;
+                    for (const like_user of like_list) {
+                        if (comment_user.id === like_user.id) {
+                            result = true;
+                            break;
+                        }
+
                     }
+                    return result;
 
-                }
-                return result;
+                });
+            }
+            //只保留同时评论和转发的人
+            if (enable_forward_list.value) {
+                console.log('从评论列表里排除未转发用户');
 
-            });
-        }
+                temp_list = temp_list.filter((comment_user) => {
 
-    }
-    else if (enable_like_list.value) {
-        temp_list = like_list;
+                    let result = false;
+                    for (const forward_user of forward_list) {
+                        if (comment_user.id === forward_user.id) {
+                            result = true;
+                            break;
+                        }
 
-        //只保留同时点赞和转发的人
-        if (enable_forward_list.value) {
-            temp_list = temp_list.filter((like_user) => {
-
-                let result = false;
-                for (const forward_user of forward_list) {
-                    if (like_user.id === forward_user.id) {
-                        result = true;
-                        break;
                     }
+                    return result;
 
-                }
-                return result;
-
-            });
-        }
-    }
-    else if (enable_forward_list.value) {
-        temp_list = forward_list;
-    }
-    else {
-        temp_list = [];
-    }
-
-    //重新生成最终的用户列表 
-    user_list.push(...temp_list);
-    //检测评论是否为原创评论, 并设置相关信息
-    set_comment_duplicate_info();
-
-    //显示列表
-    show_list.value = true;
-
-}
-
-/**
- * 检测评论是否为原创评论, 并设置相关信息
- */
-function set_comment_duplicate_info() {
-
-    //创建个本地静态储存映射 用来记录识别评论是否是原创的
-    const map_hash_content_to_original_comment_info = {};
-
-    //以逆序遍历用户列表 (这样列表将会按照时间顺序从小到大排列被遍历)
-    user_list.slice().reverse().map((user) => {
-
-        // 根据评论内容生成key
-        const key = md5(user.content.trim());
-
-        // 检索映射
-        let original_comment_info = map_hash_content_to_original_comment_info[key] || null;
-
-        //如果当前评论内容已经存在于映射中, 则说明不是原创评论
-        if (original_comment_info) {
-
-            // 不是原创评论，次数加1
-            original_comment_info.count++;
-
-            // 设置相关属性
-            user.original_comment_id = original_comment_info.id;
-            user.duplicate_comment_count = original_comment_info.count;
-
-            console.log(user.user_name + ' '+user.duplicate_comment_count);
+                });
+            }
 
         }
-        //如果不存在, 则说明是原创评论
+        else if (enable_like_list.value) {
+            temp_list = like_list;
+
+            //只保留同时点赞和转发的人
+            if (enable_forward_list.value) {
+                temp_list = temp_list.filter((like_user) => {
+
+                    let result = false;
+                    for (const forward_user of forward_list) {
+                        if (like_user.id === forward_user.id) {
+                            result = true;
+                            break;
+                        }
+
+                    }
+                    return result;
+
+                });
+            }
+        }
+        else if (enable_forward_list.value) {
+            temp_list = forward_list;
+        }
         else {
-
-            //创建新的映射记录
-            original_comment_info = {
-                id: user.reply_id,
-                count: 0
-            };
+            temp_list = [];
         }
 
-        //更新映射里的原创评论信息
-        map_hash_content_to_original_comment_info[key] = original_comment_info;
-    });
-}
+        //重新生成最终的用户列表 
+        user_list.push(...temp_list);
+        //检测评论是否为原创评论, 并设置相关信息
+        set_comment_duplicate_info();
+
+        //显示列表
+        show_list.value = true;
+
+    }
+
+    /**
+     * 检测评论是否为原创评论, 并设置相关信息
+     */
+    function set_comment_duplicate_info() {
+
+        //创建个本地静态储存映射 用来记录识别评论是否是原创的
+        const map_hash_content_to_original_comment_info = {};
+
+        //以逆序遍历用户列表 (这样列表将会按照时间顺序从小到大排列被遍历)
+        user_list.slice().reverse().map((user) => {
+
+            // 根据评论内容生成key
+            const key = md5(user.content.trim());
+
+            // 检索映射
+            let original_comment_info = map_hash_content_to_original_comment_info[key] || null;
+
+            //如果当前评论内容已经存在于映射中, 则说明不是原创评论
+            if (original_comment_info) {
+
+                // 不是原创评论，次数加1
+                original_comment_info.count++;
+
+                // 设置相关属性
+                user.original_comment_id = original_comment_info.id;
+                user.duplicate_comment_count = original_comment_info.count;
+
+                console.log(user.user_name + ' ' + user.duplicate_comment_count);
+
+            }
+            //如果不存在, 则说明是原创评论
+            else {
+
+                //创建新的映射记录
+                original_comment_info = {
+                    id: user.reply_id,
+                    count: 0
+                };
+            }
+
+            //更新映射里的原创评论信息
+            map_hash_content_to_original_comment_info[key] = original_comment_info;
+        });
+    }
 
 
-//如果源列表发生变化
-watch(video_id, () => {
+    //如果源列表发生变化
+    watch(video_id, () => {
 
-    //重置抽选选项状态
-    enable_comment_list.value = false;
-    enable_like_list.value = false;
-    enable_forward_list.value = false;
+        //重置抽选选项状态
+        enable_comment_list.value = false;
+        enable_like_list.value = false;
+        enable_forward_list.value = false;
 
-    //隐藏列表组件显示
-    show_list.value = false;
-    //清空列表
-    comment_list.length = 0;
-    like_list.length = 0;
-    forward_list.length = 0;
-    user_list.length = 0;
+        //隐藏列表组件显示
+        show_list.value = false;
+        //清空列表
+        comment_list.length = 0;
+        like_list.length = 0;
+        forward_list.length = 0;
+        user_list.length = 0;
 
-})
+    })
 
 
 
@@ -511,41 +484,48 @@ watch(video_id, () => {
 
             <div class="col-12 text-center">
 
-                <div class="my-2 alert alert-danger d-flex flex-wrap align-items-start justify-content-between gap-2" v-if="exceed_request_threshold">
-                    <div class="text-start">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge text-bg-danger me-2">注意</span>
-                            <strong>
-                                当前获取人数
-                                <template v-if="exceed_request_threshold">
-                                    ({{ selected_user_count }}) 已超过 {{ REQUEST_COUNT_THRESHOLD }}
-                                </template>
-                                ，容易触发B站风控并导致获取失败。
-                            </strong>
-                        </div>
-                        <p class="mb-1">
-                            建议下载本地运行的浏览器插件
-                            <strong class="text-decoration-underline">
-                                Bilibili Lottery Local Extension
-                            </strong>
-                            在自己的环境中独立执行抽奖流程, 以减少被封禁和失败的风险。
-                        </p>
-                        <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
-                            <RouterLink class="btn btn-warning btn-sm fw-semibold px-3" to="/extension">
-                                立即下载插件
-                            </RouterLink>
-                            <span class="small text-muted">开源项目 · 支持 Chrome / Edge / Firefox</span>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                <template v-if="exceed_request_user_count_threshold">
 
-                <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"
-                    class="my-2 alert alert-warning">
-                    <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为
-                    <strong>点赞</strong> 和 <strong>转发</strong> 的数量限制, 在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制),
-                    这种情况建议 只使用评论用户列表来抽奖
-                </div>
+                    <div class="my-2 alert alert-danger row" v-if="exceed_request_user_count_threshold">
+                        <div class="col text-center">
+                            <div class="mb-2">
+                                <span class="badge text-bg-danger me-2">注意</span>
+                                需要查询的用户总数量为
+                                <span class="fw-bold">{{ request_user_count }}</span>
+                                ，如果请求数量过多，可能会触发B站的风控反爬虫机制，导致服务器无法正常获取数据。
+                            </div>
+                            <p class="mb-1">
+                                这种情况可以尝试使用本地运行的浏览器插件版本, 通过在自己本地环境中运行, 以减少被风控拦截的风险。
+                            </p>
+                            <p class="mb-1">
+                                <strong class="text-decoration-underline">
+                                    Bilibili Lottery Local Extension by @Sakmist
+                                </strong>
+                                <span class="text-muted ms-2">[开源项目 · 支持 Chrome / Edge / Firefox]</span>
+                            </p>
+                            <div class="mt-3">
+                                <RouterLink class="btn btn-warning btn-sm fw-semibold px-3" to="/extension">
+                                    插件下载
+                                </RouterLink>
+
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+
+                    </div>
+
+                    <!-- 如果同时勾选了 评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发 -->
+                    <div v-if="enable_comment_list && (enable_like_list || enable_forward_list)"
+                        class="my-2 alert alert-warning">
+                        <span class="badge text-bg-danger">注意</span> 勾选了 (评论+点赞 / 评论+转发 / 点赞+转发 / 评论+点赞+转发), 会因为
+                        <strong>点赞</strong> 和 <strong>转发</strong> 的数量限制, 在点赞+转发=总数超过1500的情况, 有可能只获取到一小部分的用户列表 (B站接口限制),
+                        这种情况建议 只使用评论用户列表来抽奖
+                    </div>
+
+                </template>
 
                 <div class="my-2">
                     视频地址只支持加载 <strong>评论用户</strong> | 动态地址支持加载同时
@@ -573,8 +553,8 @@ watch(video_id, () => {
 </template>
 
 <style scoped>
-.form-check-input {
-    width: 25px;
-    height: 25px;
-}
+    .form-check-input {
+        width: 25px;
+        height: 25px;
+    }
 </style>

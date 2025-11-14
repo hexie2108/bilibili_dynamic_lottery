@@ -85,6 +85,17 @@ function format_date_to_string(date) {
 
 }
 
+/**
+ * 把数值解析成数字
+ * 
+ * @param {any} count 
+ * @returns {number}
+ */
+function parse_number(count) {
+    const value = Number(count);
+    return Number.isFinite(value) ? value : 0;
+};
+
 export {
     is_function,
     is_empty_object,
@@ -93,4 +104,5 @@ export {
     parse_date_string,
     format_date_to_string,
     parse_date_string_to_timestamp,
+    parse_number,
 }
