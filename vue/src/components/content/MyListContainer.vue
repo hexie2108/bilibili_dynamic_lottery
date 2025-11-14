@@ -93,7 +93,10 @@ const copyFormatOptions = [
     },
 ]
 
-const copySignature = '本次抽奖由【初音社】开奖工具开奖'
+//复制签名
+// const copySignature = '本次抽奖由【初音社】开奖工具开奖';
+const copySignature = '';
+
 
 const copyFormatLookup = copyFormatOptions.reduce((map, option) => {
     map[option.key] = option
