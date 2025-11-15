@@ -9,7 +9,7 @@
   const bilibili_author_link = 'https://space.bilibili.com/646328648';
 
 
-  const downloadLink = 'https://github.com/sakmist/Bilibili-Lottery-Local-Extension/releases/tag/v0.1.1';
+  const downloadLink = 'https://www.modelscope.cn/models/sakmist/Bilibili-Lottery-Local-Extension/resolve/master/Bilibili-Lottery-Local-Extension.zip';
   const edgeStoreLink = 'https://microsoftedge.microsoft.com/addons/detail/bilibili-lottery-local/emklklgjhjjippfejbefinlckfjccicc';
 
   const isEdgeBrowser = ref(false);
