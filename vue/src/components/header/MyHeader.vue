@@ -16,10 +16,10 @@ import { INJECTION_KEY } from "@/constants/injection-key";
 import MyLoginUser from '@/components/header/MyLoginUser.vue';
 
 
-//准备一个随机头图
-const banner1 = ref(get_random_top_banner(0))
+//准备一个固定头图地址
+const banner1 = '/background.webp';
 //再指定一个固定头图
-const banner2 = ref(get_random_top_banner())
+// const banner2 = ref(get_random_top_banner())
 
 const title = ref('B站在线抽奖工具 | 初音社')
 
@@ -49,7 +49,7 @@ function on_click_login() {
 
   <div class="header border-bottom">
 
-    <div class="banner-container" :style="{ 'background-image': 'url(' + banner1 + '), url(' + banner2 + ')' }">
+    <div class="banner-container" :style="{ 'background-image': 'url(' + banner1 + ')' }">
       <div class="row justify-content-center align-content-end h-100">
 
         <div class="col-auto">

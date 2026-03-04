@@ -1,5 +1,7 @@
 
 /**
+ * @deprecated 已废弃 2026-03-04
+ * 
  * 生成随机顶部头图地址
  * @param {number|null} index 可选 支持指定数字
  * @returns {string}
