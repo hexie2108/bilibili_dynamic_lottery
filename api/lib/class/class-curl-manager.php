@@ -72,9 +72,10 @@ class Curl_Manager
             //     error_log('请求结果: ' . $response);
             // }
 
-
-            //注销ch资源
-            curl_close($ch);
+            //PHP 8.0起curl_close已弃用(自动释放), PHP 7.x仍需要手动关闭
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($ch);
+            }
 
             //把回复按照JSON格式解析
             $response = json_decode($response, true);
@@ -101,8 +102,11 @@ class Curl_Manager
         {
 
             $error_message = curl_error($ch);
-            //注销ch资源
-            curl_close($ch);
+
+            //PHP 8.0起curl_close已弃用, PHP 7.x仍需要手动关闭
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($ch);
+            }
 
             throw new Exception($error_message);
         }

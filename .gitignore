@@ -122,3 +122,5 @@ favicon.png
 logo.png
 
 api/env.php
+
+package-lock.json

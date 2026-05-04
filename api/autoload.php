@@ -2,6 +2,9 @@
 
 namespace bilibili_dynamic_lottery;
 
+//抑制PHP 8.5弃用警告输出到响应中
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 //导入环境变量
 require_once 'env.php';
 
