@@ -24,8 +24,19 @@ const props = defineProps({
         default: 0,
     },
 
+    showCheckbox: {
+        type: Boolean,
+        default: false,
+    },
+
+    selectedIds: {
+        type: Set,
+        default: () => new Set(),
+    },
 
 })
+
+const emit = defineEmits(['toggle-select'])
 
 
 
@@ -93,6 +104,11 @@ function on_click_is_my_fans(user) {
                 <div class="bg-body-tertiary p-2 rounded-1 border border-white"
                     :class="{ 'border-white': !props.result_status, 'border-pink': props.result_status }">
                     <div class="row align-items-center">
+                        <div v-if="props.showCheckbox" class="col-auto pe-0">
+                            <input type="checkbox" class="form-check-input"
+                                :checked="props.selectedIds.has(user.id)"
+                                @change="emit('toggle-select', user.id)" />
+                        </div>
                         <div class="col-auto ">
                             <div class="position-relative">
                                 <a :href="'https://space.bilibili.com/' + user.id" class="text-pink fw-bold"

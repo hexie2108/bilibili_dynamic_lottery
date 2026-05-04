@@ -53,11 +53,37 @@ const repeat_comment_filter = ref(REPEAT_COMMENT_FILTER_OPTIONS.ONLY_FIRST_USER_
 const min_level_filter = ref('')
 const vip_filter = ref(false)
 const content_filter = ref('')
+const max_content_length_filter = ref(10)
 const date_comment_filter_start = ref(null)
 const date_comment_filter_end = ref(null)
 const only_fans = ref(false);
 
 const list_offset = ref(0)
+
+/**
+ * 用户复选框选中状态
+ */
+const selected_user_ids = reactive(new Set())
+
+function toggleUserSelection(userId) {
+    if (selected_user_ids.has(userId)) {
+        selected_user_ids.delete(userId);
+    } else {
+        selected_user_ids.add(userId);
+    }
+}
+
+function selectAllFiltered() {
+    filtered_list.value.forEach(user => selected_user_ids.add(user.id));
+}
+
+function deselectAll() {
+    selected_user_ids.clear();
+}
+
+const selected_user_list = computed(() => {
+    return filtered_list.value.filter(user => selected_user_ids.has(user.id));
+})
 
 /**
  * 抽选结果控制器
@@ -150,6 +176,11 @@ const filtered_list = computed(() => {
             // 评论内容过滤 (包含关键词)
             if (result && content_filter.value !== '') {
                 result = user.content.includes(content_filter.value);
+            }
+
+            // 评论字数过滤 (过滤掉超过指定字数的评论)
+            if (result && max_content_length_filter.value !== '' && max_content_length_filter.value !== null) {
+                result = user.content.length <= Number(max_content_length_filter.value);
             }
 
             // 最早评论时间过滤
@@ -330,6 +361,36 @@ async function copyWinnerList(formatKey) {
     }
 }
 
+function buildSelectedCopyText(formatKey) {
+    const format = copyFormatLookup[formatKey]
+    if (!format || selected_user_list.value.length === 0) {
+        return ''
+    }
+    const rows = selected_user_list.value.map((user) => format.formatter(user).trim()).filter(Boolean)
+    if (rows.length === 0) {
+        return ''
+    }
+    const body = rows.join(format.joiner).trim()
+    if (!body) {
+        return copySignature
+    }
+    return `${body}\n\n${copySignature}`
+}
+
+async function copySelectedList(formatKey) {
+    const text = buildSelectedCopyText(formatKey)
+    if (!text) {
+        setCopyStatus('请先勾选要复制的用户', 'danger')
+        return
+    }
+    try {
+        await writeTextToClipboard(text)
+        setCopyStatus(`已复制 ${selected_user_list.value.length} 位选中用户`, 'success')
+    } catch (error) {
+        setCopyStatus('复制失败，请手动选择文本复制', 'danger')
+    }
+}
+
 onBeforeUnmount(() => {
     if (copyStatusTimer) {
         clearTimeout(copyStatusTimer)
@@ -439,6 +500,11 @@ onBeforeUnmount(() => {
                         <input v-model.lazy="content_filter" class="form-control" type="text" placeholder="不限制"
                             :disabled="result_status" />
                         <div class="input-group-text">
+                            最大评论字数
+                        </div>
+                        <input v-model.number="max_content_length_filter" class="form-control" type="number" min="0"
+                            placeholder="不限制" :disabled="result_status" />
+                        <div class="input-group-text">
                             最早评论时间
                         </div>
                         <div>
@@ -505,9 +571,41 @@ onBeforeUnmount(() => {
 
             <hr />
 
+            <!-- 选中用户操作区 -->
+            <div v-show="!result_status && filtered_list.length > 0" class="row justify-content-center mb-2">
+                <div class="col-12 col-xl-10">
+                    <div class="card shadow-sm p-3 text-start">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <div class="fw-semibold">已选中 {{ selected_user_ids.size }} 人</div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    @click="selectAllFiltered">全选</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    @click="deselectAll">取消全选</button>
+                            </div>
+                            <div class="d-flex flex-column flex-md-row flex-wrap gap-3">
+                                <div v-for="option in copyFormatOptions" :key="'sel-' + option.key"
+                                    class="d-flex flex-column gap-1">
+                                    <button type="button" class="btn btn-outline-success btn-sm fw-semibold"
+                                        @click="copySelectedList(option.key)">
+                                        {{ option.label }}（仅选中）
+                                    </button>
+                                    <span class="small text-muted">示例：{{ option.example }}</span>
+                                </div>
+                            </div>
+                            <p v-if="copyStatus.message && !result_status" class="small mb-0"
+                                :class="copyStatus.type === 'success' ? 'text-success' : 'text-danger'">
+                                {{ copyStatus.message }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 参加用户列表 -->
             <MyList v-show="!result_status" :list="display_filtered_list" :result_status="result_status"
-                :offset="list_offset" />
+                :offset="list_offset" :showCheckbox="true" :selectedIds="selected_user_ids"
+                @toggle-select="toggleUserSelection" />
 
             <!-- 中奖用户列表 -->
             <MyList v-show="result_status" :list="result_winner_list" :result_status="result_status" />

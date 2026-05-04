@@ -73,9 +73,6 @@ class Curl_Manager
             // }
 
 
-            //注销ch资源
-            curl_close($ch);
-
             //把回复按照JSON格式解析
             $response = json_decode($response, true);
             //如果有错误
@@ -101,8 +98,6 @@ class Curl_Manager
         {
 
             $error_message = curl_error($ch);
-            //注销ch资源
-            curl_close($ch);
 
             throw new Exception($error_message);
         }
