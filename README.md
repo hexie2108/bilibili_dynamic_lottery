@@ -42,7 +42,7 @@
 | ---- | ------ |
 | <a href="https://github.com/monoglo"><img src="https://avatars.githubusercontent.com/u/26409918?v=4" width="50" /></a> | [monoglo](https://github.com/monoglo) |
 | <a href="https://github.com/sakmist"><img src="https://avatars.githubusercontent.com/u/123816165?v=4" width="50" /></a> | [sakmist](https://github.com/sakmist) |
-
+| <a href="https://github.com/xueayi"><img src="https://avatars.githubusercontent.com/u/95284631?v=4" width="50" /></a> | [xueayi](https://github.com/xueayi) |
 
 ## 后端的部署方法
 1. 需要一台支持PHP环境的服务器
