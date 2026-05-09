@@ -14,7 +14,7 @@
 - 一键查询目标用户是否为自己的粉丝
 
 ## 在线使用地址
-[https://bilibili.mikuclub.cc/](https://bilibili.mikuclub.cc/ "https://bilibili.mikuclub.cc/")
+[https://bilibili.mikuc.top/](https://bilibili.mikuc.top/ "https://bilibili.mikuc.top/")
 
 ## 浏览器插件版本
 （此项目库单独存放在[https://github.com/sakmist/Bilibili-Lottery-Local-Extension](https://github.com/sakmist/Bilibili-Lottery-Local-Extension "https://github.com/sakmist/Bilibili-Lottery-Local-Extension")
