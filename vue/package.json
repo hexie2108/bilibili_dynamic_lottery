@@ -26,9 +26,9 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitejs/plugin-vue": "^6.0.7",
     "eslint": "^9.27.0",
     "eslint-plugin-vue": "^10.1.0",
-    "vite": "^6.4.1"
+    "vite": "^8.0.16"
   }
 }
